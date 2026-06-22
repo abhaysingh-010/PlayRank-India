@@ -1,0 +1,588 @@
+@import "tailwindcss";
+
+/* ==========================
+   PLAYRANK x KRAFTON DESIGN SYSTEM
+========================== */
+
+:root {
+  --krafton-black: #000000;
+  --krafton-panel: #0b0b0b;
+  --krafton-card: #111111;
+  --krafton-red: #ff4038;
+  --krafton-red-hover: #ff5a52;
+  --krafton-white: #ffffff;
+  --krafton-muted: rgba(255,255,255,0.45);
+  --krafton-line: rgba(255,255,255,0.10);
+  --krafton-grid: rgba(255,255,255,0.08);
+  --rank-yellow: #ffd21a;
+  --krafton-black-soft: #050505;
+  --krafton-panel: #0b0b0b;
+  --krafton-panel-3: #171717;
+  --krafton-red: #ff4038;
+  --krafton-red-hover: #ff5a52;
+  --krafton-red-dark: #b8201d;
+  --krafton-white: #ffffff;
+  --krafton-text: #f5f5f5;
+  --krafton-muted: rgba(255, 255, 255, 0.48);
+  --krafton-muted-soft: rgba(255, 255, 255, 0.34);
+  --krafton-line: rgba(255, 255, 255, 0.1);
+  --krafton-line-soft: rgba(255, 255, 255, 0.06);
+  --krafton-grid: rgba(255, 255, 255, 0.08);
+
+  /* PlayRank ranking accent */
+  --rank-yellow: #ffd21a;
+
+  /* Existing app compatibility */
+  --background: var(--krafton-black);
+  --foreground: var(--krafton-text);
+
+  --text-primary: var(--krafton-text);
+  --text-secondary: var(--krafton-muted);
+  --text-muted: var(--krafton-muted-soft);
+  --surface: var(--krafton-panel);
+  --surface-2: var(--krafton-panel-2);
+  --surface-3: var(--krafton-panel-3);
+  --border: var(--krafton-line);
+  --border-soft: var(--krafton-line-soft);
+  --brand: var(--krafton-red);
+  --brand-hover: var(--krafton-red-hover);
+  --radius-card: 0px;
+  --radius-soft: 18px;
+  --font-display: var(--font-sans);
+}
+
+/* ==========================
+   GLOBAL BASE
+========================== */
+
+html 
+{
+  scroll-behavior: smooth;
+  background: var(--background);
+}
+
+body 
+{
+  min-height: 100vh;
+  background: var(--background);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+::selection 
+{
+  background: var(--krafton-red);
+  color: #000000;
+}
+
+a 
+{
+  text-decoration: none;
+}
+
+/* ==========================
+   TYPOGRAPHY
+========================== */
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 
+{
+  font-family: var(--font-display, var(--font-sans));
+  color: var(--text-primary);
+  font-weight: 900;
+  letter-spacing: -0.055em;
+  line-height: 0.96;
+}
+
+h1 
+{
+  font-size: clamp(3rem, 7vw, 6rem);
+}
+
+h2 
+{
+  font-size: clamp(2rem, 4vw, 3.75rem);
+}
+
+h3 
+{
+  font-size: clamp(1.25rem, 2vw, 1.75rem);
+}
+
+p 
+{
+  color: var(--text-secondary);
+  line-height: 1.65;
+  letter-spacing: -0.01em;
+  font-size: 0.95rem;
+}
+
+/* ==========================
+   PAGE LAYOUT
+========================== */
+
+.page-shell 
+{
+  max-width: 1400px;
+  margin-inline: auto;
+  padding-inline: 24px;
+}
+
+.section-spacing 
+{
+  margin-top: 56px;
+}
+
+/* ==========================
+   KRAFTON HOMEPAGE HELPERS
+========================== */
+
+.krafton-full 
+{
+  width: 100%;
+  min-height: 100vh;
+  background: var(--krafton-black);
+  color: var(--krafton-white);
+}
+
+.krafton-grid 
+{
+  position: relative;
+  background: #000000;
+  overflow: hidden;
+}
+
+.krafton-grid::before 
+{
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: 0.22;
+  pointer-events: none;
+  background:
+    linear-gradient(to right, var(--krafton-grid) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--krafton-grid) 1px, transparent 1px);
+  background-size: 160px 120px;
+}
+
+.krafton-grid::after 
+{
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.14;
+  background: linear-gradient
+  (
+    to right,
+    transparent 0%,
+    rgba(255, 255, 255, 0.14) 50%,
+    transparent 100%
+  );
+}
+
+.blueprint-lines 
+{
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.28;
+  background:
+    linear-gradient
+    (
+      to right,
+      transparent 32%,
+      rgba(255, 255, 255, 0.18) 32%,
+      transparent 32.1%
+    ),
+    linear-gradient
+    (
+      to right,
+      transparent 50%,
+      rgba(255, 255, 255, 0.16) 50%,
+      transparent 50.1%
+    ),
+    linear-gradient
+    (
+      to right,
+      transparent 66%,
+      rgba(255, 255, 255, 0.14) 66%,
+      transparent 66.1%
+    ),
+    linear-gradient
+    (
+      to bottom,
+      transparent 50%,
+      rgba(255, 255, 255, 0.16) 50%,
+      transparent 50.1%
+    );
+}
+
+/* ==========================
+   DISPLAY TYPE
+========================== */
+
+.krafton-display 
+{
+  font-weight: 950;
+  text-transform: uppercase;
+  line-height: 0.82;
+  letter-spacing: -0.095em;
+  color: var(--krafton-red);
+}
+
+.krafton-title 
+{
+  font-weight: 950;
+  text-transform: uppercase;
+  line-height: 0.9;
+  letter-spacing: -0.075em;
+}
+
+.krafton-label 
+{
+  font-size: 0.75rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.28em;
+  color: var(--krafton-red);
+}
+
+.data-label 
+{
+  font-size: 11px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.22em;
+  color: rgba(255, 255, 255, 0.35);
+}
+
+.data-value 
+{
+  font-size: 26px;
+  font-weight: 900;
+  color: var(--krafton-white);
+}
+
+/* ==========================
+   CARD / PANEL SYSTEM
+========================== */
+
+.card 
+{
+  position: relative;
+  overflow: hidden;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 0px;
+  transition:
+    transform 280ms ease,
+    border-color 280ms ease,
+    background 280ms ease,
+    box-shadow 280ms ease;
+}
+
+.card::before 
+{
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient
+  (
+    180deg,
+    rgba(255, 255, 255, 0.035),
+    transparent 42%
+  );
+}
+
+.card:hover 
+{
+  transform: translateY(-2px);
+  border-color: rgba(255, 64, 56, 0.55);
+  background: #151515;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.4);
+}
+
+.card-elevated 
+{
+  background:
+    radial-gradient
+    (
+      circle at top left,
+      rgba(255, 64, 56, 0.09),
+      transparent 36%
+    ),
+    linear-gradient(180deg, #111111, #080808);
+  border: 1px solid var(--border);
+}
+
+.krafton-card 
+{
+  position: relative;
+  overflow: hidden;
+  background: #111111;
+  border: 1px solid var(--border);
+  border-radius: 0px;
+  transition:
+    border-color 280ms ease,
+    background 280ms ease,
+    transform 280ms ease;
+}
+
+.krafton-card:hover 
+{
+  transform: translateY(-2px);
+  border-color: var(--krafton-red);
+  background: #171717;
+}
+
+.krafton-panel 
+{
+  background: var(--krafton-panel);
+  border: 1px solid var(--border);
+  border-radius: 0px;
+}
+
+.glass-surface 
+{
+  background: rgba(255, 255, 255, 0.035);
+  backdrop-filter: blur(18px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* ==========================
+   HERO SURFACE
+========================== */
+
+.hero-surface 
+{
+  position: relative;
+  overflow: hidden;
+  background:
+    radial-gradient
+    (
+      circle at top left,
+      rgba(255, 64, 56, 0.12),
+      transparent 34%
+    ),
+    radial-gradient
+    (
+      circle at bottom right,
+      rgba(255, 255, 255, 0.06),
+      transparent 32%
+    ),
+    #050505;
+  border: 1px solid var(--border);
+}
+
+.hero-surface::before 
+{
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.18;
+  background:
+    linear-gradient(to right, rgba(255, 255, 255, 0.08) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.08) 1px, transparent 1px);
+  background-size: 160px 120px;
+}
+
+/* ==========================
+   BUTTONS
+========================== */
+
+.btn-primary 
+{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--krafton-red);
+  color: #000000;
+  border: 1px solid var(--krafton-red);
+  border-radius: 999px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  transition:
+    transform 250ms ease,
+    background 250ms ease,
+    color 250ms ease,
+    border-color 250ms ease;
+}
+
+.btn-primary:hover 
+{
+  transform: translateY(-1px);
+  background: var(--krafton-white);
+  border-color: var(--krafton-white);
+  color: #000000;
+}
+
+.btn-secondary 
+{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--krafton-white);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 999px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  transition:
+    transform 250ms ease,
+    background 250ms ease,
+    color 250ms ease,
+    border-color 250ms ease;
+}
+
+.btn-secondary:hover 
+{
+  transform: translateY(-1px);
+  border-color: var(--krafton-red);
+  color: var(--krafton-red);
+}
+
+.btn-rank 
+{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 210, 26, 0.1);
+  color: var(--rank-yellow);
+  border: 1px solid rgba(255, 210, 26, 0.28);
+  border-radius: 999px;
+  font-weight: 900;
+  transition: 250ms ease;
+}
+
+.btn-rank:hover 
+{
+  background: rgba(255, 210, 26, 0.16);
+}
+
+/* ==========================
+   DIVIDERS
+========================== */
+
+.premium-divider 
+{
+  height: 1px;
+  background: linear-gradient
+  (
+    to right,
+    transparent,
+    rgba(255, 255, 255, 0.12),
+    transparent
+  );
+}
+
+.krafton-divider 
+{
+  height: 1px;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* ==========================
+   TABLES
+========================== */
+
+table 
+{
+  border-collapse: collapse;
+}
+
+th 
+{
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+}
+
+tr 
+{
+  transition: background 220ms ease;
+}
+
+/* ==========================
+   SCROLLBAR
+========================== */
+
+::-webkit-scrollbar 
+{
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track 
+{
+  background: #050505;
+}
+
+::-webkit-scrollbar-thumb 
+{
+  background: #2a2a2a;
+  border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb:hover 
+{
+  background: var(--krafton-red);
+}
+
+/* ==========================
+   ANIMATION
+========================== */
+
+@keyframes fadeUp 
+{
+  from 
+  {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to 
+  {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-up 
+{
+  animation: fadeUp 400ms ease both;
+}
+
+/* ==========================
+   RESPONSIVE
+========================== */
+
+@media (max-width: 768px) 
+{
+  .page-shell 
+  {
+    padding-inline: 16px;
+  }
+
+  h1 
+  {
+    letter-spacing: -0.055em;
+  }
+
+  .krafton-display 
+  {
+    letter-spacing: -0.075em;
+  }
+}
