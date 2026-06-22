@@ -39,11 +39,16 @@ type PlayerRow = {
   matches_played: number | null;
   total_kills: number | null;
   mvp_count: number | null;
-  recent_form: string | null;
+  recent_form: number | string | null;
   source?: string | null;
   verified?: boolean | null;
   active?: boolean | null;
 };
+
+function n(value: unknown, fallback = 0) {
+  const numberValue = Number(value);
+  return Number.isFinite(numberValue) ? numberValue : fallback;
+}
 
 function getInitials(name: string) {
   return name
@@ -56,13 +61,27 @@ function getInitials(name: string) {
 }
 
 function formatDate(value: string | null) {
-  if (!value) return "Snapshot";
+  if (!value) return "Snapshot unavailable";
 
   return new Date(value).toLocaleDateString("en-IN", {
     day: "2-digit",
     month: "short",
     year: "numeric",
   });
+}
+
+function formatChange(value: number | null) {
+  if (!value) return "—";
+
+  if (value > 0) return `+${value}`;
+
+  return String(value);
+}
+
+function changeTone(value: number | null) {
+  if (!value) return "text-white/35";
+  if (value > 0) return "text-emerald-300";
+  return "text-red-300";
 }
 
 function TeamLogo({
@@ -125,14 +144,14 @@ function getTopCardStyles(rank: number) {
 
   if (rank === 2) {
     return {
-      card: "border-slate-300/25 bg-gradient-to-br from-slate-300/14 via-[#101216] to-[#0b0d12] shadow-[0_0_30px_rgba(226,232,240,0.17)]",
+      card: "border-slate-300/25 bg-gradient-to-br from-slate-300/15 via-[#101216] to-[#0b0d12] shadow-[0_0_30px_rgba(226,232,240,0.17)]",
       glow: "bg-slate-300/15",
       accent: "text-slate-200",
     };
   }
 
   return {
-    card: "border-orange-400/25 bg-gradient-to-br from-orange-500/16 via-[#14100d] to-[#0b0d12] shadow-[0_0_28px_rgba(251,146,60,0.2)]",
+    card: "border-orange-400/25 bg-gradient-to-br from-orange-500/15 via-[#14100d] to-[#0b0d12] shadow-[0_0_28px_rgba(251,146,60,0.2)]",
     glow: "bg-orange-400/15",
     accent: "text-orange-300",
   };
@@ -147,22 +166,40 @@ function getTableRowStyles(rank: number) {
 }
 
 export default async function RankingsPage() {
-  const { data: teamRankingsRaw, error: teamRankingsError } = await supabase
-    .from("rankings")
-    .select("entity_id, entity_type, rank, score, change, updated_at")
-    .eq("entity_type", "team")
-    .order("rank", { ascending: true })
-    .range(0, 19);
+  const [
+    teamRankingsResult,
+    playerRankingsResult,
+    latestSnapshotResult,
+    teamCountResult,
+    playerCountResult,
+  ] = await Promise.all([
+    supabase
+      .from("rankings")
+      .select("entity_id, entity_type, rank, score, change, updated_at")
+      .eq("entity_type", "team")
+      .order("rank", { ascending: true })
+      .range(0, 19),
 
-  const { data: playerRankingsRaw, error: playerRankingsError } = await supabase
-    .from("rankings")
-    .select("entity_id, entity_type, rank, score, change, updated_at")
-    .eq("entity_type", "player")
-    .order("rank", { ascending: true })
-    .range(0, 19);
+    supabase
+      .from("rankings")
+      .select("entity_id, entity_type, rank, score, change, updated_at")
+      .eq("entity_type", "player")
+      .order("rank", { ascending: true })
+      .range(0, 19),
 
-  const teamRankings = (teamRankingsRaw || []) as RankingRow[];
-  const playerRankings = (playerRankingsRaw || []) as RankingRow[];
+    supabase
+      .from("ranking_history")
+      .select("snapshot_date, created_at")
+      .order("snapshot_date", { ascending: false })
+      .limit(1)
+      .maybeSingle(),
+
+    supabase.from("teams").select("*", { count: "exact", head: true }),
+    supabase.from("players").select("*", { count: "exact", head: true }),
+  ]);
+
+  const teamRankings = (teamRankingsResult.data || []) as RankingRow[];
+  const playerRankings = (playerRankingsResult.data || []) as RankingRow[];
 
   const teamIds = teamRankings.map((row) => row.entity_id);
   const playerIds = playerRankings.map((row) => row.entity_id);
@@ -198,20 +235,41 @@ export default async function RankingsPage() {
       ranking,
       team: teamById.get(ranking.entity_id),
     }))
-    .filter((item) => item.team);
+    .filter((item): item is { ranking: RankingRow; team: TeamRow } =>
+      Boolean(item.team)
+    );
 
   const rankedPlayers = playerRankings
     .map((ranking) => ({
       ranking,
       player: playerById.get(ranking.entity_id),
     }))
-    .filter((item) => item.player);
+    .filter((item): item is { ranking: RankingRow; player: PlayerRow } =>
+      Boolean(item.player)
+    );
 
   const topThreeTeams = rankedTeams.slice(0, 3);
-  const latestTeamUpdate = teamRankings[0]?.updated_at || null;
-  const latestPlayerUpdate = playerRankings[0]?.updated_at || null;
 
-  if (teamRankingsError || playerRankingsError || teamsError || playersError) {
+  const latestTeamUpdate =
+    teamRankings[0]?.updated_at ||
+    latestSnapshotResult.data?.snapshot_date ||
+    latestSnapshotResult.data?.created_at ||
+    null;
+
+  const latestPlayerUpdate =
+    playerRankings[0]?.updated_at ||
+    latestSnapshotResult.data?.snapshot_date ||
+    latestSnapshotResult.data?.created_at ||
+    null;
+
+  const totalRankedEntities = rankedTeams.length + rankedPlayers.length;
+
+  if (
+    teamRankingsResult.error ||
+    playerRankingsResult.error ||
+    teamsError ||
+    playersError
+  ) {
     return (
       <main className="page-shell py-10">
         <section className="rounded-[2rem] border border-red-500/20 bg-red-500/5 p-8">
@@ -242,8 +300,9 @@ export default async function RankingsPage() {
             </h1>
 
             <p className="mt-5 max-w-3xl text-white/50">
-              Official team rankings are Krafton-mapped. Player rankings are
-              PlayRank records built from available player and match data.
+              Team rankings are aligned with official and verified PlayRank
+              records. Player rankings are generated from available player,
+              match and performance data.
             </p>
 
             <div className="mt-5 flex flex-wrap gap-2">
@@ -251,11 +310,26 @@ export default async function RankingsPage() {
               <DataSourceBadge label="PlayRank Player Ranking" />
               <DataSourceBadge label="Ranking Snapshot" />
             </div>
+
+            <div className="mt-7 flex flex-wrap gap-3">
+              <Link href="/rankings/teams" className="btn-primary px-5 py-3 text-sm">
+                Team Rankings
+              </Link>
+
+              <Link href="/rankings/players" className="btn-secondary px-5 py-3 text-sm">
+                Player Rankings
+              </Link>
+
+              <Link href="/data" className="btn-secondary px-5 py-3 text-sm">
+                Data Trust Layer
+              </Link>
+            </div>
           </div>
 
-          <div className="grid gap-3 text-right md:grid-cols-2 lg:text-left">
+          <div className="grid gap-3 md:grid-cols-2 lg:text-left">
             <div className="rounded-2xl border border-white/10 bg-white/[0.035] p-4">
               <p className="data-label">Team Snapshot</p>
+
               <p className="mt-2 text-xl font-black text-white">
                 {formatDate(latestTeamUpdate)}
               </p>
@@ -263,8 +337,25 @@ export default async function RankingsPage() {
 
             <div className="rounded-2xl border border-white/10 bg-white/[0.035] p-4">
               <p className="data-label">Player Snapshot</p>
+
               <p className="mt-2 text-xl font-black text-white">
                 {formatDate(latestPlayerUpdate)}
+              </p>
+            </div>
+
+            <div className="rounded-2xl border border-white/10 bg-white/[0.035] p-4">
+              <p className="data-label">Ranked Entities</p>
+
+              <p className="mt-2 text-xl font-black text-white">
+                {totalRankedEntities.toLocaleString("en-IN")}
+              </p>
+            </div>
+
+            <div className="rounded-2xl border border-white/10 bg-white/[0.035] p-4">
+              <p className="data-label">Database Coverage</p>
+
+              <p className="mt-2 text-xl font-black text-white">
+                {n(teamCountResult.count) + n(playerCountResult.count)}
               </p>
             </div>
           </div>
@@ -302,21 +393,18 @@ export default async function RankingsPage() {
             return (
               <Link
                 key={ranking.entity_id}
-                href={`/teams/${team!.slug}`}
+                href={`/teams/${team.slug}`}
                 className={`group relative overflow-hidden rounded-[1.8rem] border p-6 transition duration-300 hover:-translate-y-1 ${styles.card}`}
               >
                 <div
                   className={`pointer-events-none absolute -right-10 -top-10 h-36 w-36 rounded-full blur-3xl ${styles.glow}`}
                 />
+
                 <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.10),transparent_42%)] opacity-0 transition group-hover:opacity-100" />
 
                 <div className="relative z-10">
                   <div className="flex items-start justify-between">
-                    <TeamLogo
-                      name={team!.name}
-                      logoUrl={team!.logo_url}
-                      size="lg"
-                    />
+                    <TeamLogo name={team.name} logoUrl={team.logo_url} size="lg" />
 
                     <span
                       className={`rounded-full border px-4 py-1.5 text-sm font-black ${getRankPillStyles(
@@ -328,23 +416,23 @@ export default async function RankingsPage() {
                   </div>
 
                   <h3 className="mt-6 text-2xl font-black tracking-tight text-white">
-                    {team!.name}
+                    {team.name}
                   </h3>
 
                   <p className="mt-1 text-xs uppercase tracking-[0.22em] text-white/35">
-                    {team!.short_name || "TEAM"}
+                    {team.short_name || "TEAM"}
                   </p>
 
                   <div className="mt-4">
                     <DataSourceBadge
-                      source={team!.source}
-                      verified={team!.verified}
+                      source={team.source}
+                      verified={team.verified}
                       label={
-                        team!.source === "krafton_india_esports"
+                        team.source === "krafton_india_esports"
                           ? "Official Krafton Team"
-                          : team!.verified
-                          ? "Verified Team"
-                          : "Team Record"
+                          : team.verified
+                            ? "Verified Team"
+                            : "Team Record"
                       }
                     />
                   </div>
@@ -352,6 +440,7 @@ export default async function RankingsPage() {
                   <div className="mt-6 grid grid-cols-2 gap-4 border-t border-white/10 pt-5">
                     <div>
                       <p className="text-xs text-white/35">Points</p>
+
                       <p className={`mt-1 text-2xl font-black ${styles.accent}`}>
                         {ranking.score}
                       </p>
@@ -359,8 +448,9 @@ export default async function RankingsPage() {
 
                     <div className="text-right">
                       <p className="text-xs text-white/35">WWCD</p>
+
                       <p className="mt-1 text-2xl font-black text-white">
-                        {team!.wins ?? 0}
+                        {team.wins ?? 0}
                       </p>
                     </div>
                   </div>
@@ -384,19 +474,27 @@ export default async function RankingsPage() {
             </h2>
 
             <p className="mt-2 text-sm text-white/45">
-              Top 20 official Krafton-mapped PlayRank teams.
+              Top 20 official and PlayRank-mapped teams.
             </p>
           </div>
+
+          <Link
+            href="/data"
+            className="rounded-full border border-white/10 bg-white/[0.03] px-5 py-2 text-sm text-white/60 transition hover:border-white/25 hover:text-white"
+          >
+            View data methodology
+          </Link>
         </div>
 
         <div className="max-h-[760px] overflow-auto">
-          <table className="w-full min-w-[980px] border-collapse text-left">
+          <table className="w-full min-w-[1040px] border-collapse text-left">
             <thead className="sticky top-0 z-20 backdrop-blur-xl">
               <tr className="border-b border-white/10 bg-[#090b10]/90 text-xs uppercase tracking-[0.22em] text-white/35">
                 <th className="px-6 py-4">Rank</th>
                 <th className="px-6 py-4">Team</th>
                 <th className="px-6 py-4">Status</th>
                 <th className="px-6 py-4 text-right">Points</th>
+                <th className="px-6 py-4 text-right">Change</th>
                 <th className="px-6 py-4 text-right">WWCD</th>
                 <th className="px-6 py-4 text-right">Matches</th>
                 <th className="px-6 py-4 text-right">Kills</th>
@@ -405,89 +503,101 @@ export default async function RankingsPage() {
             </thead>
 
             <tbody>
-              {rankedTeams.map(({ ranking, team }) => (
-                <tr
-                  key={ranking.entity_id}
-                  className={`border-b border-white/[0.06] transition ${getTableRowStyles(
-                    ranking.rank
-                  )}`}
-                >
-                  <td className="px-6 py-5">
-                    <span
-                      className={`rounded-full border px-3 py-1 text-sm font-black ${getRankPillStyles(
-                        ranking.rank
+              {rankedTeams.length > 0 ? (
+                rankedTeams.map(({ ranking, team }) => (
+                  <tr
+                    key={ranking.entity_id}
+                    className={`border-b border-white/[0.06] transition ${getTableRowStyles(
+                      ranking.rank
+                    )}`}
+                  >
+                    <td className="px-6 py-5">
+                      <span
+                        className={`rounded-full border px-3 py-1 text-sm font-black ${getRankPillStyles(
+                          ranking.rank
+                        )}`}
+                      >
+                        #{ranking.rank}
+                      </span>
+                    </td>
+
+                    <td className="px-6 py-5">
+                      <div className="flex items-center gap-4">
+                        <TeamLogo name={team.name} logoUrl={team.logo_url} size="sm" />
+
+                        <div>
+                          <Link
+                            href={`/teams/${team.slug}`}
+                            className="font-bold text-white hover:underline"
+                          >
+                            {team.name}
+                          </Link>
+
+                          <p className="mt-1 text-xs uppercase tracking-[0.18em] text-white/35">
+                            {team.short_name || "TEAM"}
+                          </p>
+                        </div>
+                      </div>
+                    </td>
+
+                    <td className="px-6 py-5">
+                      {team.active !== false ? (
+                        <span className="rounded-full border border-emerald-400/20 bg-emerald-400/10 px-3 py-1 text-xs font-semibold text-emerald-300">
+                          Active
+                        </span>
+                      ) : (
+                        <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-semibold text-white/35">
+                          Inactive
+                        </span>
+                      )}
+                    </td>
+
+                    <td className="px-6 py-5 text-right font-black text-white">
+                      {ranking.score}
+                    </td>
+
+                    <td
+                      className={`px-6 py-5 text-right font-black ${changeTone(
+                        ranking.change
                       )}`}
                     >
-                      #{ranking.rank}
-                    </span>
-                  </td>
+                      {formatChange(ranking.change)}
+                    </td>
 
-                  <td className="px-6 py-5">
-                    <div className="flex items-center gap-4">
-                      <TeamLogo
-                        name={team!.name}
-                        logoUrl={team!.logo_url}
-                        size="sm"
+                    <td className="px-6 py-5 text-right text-white/65">
+                      {team.wins ?? 0}
+                    </td>
+
+                    <td className="px-6 py-5 text-right text-white/45">
+                      {team.matches_played ?? 0}
+                    </td>
+
+                    <td className="px-6 py-5 text-right text-white/45">
+                      {team.kills ?? 0}
+                    </td>
+
+                    <td className="px-6 py-5">
+                      <DataSourceBadge
+                        source={team.source}
+                        verified={team.verified}
+                        label={
+                          team.source === "krafton_india_esports"
+                            ? "Official Krafton"
+                            : team.verified
+                              ? "Verified"
+                              : "Record"
+                        }
                       />
-
-                      <div>
-                        <Link
-                          href={`/teams/${team!.slug}`}
-                          className="font-bold text-white hover:underline"
-                        >
-                          {team!.name}
-                        </Link>
-
-                        <p className="mt-1 text-xs uppercase tracking-[0.18em] text-white/35">
-                          {team!.short_name || "TEAM"}
-                        </p>
-                      </div>
-                    </div>
-                  </td>
-
-                  <td className="px-6 py-5">
-                    {team!.active !== false ? (
-                      <span className="rounded-full border border-emerald-400/20 bg-emerald-400/10 px-3 py-1 text-xs font-semibold text-emerald-300">
-                        Active
-                      </span>
-                    ) : (
-                      <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-semibold text-white/35">
-                        Inactive
-                      </span>
-                    )}
-                  </td>
-
-                  <td className="px-6 py-5 text-right font-black text-white">
-                    {ranking.score}
-                  </td>
-
-                  <td className="px-6 py-5 text-right text-white/65">
-                    {team!.wins ?? 0}
-                  </td>
-
-                  <td className="px-6 py-5 text-right text-white/45">
-                    {team!.matches_played ?? 0}
-                  </td>
-
-                  <td className="px-6 py-5 text-right text-white/45">
-                    {team!.kills ?? 0}
-                  </td>
-
-                  <td className="px-6 py-5">
-                    <DataSourceBadge
-                      source={team!.source}
-                      verified={team!.verified}
-                      label={
-                        team!.source === "krafton_india_esports"
-                          ? "Official Krafton"
-                          : team!.verified
-                          ? "Verified"
-                          : "Record"
-                      }
-                    />
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={9} className="px-6 py-10 text-center text-white/45">
+                    No team rankings available yet.
                   </td>
                 </tr>
-              ))}
+              )}
             </tbody>
           </table>
         </div>
@@ -506,7 +616,8 @@ export default async function RankingsPage() {
             </h2>
 
             <p className="mt-2 text-sm text-white/45">
-              Player ranking is currently based on PlayRank match and seed data.
+              Player ranking is generated from PlayRank match, stat and seed
+              data. Treat early rankings as directional until match sample size grows.
             </p>
           </div>
 
@@ -519,13 +630,14 @@ export default async function RankingsPage() {
         </div>
 
         <div className="overflow-x-auto">
-          <table className="w-full min-w-[880px] border-collapse text-left">
+          <table className="w-full min-w-[980px] border-collapse text-left">
             <thead>
               <tr className="border-b border-white/10 bg-white/[0.025] text-xs uppercase tracking-[0.22em] text-white/35">
                 <th className="px-6 py-4">Rank</th>
                 <th className="px-6 py-4">Player</th>
                 <th className="px-6 py-4">Role</th>
                 <th className="px-6 py-4 text-right">Score</th>
+                <th className="px-6 py-4 text-right">Change</th>
                 <th className="px-6 py-4 text-right">Kills</th>
                 <th className="px-6 py-4 text-right">Damage</th>
                 <th className="px-6 py-4 text-right">MVP</th>
@@ -555,14 +667,14 @@ export default async function RankingsPage() {
 
                     <td className="px-6 py-5">
                       <div className="flex items-center gap-4">
-                        <PlayerAvatar ign={player!.ign} />
+                        <PlayerAvatar ign={player.ign} />
 
                         <div>
                           <Link
-                            href={`/players/${player!.slug}`}
+                            href={`/players/${player.slug}`}
                             className="font-bold text-white hover:underline"
                           >
-                            {player!.ign}
+                            {player.ign}
                           </Link>
 
                           <p className="mt-1 text-xs uppercase tracking-[0.18em] text-white/35">
@@ -573,48 +685,51 @@ export default async function RankingsPage() {
                     </td>
 
                     <td className="px-6 py-5 text-white/60">
-                      {player!.role || "—"}
+                      {player.role || "—"}
                     </td>
 
                     <td className="px-6 py-5 text-right font-black text-white">
                       {ranking.score}
                     </td>
 
-                    <td className="px-6 py-5 text-right text-white/65">
-                      {player!.total_kills ?? 0}
+                    <td
+                      className={`px-6 py-5 text-right font-black ${changeTone(
+                        ranking.change
+                      )}`}
+                    >
+                      {formatChange(ranking.change)}
                     </td>
 
                     <td className="px-6 py-5 text-right text-white/65">
-                      {player!.avg_damage ?? 0}
+                      {player.total_kills ?? 0}
                     </td>
 
                     <td className="px-6 py-5 text-right text-white/65">
-                      {player!.mvp_count ?? 0}
+                      {player.avg_damage ?? 0}
+                    </td>
+
+                    <td className="px-6 py-5 text-right text-white/65">
+                      {player.mvp_count ?? 0}
                     </td>
 
                     <td className="px-6 py-5">
                       <span className="rounded-full border border-emerald-400/20 bg-emerald-400/10 px-3 py-1 text-xs font-semibold text-emerald-300">
-                        {player!.recent_form || "N/A"}
+                        {player.recent_form ?? "N/A"}
                       </span>
                     </td>
 
                     <td className="px-6 py-5">
                       <DataSourceBadge
-                        source={player!.source}
-                        verified={player!.verified}
-                        label={
-                          player!.verified ? "Verified Player" : "PlayRank"
-                        }
+                        source={player.source}
+                        verified={player.verified}
+                        label={player.verified ? "Verified Player" : "PlayRank"}
                       />
                     </td>
                   </tr>
                 ))
               ) : (
                 <tr>
-                  <td
-                    colSpan={9}
-                    className="px-6 py-10 text-center text-white/45"
-                  >
+                  <td colSpan={10} className="px-6 py-10 text-center text-white/45">
                     No player rankings available yet.
                   </td>
                 </tr>
