@@ -12,6 +12,12 @@ type TeamMini = {
   active?: boolean | null;
 };
 
+type TournamentMini = {
+  id: string;
+  name: string;
+  slug: string;
+};
+
 type MatchRow = {
   id: string;
   tournament_id: string | null;
@@ -23,14 +29,24 @@ type MatchRow = {
   map_name: string | null;
   stage: string | null;
   date: string | null;
+  source: string | null;
+  source_url: string | null;
+  verified: boolean | null;
+  created_at: string | null;
   team1: TeamMini | null;
   team2: TeamMini | null;
   winner: TeamMini | null;
 };
 
-type TournamentMini = {
+type MatchRowRaw = Omit<MatchRow, "team1" | "team2" | "winner"> & {
+  team1: TeamMini | TeamMini[] | null;
+  team2: TeamMini | TeamMini[] | null;
+  winner: TeamMini | TeamMini[] | null;
+};
+
+type PlayerMini = {
   id: string;
-  name: string;
+  ign: string;
   slug: string;
 };
 
@@ -40,17 +56,18 @@ type PlayerStatRow = {
   match_id: string;
   kills: number | null;
   damage: number | null;
+  placement: number | null;
   knocks?: number | null;
   assists?: number | null;
   revives?: number | null;
   survival_time?: number | null;
   is_mvp?: boolean | null;
   mvp?: boolean | null;
-  player: {
-    id: string;
-    ign: string;
-    slug: string;
-  } | null;
+  player: PlayerMini | null;
+};
+
+type PlayerStatRaw = Omit<PlayerStatRow, "player"> & {
+  player: PlayerMini | PlayerMini[] | null;
 };
 
 type TeamStatRow = {
@@ -66,11 +83,20 @@ type TeamStatRow = {
   team: TeamMini | null;
 };
 
+type TeamStatRaw = Omit<TeamStatRow, "team"> & {
+  team: TeamMini | TeamMini[] | null;
+};
+
 const card =
   "rounded-[2rem] border border-white/10 bg-[#090b10] shadow-[0_24px_80px_rgba(0,0,0,0.35)]";
 
 const softCard =
   "rounded-2xl border border-white/10 bg-white/[0.035] shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]";
+
+function one<T>(value: T | T[] | null): T | null {
+  if (Array.isArray(value)) return value[0] || null;
+  return value;
+}
 
 function n(value: unknown, fallback = 0) {
   const numberValue = Number(value);
@@ -93,9 +119,7 @@ function formatDate(value: string | null) {
 
 function formatMinutes(seconds: unknown) {
   const safeSeconds = n(seconds);
-
   if (!safeSeconds) return "0m";
-
   return `${Math.floor(safeSeconds / 60)}m`;
 }
 
@@ -111,16 +135,17 @@ function getInitials(name: string) {
 
 function getTeamBadgeLabel(team?: TeamMini | null) {
   if (!team) return "Team Record";
-
-  if (team.source === "krafton_india_esports") {
-    return "Official Krafton Team";
-  }
-
-  if (team.verified) {
-    return "Verified Team";
-  }
-
+  if (team.source === "krafton_india_esports") return "Official Krafton Team";
+  if (team.verified) return "Verified Team";
   return "Team Record";
+}
+
+function getMatchSourceLabel(source: string | null, verified: boolean | null) {
+  if (source === "pubg_developer_api") return "PUBG API Promoted";
+  if (source === "pubg_api") return "PUBG API";
+  if (source === "krafton_india_esports") return "Official Krafton Source";
+  if (verified) return "Verified Match";
+  return "Match Record";
 }
 
 function Metric({
@@ -192,7 +217,11 @@ function TeamIdentity({
           {winner ? "Winner" : "Team"}
         </p>
 
-        <div className={`mt-2 flex flex-wrap gap-2 ${align === "right" ? "justify-end" : ""}`}>
+        <div
+          className={`mt-2 flex flex-wrap gap-2 ${
+            align === "right" ? "justify-end" : ""
+          }`}
+        >
           <DataSourceBadge
             source={team?.source}
             verified={team?.verified}
@@ -231,7 +260,7 @@ export default async function MatchDetailPage({
 }) {
   const { id } = await params;
 
-  const { data: matchRaw } = await supabase
+  const { data: matchRaw, error: matchError } = await supabase
     .from("matches")
     .select(
       `
@@ -245,6 +274,10 @@ export default async function MatchDetailPage({
       map_name,
       stage,
       date,
+      source,
+      source_url,
+      verified,
+      created_at,
       team1:team1_id (
         id,
         name,
@@ -274,30 +307,37 @@ export default async function MatchDetailPage({
     .eq("id", id)
     .single();
 
-  if (!matchRaw) {
+  if (matchError || !matchRaw) {
     notFound();
   }
 
-  const match = {
-    ...matchRaw,
-    team1: Array.isArray(matchRaw.team1)
-      ? matchRaw.team1[0] ?? null
-      : matchRaw.team1,
-    team2: Array.isArray(matchRaw.team2)
-      ? matchRaw.team2[0] ?? null
-      : matchRaw.team2,
-    winner: Array.isArray(matchRaw.winner)
-      ? matchRaw.winner[0] ?? null
-      : matchRaw.winner,
-  } as MatchRow;
+  const rawMatch = matchRaw as MatchRowRaw;
 
-  const [{ data: playerStatsRaw }, { data: teamStatsRaw }, tournamentResult] =
+  const match: MatchRow = {
+    ...rawMatch,
+    team1: one(rawMatch.team1),
+    team2: one(rawMatch.team2),
+    winner: one(rawMatch.winner),
+  };
+
+  const [playerStatsResult, teamStatsResult, tournamentResult] =
     await Promise.all([
       supabase
         .from("player_match_stats")
         .select(
           `
-          *,
+          id,
+          player_id,
+          match_id,
+          kills,
+          damage,
+          placement,
+          knocks,
+          assists,
+          revives,
+          survival_time,
+          is_mvp,
+          mvp,
           player:player_id (
             id,
             ign,
@@ -312,7 +352,15 @@ export default async function MatchDetailPage({
         .from("team_match_results")
         .select(
           `
-          *,
+          id,
+          team_id,
+          match_id,
+          placement,
+          kills,
+          placement_points,
+          kill_points,
+          total_points,
+          survival_time,
           team:team_id (
             id,
             name,
@@ -335,8 +383,20 @@ export default async function MatchDetailPage({
         : Promise.resolve({ data: null, error: null }),
     ]);
 
-  const playerStats = (playerStatsRaw || []) as PlayerStatRow[];
-  const teamStats = (teamStatsRaw || []) as TeamStatRow[];
+  const playerStats = ((playerStatsResult.data || []) as PlayerStatRaw[]).map(
+    (row) => ({
+      ...row,
+      player: one(row.player),
+    })
+  ) as PlayerStatRow[];
+
+  const teamStats = ((teamStatsResult.data || []) as TeamStatRaw[]).map(
+    (row) => ({
+      ...row,
+      team: one(row.team),
+    })
+  ) as TeamStatRow[];
+
   const tournament = tournamentResult.data as TournamentMini | null;
 
   const team1Score = n(match.team1_score);
@@ -370,7 +430,6 @@ export default async function MatchDetailPage({
     [...playerStats].sort((a, b) => {
       const aScore = n(a.kills) * 100 + n(a.damage);
       const bScore = n(b.kills) * 100 + n(b.damage);
-
       return bScore - aScore;
     })[0] ||
     null;
@@ -384,6 +443,9 @@ export default async function MatchDetailPage({
   const survivalIndex = clamp(Math.round(longestSurvival / 18));
   const scoreTension = scoreTotal > 0 ? clamp(100 - scoreDiff * 10) : 0;
 
+  const isHeadToHead = Boolean(match.team1 || match.team2);
+  const matchFormat = isHeadToHead ? "Head-to-Head" : "Battle Royale";
+
   return (
     <main className="page-shell space-y-6 py-8 text-white">
       <section className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-[#07080c] p-7 shadow-2xl md:p-9">
@@ -392,7 +454,14 @@ export default async function MatchDetailPage({
 
         <div className="relative z-10">
           <div className="mb-7 flex flex-wrap gap-2">
-            <DataSourceBadge label="Match Data" size="md" />
+            <DataSourceBadge
+              source={match.source}
+              verified={match.verified}
+              label={getMatchSourceLabel(match.source, match.verified)}
+              size="md"
+            />
+
+            <DataSourceBadge label={matchFormat} size="md" />
             <DataSourceBadge label="Match Intelligence" size="md" />
             <DataSourceBadge label="Analytics Generated" size="md" />
 
@@ -452,20 +521,30 @@ export default async function MatchDetailPage({
                 {match.winner.name}
               </Link>
             </div>
+          ) : topTeam?.team ? (
+            <div className="mt-7 rounded-2xl border border-[#ffd21a]/20 bg-[#ffd21a]/10 p-5">
+              <p className="text-xs font-black uppercase tracking-[0.24em] text-[#ffd21a]">
+                Top Placement
+              </p>
+
+              <Link
+                href={`/teams/${topTeam.team.slug}`}
+                className="mt-2 inline-flex text-3xl font-black tracking-[-0.04em] text-white hover:underline"
+              >
+                {topTeam.team.name}
+              </Link>
+            </div>
           ) : null}
         </div>
       </section>
 
-      <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
+      <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-6">
         <Metric label="Total Kills" value={totalKills} />
         <Metric label="Total Damage" value={totalDamage} />
         <Metric label="Score Gap" value={scoreDiff} />
         <Metric label="Survival Peak" value={formatMinutes(longestSurvival)} />
-        <Metric
-          label="Data Source"
-          value={tournament ? "Tournament" : "Match"}
-          muted
-        />
+        <Metric label="Teams" value={teamStats.length || (isHeadToHead ? 2 : 0)} muted />
+        <Metric label="Source" value={getMatchSourceLabel(match.source, match.verified)} muted />
       </section>
 
       <section className="grid gap-6 xl:grid-cols-[0.9fr_1.1fr]">
@@ -635,7 +714,7 @@ export default async function MatchDetailPage({
             <DataSourceBadge label="Analytics Generated" />
           </div>
 
-          <p className="mt-5 leading-7 text-white/62">
+          <p className="mt-5 leading-7 text-white/60">
             This match produced{" "}
             <span className="font-bold text-white">{totalKills}</span> total
             kills and{" "}
@@ -660,6 +739,18 @@ export default async function MatchDetailPage({
           <div className="mt-6 grid gap-3 md:grid-cols-2">
             <Metric label="Fight Intensity" value={`${fightIntensity}%`} muted />
             <Metric label="Score Tension" value={`${scoreTension}%`} muted />
+          </div>
+
+          <div className="mt-5 rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-white/35">
+              Data Context
+            </p>
+
+            <p className="mt-2 text-sm leading-6 text-white/45">
+              Match detail uses normalized match, team result and player stat
+              tables. PUBG API records only appear here after controlled
+              promotion into PlayRank core tables.
+            </p>
           </div>
         </section>
       </section>
