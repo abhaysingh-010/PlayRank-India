@@ -3,6 +3,17 @@ import { supabase } from "@/lib/supabase";
 import RankHistoryChart from "@/components/RankHistoryChart";
 import DataSourceBadge from "@/components/DataSourceBadge";
 
+type PlayerTeamRow = {
+  id: string;
+  name: string;
+  slug: string;
+  short_name: string | null;
+  global_rank: number | null;
+  source?: string | null;
+  verified?: boolean | null;
+  active?: boolean | null;
+};
+
 type PlayerRow = {
   id: string;
   ign: string;
@@ -25,23 +36,24 @@ type PlayerRow = {
   source_url?: string | null;
   verified?: boolean | null;
   active?: boolean | null;
-  team: {
-    id: string;
-    name: string;
-    slug: string;
-    short_name: string | null;
-    global_rank: number | null;
-    source?: string | null;
-    verified?: boolean | null;
-    active?: boolean | null;
-  } | null;
+  team: PlayerTeamRow | null;
+};
+
+type PlayerQueryRow = Omit<PlayerRow, "team"> & {
+  team: PlayerTeamRow | PlayerTeamRow[] | null;
 };
 
 type PlayerMatchStat = {
   id: string | number;
+  match_id: string | null;
   kills: number | null;
   damage: number | null;
   placement: number | null;
+  assists: number | null;
+  revives: number | null;
+  knocks: number | null;
+  is_mvp: boolean | null;
+  mvp: boolean | null;
 };
 
 type RankingHistoryRow = {
@@ -51,8 +63,21 @@ type RankingHistoryRow = {
   rank: number;
   score: number;
   snapshot_date: string;
-  created_at?: string;
+  created_at?: string | null;
 };
+
+type RankingRow = {
+  rank: number;
+  score: number;
+  change: number | null;
+  updated_at: string | null;
+};
+
+const card =
+  "rounded-[2rem] border border-white/10 bg-[#090b10] shadow-[0_24px_80px_rgba(0,0,0,0.35)]";
+
+const softCard =
+  "rounded-2xl border border-white/10 bg-white/[0.035] shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]";
 
 function n(value: unknown, fallback = 0) {
   const numberValue = Number(value);
@@ -78,11 +103,24 @@ function formatValue(value: unknown, decimals = 0) {
   return decimals > 0 ? safe.toFixed(decimals) : Math.round(safe).toString();
 }
 
-const card =
-  "rounded-[2rem] border border-white/10 bg-[#090b10] shadow-[0_24px_80px_rgba(0,0,0,0.35)]";
+function formatChange(value: number | null | undefined) {
+  if (!value) return "—";
+  if (value > 0) return `+${value}`;
+  return String(value);
+}
 
-const softCard =
-  "rounded-2xl border border-white/10 bg-white/[0.035] shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]";
+function changeTone(value: number | null | undefined) {
+  if (!value) return "text-white/35";
+  if (value > 0) return "text-emerald-300";
+  return "text-red-300";
+}
+
+function getSourceLabel(source: string | null | undefined) {
+  if (source === "krafton_india_esports") return "Official Krafton";
+  if (source === "pubg_api") return "PUBG API";
+  if (source === "admin_manual") return "Admin Verified";
+  return source || "PlayRank";
+}
 
 function PlayerAvatar({ ign, role }: { ign: string; role?: string | null }) {
   return (
@@ -200,26 +238,48 @@ export default async function PlayerPage({
           <p className="mt-3 text-white/45">
             This player profile does not exist or is not available yet.
           </p>
+
+          <Link
+            href="/players"
+            className="mt-5 inline-flex rounded-full border border-white/10 px-5 py-2 text-sm text-white/60 hover:text-white"
+          >
+            Back to players
+          </Link>
         </section>
       </main>
     );
   }
 
-  const player = playerRaw as PlayerRow;
+  const playerQuery = playerRaw as PlayerQueryRow;
+
+  const player: PlayerRow = {
+    ...playerQuery,
+    team: Array.isArray(playerQuery.team)
+      ? playerQuery.team[0] || null
+      : playerQuery.team,
+  };
 
   const [
-    { data: statsRaw },
-    { data: recentMatchesRaw },
-    { data: rankHistoryRaw },
+    rankingResult,
+    statsResult,
+    recentMatchesResult,
+    rankHistoryResult,
   ] = await Promise.all([
     supabase
+      .from("rankings")
+      .select("rank, score, change, updated_at")
+      .eq("entity_type", "player")
+      .eq("entity_id", player.id)
+      .maybeSingle(),
+
+    supabase
       .from("player_match_stats")
-      .select("id,kills,damage,placement")
+      .select("id, match_id, kills, damage, placement, assists, revives, knocks, is_mvp, mvp")
       .eq("player_id", player.id),
 
     supabase
       .from("player_match_stats")
-      .select("id,kills,damage,placement")
+      .select("id, match_id, kills, damage, placement, assists, revives, knocks, is_mvp, mvp")
       .eq("player_id", player.id)
       .order("id", { ascending: false })
       .limit(5),
@@ -232,9 +292,10 @@ export default async function PlayerPage({
       .order("snapshot_date", { ascending: true }),
   ]);
 
-  const stats = (statsRaw || []) as PlayerMatchStat[];
-  const recentMatches = (recentMatchesRaw || []) as PlayerMatchStat[];
-  const rankHistory = (rankHistoryRaw || []) as RankingHistoryRow[];
+  const currentRanking = rankingResult.data as RankingRow | null;
+  const stats = (statsResult.data || []) as PlayerMatchStat[];
+  const recentMatches = (recentMatchesResult.data || []) as PlayerMatchStat[];
+  const rankHistory = (rankHistoryResult.data || []) as RankingHistoryRow[];
 
   const totalMatches = stats.length || n(player.matches_played);
 
@@ -246,31 +307,55 @@ export default async function PlayerPage({
     stats.reduce((sum, match) => sum + n(match.damage), 0) ||
     n(player.avg_damage) * totalMatches;
 
+  const totalAssists =
+    stats.reduce((sum, match) => sum + n(match.assists), 0) ||
+    n(player.assists);
+
+  const totalRevives =
+    stats.reduce((sum, match) => sum + n(match.revives), 0) ||
+    n(player.revives);
+
+  const totalKnocks =
+    stats.reduce((sum, match) => sum + n(match.knocks), 0) ||
+    n(player.knocks);
+
+  const mvpCount =
+    stats.filter((match) => match.is_mvp === true || match.mvp === true).length ||
+    n(player.mvp_count);
+
   const avgKills = totalMatches > 0 ? totalKills / totalMatches : 0;
 
   const avgDamage =
     totalMatches > 0 ? totalDamage / totalMatches : n(player.avg_damage);
 
   const aggression = clamp(Math.round(avgDamage / 7 + avgKills * 8));
+
   const consistency = clamp(
     Math.round(avgKills * 12 + n(player.win_rate) * 0.35)
   );
-  const clutch = clamp(Math.round(n(player.mvp_count) * 12));
-  const support = clamp(
-    Math.round(n(player.assists) * 1.2 + n(player.revives) * 3)
-  );
+
+  const clutch = clamp(Math.round(mvpCount * 12));
+
+  const support = clamp(Math.round(totalAssists * 1.2 + totalRevives * 3));
 
   const impactScore = Math.round(
-    n(player.total_kills) * 0.35 +
-      n(player.avg_damage) * 0.2 +
-      n(player.mvp_count) * 8 +
-      n(player.assists) * 0.1 +
-      n(player.knocks) * 0.15
+    totalKills * 0.35 +
+      avgDamage * 0.2 +
+      mvpCount * 8 +
+      totalAssists * 0.1 +
+      totalKnocks * 0.15
   );
 
-  const currentRank = rankHistory[rankHistory.length - 1]?.rank || 0;
-  const previousRank = rankHistory[rankHistory.length - 2]?.rank || currentRank;
-  const movement = previousRank - currentRank;
+  const latestHistoryRank = rankHistory[rankHistory.length - 1]?.rank || 0;
+
+  const currentRank = currentRanking?.rank || latestHistoryRank || 0;
+
+  const historyPreviousRank =
+    rankHistory[rankHistory.length - 2]?.rank || currentRank;
+
+  const historyMovement = historyPreviousRank - currentRank;
+
+  const movement = currentRanking?.change ?? historyMovement;
 
   let archetype = "Balanced Fighter";
 
@@ -295,15 +380,18 @@ export default async function PlayerPage({
     player.source === "krafton_india_esports"
       ? "Official Krafton Player"
       : player.verified
-      ? "Verified Player"
-      : "Player Record";
+        ? "Verified Player"
+        : "Player Record";
 
   const teamSourceLabel =
     player.team?.source === "krafton_india_esports"
       ? "Official Krafton Team"
       : player.team?.verified
-      ? "Verified Team"
-      : "Team Record";
+        ? "Verified Team"
+        : "Team Record";
+
+  const playerSource = getSourceLabel(player.source);
+  const teamName = player.team?.name || "Free Agent";
 
   return (
     <main className="page-shell space-y-6 py-8 text-white">
@@ -312,7 +400,7 @@ export default async function PlayerPage({
         <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/30 to-transparent" />
 
         <div className="relative z-10 flex flex-col gap-7 lg:flex-row lg:items-end lg:justify-between">
-          <div className="flex items-center gap-5">
+          <div className="flex flex-col gap-5 md:flex-row md:items-center">
             <PlayerAvatar ign={player.ign} role={player.role} />
 
             <div>
@@ -320,13 +408,13 @@ export default async function PlayerPage({
                 Player Profile
               </p>
 
-              <h1 className="mt-2 text-5xl font-black tracking-[-0.05em] text-white md:text-6xl">
+              <h1 className="mt-2 text-5xl font-black uppercase leading-[0.9] tracking-[-0.06em] text-white md:text-7xl">
                 {player.ign}
               </h1>
 
-              <p className="mt-2 text-white/45">
-                {player.team?.name || "Free Agent"} ·{" "}
-                {player.role || "Player"} · {player.country || "India"}
+              <p className="mt-3 text-white/45">
+                {teamName} · {player.role || "Player"} ·{" "}
+                {player.country || "India"}
               </p>
 
               <div className="mt-4 flex flex-wrap gap-2">
@@ -343,6 +431,8 @@ export default async function PlayerPage({
                     label={teamSourceLabel}
                   />
                 ) : null}
+
+                <DataSourceBadge label="Ranking Snapshot" />
 
                 <ActiveBadge active={player.active} />
               </div>
@@ -365,20 +455,35 @@ export default async function PlayerPage({
                 View Team
               </Link>
             ) : null}
+
+            <Link
+              href="/rankings"
+              className="rounded-full border border-white/10 bg-white/[0.04] px-5 py-2.5 text-sm font-semibold text-white/55 transition hover:border-white/25 hover:text-white"
+            >
+              Rankings
+            </Link>
+
+            <Link
+              href="/data"
+              className="rounded-full border border-white/10 bg-white/[0.04] px-5 py-2.5 text-sm font-semibold text-white/55 transition hover:border-white/25 hover:text-white"
+            >
+              Data Trust
+            </Link>
           </div>
         </div>
       </section>
 
-      <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
-        <Metric label="Impact Score" value={impactScore} />
-        <Metric label="Kills" value={n(player.total_kills)} />
-        <Metric label="Avg Damage" value={formatValue(avgDamage)} />
-        <Metric label="KD" value={formatValue(player.kd_ratio, 2)} />
+      <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-6">
+        <Metric label="Rank" value={currentRank ? `#${currentRank}` : "—"} />
         <Metric
-          label="Rank"
-          value={currentRank ? `#${currentRank}` : "—"}
+          label="Rank Change"
+          value={formatChange(movement)}
           muted
         />
+        <Metric label="Impact Score" value={impactScore} />
+        <Metric label="Kills" value={totalKills} />
+        <Metric label="Avg Damage" value={formatValue(avgDamage)} />
+        <Metric label="KD" value={formatValue(player.kd_ratio, 2)} />
       </section>
 
       <section className="grid gap-6 xl:grid-cols-[1.15fr_0.85fr]">
@@ -399,8 +504,8 @@ export default async function PlayerPage({
             </div>
 
             <div className="text-right">
-              <p className="text-3xl font-black text-[#ffd21a]">
-                {movement > 0 ? `+${movement}` : movement}
+              <p className={`text-3xl font-black ${changeTone(movement)}`}>
+                {formatChange(movement)}
               </p>
 
               <p className="text-xs text-white/35">Movement</p>
@@ -408,7 +513,7 @@ export default async function PlayerPage({
           </div>
 
           {rankHistory.length > 0 ? (
-            <RankHistoryChart history={rankHistory || []} />
+            <RankHistoryChart history={rankHistory} />
           ) : (
             <p className="rounded-2xl border border-white/10 bg-white/[0.03] p-5 text-sm text-white/45">
               No ranking history available yet.
@@ -462,16 +567,29 @@ export default async function PlayerPage({
             </div>
           </div>
 
-          <div className="mt-6 flex gap-3">
+          <div className="mt-6 flex flex-wrap gap-3">
             {recentMatches.length > 0 ? (
-              recentMatches.map((match, index) => (
-                <div
-                  key={`${match.id}-${index}`}
-                  className="flex h-12 w-12 items-center justify-center rounded-xl border border-white/10 bg-white/[0.04] font-black text-white"
-                >
-                  {match.kills || 0}
-                </div>
-              ))
+              recentMatches.map((match, index) =>
+                match.match_id ? (
+                  <Link
+                    key={`${match.id}-${index}`}
+                    href={`/match/${match.match_id}`}
+                    className="flex h-12 w-12 items-center justify-center rounded-xl border border-white/10 bg-white/[0.04] font-black text-white transition hover:-translate-y-0.5 hover:border-[#ffd21a]/30"
+                    title={`Kills: ${match.kills || 0}, Damage: ${
+                      match.damage || 0
+                    }`}
+                  >
+                    {match.kills || 0}
+                  </Link>
+                ) : (
+                  <div
+                    key={`${match.id}-${index}`}
+                    className="flex h-12 w-12 items-center justify-center rounded-xl border border-white/10 bg-white/[0.04] font-black text-white"
+                  >
+                    {match.kills || 0}
+                  </div>
+                )
+              )
             ) : (
               <p className="text-sm text-white/40">No recent matches found.</p>
             )}
@@ -493,7 +611,7 @@ export default async function PlayerPage({
             <DataSourceBadge label="Analytics Generated" />
           </div>
 
-          <p className="mt-5 leading-7 text-white/62">
+          <p className="mt-5 leading-7 text-white/60">
             <span className="font-bold text-white">{player.ign}</span> profiles
             as a{" "}
             <span className="font-bold text-[#ffd21a]">{archetype}</span>. The
@@ -504,12 +622,20 @@ export default async function PlayerPage({
           </p>
 
           <div className="mt-6 grid gap-3 md:grid-cols-2">
-            <Metric label="Record Source" value={playerSourceLabel} muted />
-            <Metric
-              label="Team Link"
-              value={player.team?.name || "Free Agent"}
-              muted
-            />
+            <Metric label="Record Source" value={playerSource} muted />
+            <Metric label="Team Link" value={teamName} muted />
+          </div>
+
+          <div className="mt-5 rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-white/35">
+              Data Context
+            </p>
+
+            <p className="mt-2 text-sm leading-6 text-white/45">
+              This profile uses normalized PlayRank player, ranking, roster and
+              match records. API-imported stats are only included after
+              promotion safety checks.
+            </p>
           </div>
         </section>
       </section>
