@@ -5,11 +5,13 @@ import DataSourceBadge from "@/components/DataSourceBadge";
 type TeamMini = {
   name: string;
   slug: string;
+  logo_url: string | null;
 };
 
 type MatchResultTeam = {
   name: string;
   slug: string;
+  logo_url: string | null;
 };
 
 type MatchResultRow = {
@@ -83,14 +85,6 @@ function getInitials(name: string) {
     .toUpperCase();
 }
 
-function getSourceLabel(source: string | null) {
-  if (source === "krafton_india_esports") return "Official Krafton";
-  if (source === "pubg_developer_api") return "PUBG API Promoted";
-  if (source === "pubg_api") return "PUBG API";
-  if (source === "admin_manual") return "Manual Verified";
-  return source || "PlayRank";
-}
-
 function getMatchType(match: MatchRow, resultRows: NormalizedMatchResultRow[]) {
   if (match.team1 || match.team2) return "Head-to-Head";
   if (resultRows.length > 0) return "Battle Royale";
@@ -123,6 +117,37 @@ function Metric({
   );
 }
 
+function TeamLogo({
+  team,
+  won = false,
+}: {
+  team: TeamMini | null;
+  won?: boolean;
+}) {
+  const teamName = team?.name || "Team N/A";
+
+  return (
+    <div
+      className={`flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-2xl border ${
+        won
+          ? "border-[#ffd21a]/30 bg-[#ffd21a]/10 text-[#ffd21a]"
+          : "border-white/10 bg-white/[0.04] text-white/65"
+      }`}
+    >
+      {team?.logo_url ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={team.logo_url}
+          alt={`${teamName} logo`}
+          className="h-full w-full object-contain p-2"
+        />
+      ) : (
+        <span className="text-sm font-black">{getInitials(teamName)}</span>
+      )}
+    </div>
+  );
+}
+
 function TeamBadge({
   team,
   align = "left",
@@ -140,15 +165,7 @@ function TeamBadge({
         align === "right" ? "flex-row-reverse text-right" : ""
       }`}
     >
-      <div
-        className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border ${
-          won
-            ? "border-[#ffd21a]/30 bg-[#ffd21a]/10 text-[#ffd21a]"
-            : "border-white/10 bg-white/[0.04] text-white/65"
-        }`}
-      >
-        <span className="text-sm font-black">{getInitials(teamName)}</span>
-      </div>
+      <TeamLogo team={team} won={won} />
 
       <div className="min-w-0">
         {team?.slug ? (
@@ -195,22 +212,39 @@ function MatchResultPreview({
       {visibleRows.map((row) => (
         <div
           key={`${row.match_id}-${row.team_id}`}
-          className="grid grid-cols-[auto_1fr_auto_auto] items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.035] px-4 py-3"
+          className="grid grid-cols-[auto_minmax(0,1fr)_auto_auto] items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.035] px-4 py-3"
         >
           <span className="rounded-full border border-[#ffd21a]/25 bg-[#ffd21a]/10 px-2.5 py-1 text-xs font-black text-[#ffd21a]">
             #{row.placement ?? "—"}
           </span>
 
-          {row.team?.slug ? (
-            <Link
-              href={`/teams/${row.team.slug}`}
-              className="truncate text-sm font-black text-white hover:underline"
-            >
-              {row.team.name}
-            </Link>
-          ) : (
-            <p className="truncate text-sm font-black text-white">Team N/A</p>
-          )}
+          <div className="flex min-w-0 items-center gap-3">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-white/10 bg-white/[0.04]">
+              {row.team?.logo_url ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={row.team.logo_url}
+                  alt={`${row.team.name} logo`}
+                  className="h-full w-full object-contain p-1.5"
+                />
+              ) : (
+                <span className="text-xs font-black text-white/60">
+                  {getInitials(row.team?.name || "Team")}
+                </span>
+              )}
+            </div>
+
+            {row.team?.slug ? (
+              <Link
+                href={`/teams/${row.team.slug}`}
+                className="truncate text-sm font-black text-white hover:underline"
+              >
+                {row.team.name}
+              </Link>
+            ) : (
+              <p className="truncate text-sm font-black text-white">Team N/A</p>
+            )}
+          </div>
 
           <span className="text-xs font-bold text-white/50">
             K {row.kills ?? 0}
@@ -273,10 +307,7 @@ function MatchCard({
   const hasHeadToHead = Boolean(match.team1 || match.team2);
 
   return (
-    <Link
-      href={`/match/${match.id}`}
-      className="group relative overflow-hidden rounded-[2rem] border border-white/10 bg-[#090b10] p-5 shadow-[0_24px_80px_rgba(0,0,0,0.28)] transition hover:-translate-y-0.5 hover:border-[#ffd21a]/30 hover:bg-white/[0.035]"
-    >
+    <article className="group relative overflow-hidden rounded-[2rem] border border-white/10 bg-[#090b10] p-5 shadow-[0_24px_80px_rgba(0,0,0,0.28)] transition hover:-translate-y-0.5 hover:border-[#ffd21a]/30 hover:bg-white/[0.035]">
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.08),transparent_34%),radial-gradient(circle_at_bottom_right,rgba(250,204,21,0.08),transparent_30%)] opacity-0 transition group-hover:opacity-100" />
 
       <div className="relative z-10">
@@ -331,12 +362,15 @@ function MatchCard({
             </p>
           </div>
 
-          <span className="text-sm font-black text-white/45 transition group-hover:text-[#ffd21a]">
+          <Link
+            href={`/match/${match.id}`}
+            className="text-sm font-black text-white/45 transition hover:text-[#ffd21a]"
+          >
             View match →
-          </span>
+          </Link>
         </div>
       </div>
-    </Link>
+    </article>
   );
 }
 
@@ -357,15 +391,18 @@ export default async function MatchesPage() {
       created_at,
       team1:team1_id (
         name,
-        slug
+        slug,
+        logo_url
       ),
       team2:team2_id (
         name,
-        slug
+        slug,
+        logo_url
       ),
       winner:winner_team_id (
         name,
-        slug
+        slug,
+        logo_url
       )
     `
     )
@@ -410,7 +447,8 @@ export default async function MatchesPage() {
             total_points,
             team:team_id (
               name,
-              slug
+              slug,
+              logo_url
             )
           `
           )
@@ -439,10 +477,13 @@ export default async function MatchesPage() {
       (resultsByMatchId.get(match.id) || []).length > 0
   ).length;
 
-  const verifiedMatches = matches.filter((match) => match.verified === true).length;
+  const verifiedMatches = matches.filter(
+    (match) => match.verified === true
+  ).length;
 
   const pubgApiMatches = matches.filter(
-    (match) => match.source === "pubg_developer_api" || match.source === "pubg_api"
+    (match) =>
+      match.source === "pubg_developer_api" || match.source === "pubg_api"
   ).length;
 
   const totalMaps = new Set(
