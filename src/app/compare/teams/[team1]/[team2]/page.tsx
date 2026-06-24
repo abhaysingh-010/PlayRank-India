@@ -22,8 +22,8 @@ type TeamBase = {
 
 type RankingRow = {
   entity_id: string;
-  rank: number;
-  score: number;
+  rank: number | null;
+  score: number | null;
   change: number | null;
 };
 
@@ -37,6 +37,8 @@ type MatchRow = {
   map_name: string | null;
   stage: string | null;
   date: string | null;
+  source: string | null;
+  verified: boolean | null;
 };
 
 type TeamMatchResultRow = {
@@ -46,6 +48,15 @@ type TeamMatchResultRow = {
   kills: number | null;
   total_points: number | null;
   created_at: string | null;
+};
+
+type Momentum = {
+  matches: number;
+  avgPoints: number;
+  avgKills: number;
+  avgPlacement: number;
+  score: number;
+  label: string;
 };
 
 const surface =
@@ -59,9 +70,23 @@ function n(value: unknown, fallback = 0) {
   return Number.isFinite(numberValue) ? numberValue : fallback;
 }
 
+function clamp(value: number, min = 0, max = 100) {
+  return Math.max(min, Math.min(max, value));
+}
+
 function shortNumber(value: number) {
   if (value >= 1000) return `${(value / 1000).toFixed(1)}k`;
   return Math.round(value).toString();
+}
+
+function formatDate(value: string | null) {
+  if (!value) return "TBD";
+
+  return new Date(value).toLocaleDateString("en-IN", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  });
 }
 
 function getInitials(name: string) {
@@ -75,53 +100,9 @@ function getInitials(name: string) {
 }
 
 function getTeamBadgeLabel(team: TeamBase) {
-  if (team.source === "krafton_india_esports") {
-    return "Official Krafton Team";
-  }
-
-  if (team.verified) {
-    return "Verified Team";
-  }
-
+  if (team.source === "krafton_india_esports") return "Official Krafton Team";
+  if (team.verified) return "Verified Team";
   return "Team Record";
-}
-
-function TeamLogo({
-  name,
-  logoUrl,
-  size = "md",
-}: {
-  name: string;
-  logoUrl: string | null;
-  size?: "sm" | "md" | "lg" | "xl";
-}) {
-  const sizeClass =
-    size === "xl"
-      ? "h-24 w-24"
-      : size === "lg"
-      ? "h-16 w-16"
-      : size === "sm"
-      ? "h-10 w-10"
-      : "h-12 w-12";
-
-  return (
-    <div
-      className={`${sizeClass} flex shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-white/[0.12] bg-black/25 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]`}
-    >
-      {logoUrl ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          src={logoUrl}
-          alt={`${name} logo`}
-          className="h-full w-full object-contain p-2"
-        />
-      ) : (
-        <span className="text-sm font-black text-white/70">
-          {getInitials(name)}
-        </span>
-      )}
-    </div>
-  );
 }
 
 function rankTone(rank: number | null | undefined) {
@@ -132,10 +113,6 @@ function rankTone(rank: number | null | undefined) {
   if (rank <= 10) return "border-emerald-400/25 bg-emerald-400/10 text-emerald-300";
 
   return "border-white/10 bg-white/[0.04] text-white/70";
-}
-
-function clamp(value: number, min = 0, max = 100) {
-  return Math.max(min, Math.min(max, value));
 }
 
 function normalizeHigher(value: number, max: number) {
@@ -178,7 +155,7 @@ function buildGridPoints(sides: number, radius: number, center: number) {
     .join(" ");
 }
 
-function getMomentum(results: TeamMatchResultRow[] = []) {
+function getMomentum(results: TeamMatchResultRow[] = []): Momentum {
   const matches = results.length;
   const totalPoints = results.reduce((sum, row) => sum + n(row.total_points), 0);
   const totalKills = results.reduce((sum, row) => sum + n(row.kills), 0);
@@ -196,10 +173,10 @@ function getMomentum(results: TeamMatchResultRow[] = []) {
     score >= 90
       ? "Hot Streak"
       : score >= 65
-      ? "Strong Form"
-      : score >= 40
-      ? "Stable"
-      : "Low Momentum";
+        ? "Strong Form"
+        : score >= 40
+          ? "Stable"
+          : "Low Momentum";
 
   return {
     matches,
@@ -209,6 +186,44 @@ function getMomentum(results: TeamMatchResultRow[] = []) {
     score,
     label,
   };
+}
+
+function TeamLogo({
+  name,
+  logoUrl,
+  size = "md",
+}: {
+  name: string;
+  logoUrl: string | null;
+  size?: "sm" | "md" | "lg" | "xl";
+}) {
+  const sizeClass =
+    size === "xl"
+      ? "h-24 w-24"
+      : size === "lg"
+        ? "h-16 w-16"
+        : size === "sm"
+          ? "h-10 w-10"
+          : "h-12 w-12";
+
+  return (
+    <div
+      className={`${sizeClass} flex shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-white/[0.12] bg-black/25 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]`}
+    >
+      {logoUrl ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={logoUrl}
+          alt={`${name} logo`}
+          className="h-full w-full object-contain p-2"
+        />
+      ) : (
+        <span className="text-sm font-black text-white/70">
+          {getInitials(name)}
+        </span>
+      )}
+    </div>
+  );
 }
 
 function Mini({
@@ -226,13 +241,7 @@ function Mini({
         {label}
       </p>
 
-      <p
-        className={`mt-1 truncate text-lg font-black ${
-          highlight
-            ? "bg-gradient-to-r from-emerald-200 to-emerald-400 bg-clip-text text-transparent"
-            : "text-white"
-        }`}
-      >
+      <p className={`mt-1 truncate text-lg font-black ${highlight ? "text-[#ffd21a]" : "text-white"}`}>
         {value}
       </p>
     </div>
@@ -259,12 +268,12 @@ function TeamCard({
   return (
     <Link
       href={`/teams/${team.slug}`}
-      className="group relative block overflow-hidden rounded-[1.65rem] border border-white/[0.12] bg-gradient-to-br from-white/[0.075] via-white/[0.035] to-transparent p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] transition hover:-translate-y-0.5 hover:border-white/25 hover:bg-white/[0.07]"
+      className="group relative block overflow-hidden rounded-[1.65rem] border border-white/[0.12] bg-gradient-to-br from-white/[0.075] via-white/[0.035] to-transparent p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] transition hover:-translate-y-0.5 hover:border-[#ffd21a]/30 hover:bg-white/[0.07]"
     >
       <div
         className={`pointer-events-none absolute ${
           align === "right" ? "-left-16" : "-right-16"
-        } -top-16 h-40 w-40 rounded-full bg-emerald-400/10 blur-3xl opacity-0 transition group-hover:opacity-100`}
+        } -top-16 h-40 w-40 rounded-full bg-[#ffd21a]/10 blur-3xl opacity-0 transition group-hover:opacity-100`}
       />
 
       <div
@@ -337,13 +346,7 @@ function MetricRow({
 
   return (
     <div className="grid grid-cols-[1fr_150px_1fr] items-center gap-4 border-b border-white/[0.055] px-5 py-4 transition last:border-b-0 hover:bg-white/[0.025]">
-      <p
-        className={`text-left text-lg font-black ${
-          leftWins
-            ? "bg-gradient-to-r from-emerald-200 to-emerald-400 bg-clip-text text-transparent"
-            : "text-white/62"
-        }`}
-      >
+      <p className={`text-left text-lg font-black ${leftWins ? "text-[#ffd21a]" : "text-white/62"}`}>
         {left}
       </p>
 
@@ -351,13 +354,7 @@ function MetricRow({
         {label}
       </p>
 
-      <p
-        className={`text-right text-lg font-black ${
-          rightWins
-            ? "bg-gradient-to-r from-emerald-200 to-emerald-400 bg-clip-text text-transparent"
-            : "text-white/62"
-        }`}
-      >
+      <p className={`text-right text-lg font-black ${rightWins ? "text-[#ffd21a]" : "text-white/62"}`}>
         {right}
       </p>
     </div>
@@ -383,8 +380,8 @@ function RadarChart({
   const secondPoints = buildRadarPoints(secondValues, radius, center);
 
   return (
-    <div className={surface}>
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_10%,rgba(16,185,129,0.12),transparent_34%),radial-gradient(circle_at_85%_15%,rgba(59,130,246,0.10),transparent_34%)]" />
+    <section className={surface}>
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_10%,rgba(250,204,21,0.12),transparent_34%),radial-gradient(circle_at_85%_15%,rgba(59,130,246,0.10),transparent_34%)]" />
       <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/30 to-transparent" />
 
       <div className="relative z-10 border-b border-white/10 px-5 py-4">
@@ -404,7 +401,7 @@ function RadarChart({
 
         <div className="mt-4 hidden items-center gap-4 text-xs md:flex">
           <div className="flex items-center gap-2">
-            <span className="h-2.5 w-2.5 rounded-full bg-emerald-300" />
+            <span className="h-2.5 w-2.5 rounded-full bg-[#ffd21a]" />
             <span className="text-white/45">{firstLabel}</span>
           </div>
 
@@ -417,7 +414,7 @@ function RadarChart({
 
       <div className="relative z-10 grid gap-5 p-5 lg:grid-cols-[320px_1fr] lg:items-center">
         <div className="relative mx-auto h-[300px] w-[300px]">
-          <div className="pointer-events-none absolute inset-8 rounded-full bg-emerald-300/10 blur-2xl" />
+          <div className="pointer-events-none absolute inset-8 rounded-full bg-[#ffd21a]/10 blur-2xl" />
 
           <svg viewBox={`0 0 ${size} ${size}`} className="relative h-full w-full">
             {[0.25, 0.5, 0.75, 1].map((level) => (
@@ -450,8 +447,8 @@ function RadarChart({
 
             <polygon
               points={firstPoints}
-              fill="rgba(16,185,129,0.20)"
-              stroke="rgba(110,231,183,0.95)"
+              fill="rgba(250,204,21,0.20)"
+              stroke="rgba(250,204,21,0.95)"
               strokeWidth="2.5"
             />
 
@@ -503,7 +500,7 @@ function RadarChart({
                 <div className="grid grid-cols-2 gap-2">
                   <div className="h-1.5 overflow-hidden rounded-full bg-white/10">
                     <div
-                      className="h-full rounded-full bg-emerald-300"
+                      className="h-full rounded-full bg-[#ffd21a]"
                       style={{ width: `${left}%` }}
                     />
                   </div>
@@ -516,7 +513,7 @@ function RadarChart({
                   </div>
                 </div>
 
-                <p className="text-right text-xs font-black text-emerald-300">
+                <p className="text-right text-xs font-black text-[#ffd21a]">
                   {left}
                 </p>
 
@@ -528,7 +525,134 @@ function RadarChart({
           })}
         </div>
       </div>
-    </div>
+    </section>
+  );
+}
+
+function InsightCard({
+  label,
+  value,
+  description,
+  badge,
+  accent = false,
+}: {
+  label: string;
+  value: string | number;
+  description: string;
+  badge: string;
+  accent?: boolean;
+}) {
+  return (
+    <article
+      className={
+        accent
+          ? "relative overflow-hidden rounded-[1.35rem] border border-[#ffd21a]/25 bg-gradient-to-br from-[#ffd21a]/[0.16] via-[#ffd21a]/[0.07] to-white/[0.03] p-5 shadow-[0_0_45px_rgba(250,204,21,0.14),inset_0_1px_0_rgba(255,255,255,0.08)]"
+          : `${panel} p-5`
+      }
+    >
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <p className="text-xs font-semibold uppercase tracking-[0.25em] text-white/35">
+          {label}
+        </p>
+
+        <DataSourceBadge label={badge} />
+      </div>
+
+      <p className={`mt-4 text-4xl font-black ${accent ? "text-[#ffd21a]" : "text-white"}`}>
+        {value}
+      </p>
+
+      <p className="mt-2 text-sm leading-6 text-white/45">{description}</p>
+    </article>
+  );
+}
+
+function RecentH2H({
+  matches,
+  firstTeam,
+  secondTeam,
+}: {
+  matches: MatchRow[];
+  firstTeam: TeamBase;
+  secondTeam: TeamBase;
+}) {
+  return (
+    <section className={surface}>
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(250,204,21,0.10),transparent_34%)]" />
+
+      <div className="relative z-10 flex flex-col gap-2 border-b border-white/10 px-5 py-4 md:flex-row md:items-end md:justify-between">
+        <div>
+          <div className="flex flex-wrap gap-2">
+            <DataSourceBadge label="Head-to-Head" />
+            <DataSourceBadge label="Match Data" />
+          </div>
+
+          <h2 className="mt-4 text-2xl font-black tracking-tight text-white">
+            Recent Meetings
+          </h2>
+        </div>
+
+        <p className="text-sm text-white/40">{matches.length} meetings</p>
+      </div>
+
+      <div className="relative z-10 grid gap-3 p-5 lg:grid-cols-2">
+        {matches.length > 0 ? (
+          matches.slice(0, 6).map((match) => {
+            const winner =
+              match.winner_team_id === firstTeam.id
+                ? firstTeam
+                : match.winner_team_id === secondTeam.id
+                  ? secondTeam
+                  : null;
+
+            return (
+              <Link
+                key={match.id}
+                href={`/match/${match.id}`}
+                className="rounded-2xl border border-white/10 bg-white/[0.035] p-4 transition hover:border-[#ffd21a]/30 hover:bg-white/[0.055]"
+              >
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <p className="text-xs uppercase tracking-[0.2em] text-white/35">
+                      {match.stage || "Match"}
+                    </p>
+
+                    <p className="mt-2 font-black text-white">
+                      {firstTeam.short_name || firstTeam.name}
+                      <span className="px-2 text-white/25">vs</span>
+                      {secondTeam.short_name || secondTeam.name}
+                    </p>
+
+                    <p className="mt-2 text-sm text-white/40">
+                      {match.map_name || "Map N/A"} · {formatDate(match.date)}
+                    </p>
+                  </div>
+
+                  <div className="text-right">
+                    <p className="text-xl font-black text-white">
+                      {match.team1_score ?? 0}
+                      <span className="px-2 text-white/25">-</span>
+                      {match.team2_score ?? 0}
+                    </p>
+
+                    <p className="mt-2 text-xs text-white/40">
+                      Winner:{" "}
+                      <span className="font-bold text-[#ffd21a]">
+                        {winner?.short_name || winner?.name || "N/A"}
+                      </span>
+                    </p>
+                  </div>
+                </div>
+              </Link>
+            );
+          })
+        ) : (
+          <p className="rounded-2xl border border-white/10 bg-white/[0.03] p-5 text-sm text-white/45 lg:col-span-2">
+            No direct head-to-head matches found yet.
+          </p>
+        )}
+      </div>
+    </section>
   );
 }
 
@@ -574,44 +698,48 @@ export default async function TeamCompareDynamicPage({
   ] = await Promise.all([
     supabase.from("team_analytics").select("*").eq("slug", team1).maybeSingle(),
     supabase.from("team_analytics").select("*").eq("slug", team2).maybeSingle(),
+
     supabase
       .from("rankings")
       .select("entity_id, rank, score, change")
       .eq("entity_type", "team")
       .in("entity_id", [firstTeam.id, secondTeam.id]),
+
     supabase
       .from("matches")
-      .select("*")
+      .select(
+        "id, team1_id, team2_id, winner_team_id, team1_score, team2_score, map_name, stage, date, source, verified"
+      )
       .or(
         `and(team1_id.eq.${firstTeam.id},team2_id.eq.${secondTeam.id}),and(team1_id.eq.${secondTeam.id},team2_id.eq.${firstTeam.id})`
       )
       .order("date", { ascending: false }),
+
     supabase
       .from("team_match_results")
-      .select("*")
+      .select("id, team_id, placement, kills, total_points, created_at")
       .eq("team_id", firstTeam.id)
       .order("created_at", { ascending: false })
       .limit(5),
+
     supabase
       .from("team_match_results")
-      .select("*")
+      .select("id, team_id, placement, kills, total_points, created_at")
       .eq("team_id", secondTeam.id)
       .order("created_at", { ascending: false })
       .limit(5),
   ]);
 
-  const firstAnalytics = (firstAnalyticsResult.data || {}) as any;
-  const secondAnalytics = (secondAnalyticsResult.data || {}) as any;
+  const firstAnalytics = (firstAnalyticsResult.data || {}) as Record<string, unknown>;
+  const secondAnalytics = (secondAnalyticsResult.data || {}) as Record<string, unknown>;
 
   const rankings = (rankingsResult.data || []) as RankingRow[];
   const rank1 = rankings.find((row) => row.entity_id === firstTeam.id);
   const rank2 = rankings.find((row) => row.entity_id === secondTeam.id);
 
   const h2hMatches = (h2hMatchesResult.data || []) as MatchRow[];
-  const firstRecentResults = (firstRecentResultsResult.data ||
-    []) as TeamMatchResultRow[];
-  const secondRecentResults = (secondRecentResultsResult.data ||
-    []) as TeamMatchResultRow[];
+  const firstRecentResults = (firstRecentResultsResult.data || []) as TeamMatchResultRow[];
+  const secondRecentResults = (secondRecentResultsResult.data || []) as TeamMatchResultRow[];
 
   const firstScore = n(rank1?.score, n(firstTeam.points));
   const secondScore = n(rank2?.score, n(secondTeam.points));
@@ -622,42 +750,36 @@ export default async function TeamCompareDynamicPage({
   const firstWins = n(firstAnalytics.wins, n(firstTeam.wins));
   const secondWins = n(secondAnalytics.wins, n(secondTeam.wins));
 
-  const firstMatches = n(
-    firstAnalytics.matches_played,
-    n(firstTeam.matches_played)
-  );
-  const secondMatches = n(
-    secondAnalytics.matches_played,
-    n(secondTeam.matches_played)
-  );
+  const firstMatches = n(firstAnalytics.matches_played, n(firstTeam.matches_played));
+  const secondMatches = n(secondAnalytics.matches_played, n(secondTeam.matches_played));
 
   const firstAvgKills =
     firstAnalytics.avg_kills !== undefined
       ? n(firstAnalytics.avg_kills)
       : firstMatches > 0
-      ? firstKills / firstMatches
-      : 0;
+        ? firstKills / firstMatches
+        : 0;
 
   const secondAvgKills =
     secondAnalytics.avg_kills !== undefined
       ? n(secondAnalytics.avg_kills)
       : secondMatches > 0
-      ? secondKills / secondMatches
-      : 0;
+        ? secondKills / secondMatches
+        : 0;
 
   const firstAvgPoints =
     firstAnalytics.avg_points !== undefined
       ? n(firstAnalytics.avg_points)
       : firstMatches > 0
-      ? firstScore / firstMatches
-      : 0;
+        ? firstScore / firstMatches
+        : 0;
 
   const secondAvgPoints =
     secondAnalytics.avg_points !== undefined
       ? n(secondAnalytics.avg_points)
       : secondMatches > 0
-      ? secondScore / secondMatches
-      : 0;
+        ? secondScore / secondMatches
+        : 0;
 
   const firstAvgPlacement = n(firstAnalytics.avg_placement, 0);
   const secondAvgPlacement = n(secondAnalytics.avg_placement, 0);
@@ -665,14 +787,8 @@ export default async function TeamCompareDynamicPage({
   const firstMomentum = getMomentum(firstRecentResults);
   const secondMomentum = getMomentum(secondRecentResults);
 
-  const team1Wins = h2hMatches.filter(
-    (match) => match.winner_team_id === firstTeam.id
-  ).length;
-
-  const team2Wins = h2hMatches.filter(
-    (match) => match.winner_team_id === secondTeam.id
-  ).length;
-
+  const team1Wins = h2hMatches.filter((match) => match.winner_team_id === firstTeam.id).length;
+  const team2Wins = h2hMatches.filter((match) => match.winner_team_id === secondTeam.id).length;
   const totalMeetings = h2hMatches.length;
 
   const closeMatches = h2hMatches.filter((match) => {
@@ -701,10 +817,10 @@ export default async function TeamCompareDynamicPage({
     rivalryScore >= 100
       ? "Elite Rivalry"
       : rivalryScore >= 70
-      ? "Strong Rivalry"
-      : rivalryScore >= 40
-      ? "Developing Rivalry"
-      : "Limited History";
+        ? "Strong Rivalry"
+        : rivalryScore >= 40
+          ? "Developing Rivalry"
+          : "Limited History";
 
   const scoreDiff = firstScore - secondScore;
   const killDiff = firstKills - secondKills;
@@ -753,10 +869,10 @@ export default async function TeamCompareDynamicPage({
 
   return (
     <main className="page-shell relative space-y-5 py-6 text-white">
-      <div className="pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(circle_at_20%_10%,rgba(16,185,129,0.08),transparent_30%),radial-gradient(circle_at_80%_20%,rgba(59,130,246,0.07),transparent_30%)]" />
+      <div className="pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(circle_at_20%_10%,rgba(250,204,21,0.08),transparent_30%),radial-gradient(circle_at_80%_20%,rgba(59,130,246,0.07),transparent_30%)]" />
 
       <section className="relative overflow-hidden rounded-[2rem] border border-white/[0.10] bg-[#080a0f] px-6 py-6 shadow-[0_24px_80px_rgba(0,0,0,0.35)] md:px-8">
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_15%_20%,rgba(16,185,129,0.14),transparent_32%),radial-gradient(circle_at_85%_10%,rgba(59,130,246,0.10),transparent_32%)]" />
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_15%_20%,rgba(250,204,21,0.14),transparent_32%),radial-gradient(circle_at_85%_10%,rgba(59,130,246,0.10),transparent_32%)]" />
         <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/30 to-transparent" />
 
         <div className="relative z-10 flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
@@ -768,7 +884,7 @@ export default async function TeamCompareDynamicPage({
               <DataSourceBadge label="Analytics Generated" size="md" />
             </div>
 
-            <p className="text-xs font-black uppercase tracking-[0.28em] text-emerald-300/70">
+            <p className="text-xs font-black uppercase tracking-[0.28em] text-[#ffd21a]">
               Comparative Edge
             </p>
 
@@ -784,21 +900,30 @@ export default async function TeamCompareDynamicPage({
             </p>
           </div>
 
-          <Link
-            href="/compare"
-            className="w-fit rounded-full border border-white/10 bg-white/[0.04] px-5 py-2.5 text-sm font-semibold text-white/55 transition hover:border-white/25 hover:text-white"
-          >
-            Change Teams
-          </Link>
+          <div className="flex flex-wrap gap-3">
+            <Link
+              href="/teams/compare"
+              className="w-fit rounded-full border border-[#ffd21a]/30 bg-[#ffd21a]/10 px-5 py-2.5 text-sm font-black text-[#ffd21a] transition hover:bg-[#ffd21a]/15"
+            >
+              Change Teams
+            </Link>
+
+            <Link
+              href="/data"
+              className="w-fit rounded-full border border-white/10 bg-white/[0.04] px-5 py-2.5 text-sm font-semibold text-white/55 transition hover:border-white/25 hover:text-white"
+            >
+              Data Trust
+            </Link>
+          </div>
         </div>
       </section>
 
       <section className={surface}>
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_18%_18%,rgba(16,185,129,0.12),transparent_34%),radial-gradient(circle_at_82%_18%,rgba(59,130,246,0.10),transparent_34%)]" />
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_18%_18%,rgba(250,204,21,0.12),transparent_34%),radial-gradient(circle_at_82%_18%,rgba(59,130,246,0.10),transparent_34%)]" />
         <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/30 to-transparent" />
 
         <div className="relative z-10 grid gap-0 lg:grid-cols-[1fr_240px_1fr]">
-          <div className="border-b border-white/10 p-5 lg:border-b-0 lg:border-r">
+          <div className="border-b border-white/10 p-5 lg:border-b-0 lg:border-r lg:border-white/10">
             <TeamCard
               team={firstTeam}
               rank={rank1?.rank ?? firstTeam.global_rank}
@@ -809,9 +934,9 @@ export default async function TeamCompareDynamicPage({
             />
           </div>
 
-          <div className="relative flex flex-col items-center justify-center overflow-hidden border-b border-white/10 bg-gradient-to-b from-emerald-400/[0.075] via-white/[0.025] to-transparent p-5 text-center lg:border-b-0">
-            <div className="pointer-events-none absolute h-44 w-44 rounded-full border border-emerald-300/15" />
-            <div className="pointer-events-none absolute h-32 w-32 rounded-full border border-emerald-300/20" />
+          <div className="relative flex flex-col items-center justify-center overflow-hidden border-b border-white/10 bg-gradient-to-b from-[#ffd21a]/[0.075] via-white/[0.025] to-transparent p-5 text-center lg:border-b-0">
+            <div className="pointer-events-none absolute h-44 w-44 rounded-full border border-[#ffd21a]/15" />
+            <div className="pointer-events-none absolute h-32 w-32 rounded-full border border-[#ffd21a]/20" />
 
             <DataSourceBadge label="Analytics Generated" />
 
@@ -819,10 +944,10 @@ export default async function TeamCompareDynamicPage({
               Comparative Edge
             </p>
 
-            <div className="relative z-10 mt-4 flex h-28 w-28 items-center justify-center rounded-full border border-emerald-400/25 bg-emerald-400/10 shadow-[0_0_45px_rgba(16,185,129,0.20)]">
+            <div className="relative z-10 mt-4 flex h-28 w-28 items-center justify-center rounded-full border border-[#ffd21a]/25 bg-[#ffd21a]/10 shadow-[0_0_45px_rgba(250,204,21,0.18)]">
               <div>
-                <p className="text-4xl font-black tracking-[-0.08em] text-emerald-300">
-                  +{edgeMagnitude}
+                <p className="text-4xl font-black tracking-[-0.08em] text-[#ffd21a]">
+                  {edgeMagnitude === 0 ? "EVEN" : `+${edgeMagnitude}`}
                 </p>
 
                 <p className="text-[10px] uppercase tracking-[0.24em] text-white/35">
@@ -840,7 +965,7 @@ export default async function TeamCompareDynamicPage({
             </p>
           </div>
 
-          <div className="p-5 lg:border-l">
+          <div className="p-5 lg:border-l lg:border-white/10">
             <TeamCard
               team={secondTeam}
               rank={rank2?.rank ?? secondTeam.global_rank}
@@ -863,7 +988,7 @@ export default async function TeamCompareDynamicPage({
         />
 
         <section className={surface}>
-          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_90%_0%,rgba(16,185,129,0.10),transparent_34%)]" />
+          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_90%_0%,rgba(250,204,21,0.10),transparent_34%)]" />
 
           <div className="relative z-10 border-b border-white/10 px-5 py-4">
             <div className="flex flex-wrap items-start justify-between gap-3">
@@ -915,100 +1040,41 @@ export default async function TeamCompareDynamicPage({
       </section>
 
       <section className="grid gap-4 lg:grid-cols-4">
-        <div className={`${panel} p-5`}>
-          <div className="flex flex-wrap items-start justify-between gap-3">
-            <p className="text-xs font-semibold uppercase tracking-[0.25em] text-white/35">
-              H2H
-            </p>
+        <InsightCard
+          label="H2H"
+          value={`${team1Wins}-${team2Wins}`}
+          description={`${totalMeetings} direct meetings tracked between these teams.`}
+          badge="Match Data"
+        />
 
-            <DataSourceBadge label="Match Data" />
-          </div>
+        <InsightCard
+          label="Momentum"
+          value={`${firstMomentum.score}-${secondMomentum.score}`}
+          description={`${firstLabel}: ${firstMomentum.label}. ${secondLabel}: ${secondMomentum.label}.`}
+          badge="Recent Form"
+        />
 
-          <div className="mt-4 flex items-end justify-between">
-            <div>
-              <p className="text-4xl font-black text-white">{team1Wins}</p>
-              <p className="text-xs text-white/40">{firstLabel}</p>
-            </div>
+        <InsightCard
+          label="Rivalry"
+          value={rivalryScore}
+          description={`${rivalryLabel} · ${closeMatches} close matches tracked.`}
+          badge="Rivalry Intelligence"
+        />
 
-            <div className="text-center">
-              <p className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-sm font-black text-white/55">
-                {totalMeetings}
-              </p>
-
-              <p className="mt-1 text-xs text-white/35">Meetings</p>
-            </div>
-
-            <div className="text-right">
-              <p className="text-4xl font-black text-white">{team2Wins}</p>
-              <p className="text-xs text-white/40">{secondLabel}</p>
-            </div>
-          </div>
-        </div>
-
-        <div className={`${panel} p-5`}>
-          <div className="flex flex-wrap items-start justify-between gap-3">
-            <p className="text-xs font-semibold uppercase tracking-[0.25em] text-white/35">
-              Momentum
-            </p>
-
-            <DataSourceBadge label="Recent Form" />
-          </div>
-
-          <div className="mt-4 grid grid-cols-2 gap-3">
-            <div>
-              <p className="text-4xl font-black text-emerald-300">
-                {firstMomentum.score}
-              </p>
-              <p className="text-xs text-white/40">{firstMomentum.label}</p>
-            </div>
-
-            <div className="text-right">
-              <p className="text-4xl font-black text-emerald-300">
-                {secondMomentum.score}
-              </p>
-              <p className="text-xs text-white/40">{secondMomentum.label}</p>
-            </div>
-          </div>
-        </div>
-
-        <div className={`${panel} p-5`}>
-          <div className="flex flex-wrap items-start justify-between gap-3">
-            <p className="text-xs font-semibold uppercase tracking-[0.25em] text-white/35">
-              Rivalry
-            </p>
-
-            <DataSourceBadge label="Rivalry Intelligence" />
-          </div>
-
-          <p className="mt-4 text-4xl font-black text-white">{rivalryScore}</p>
-
-          <p className="mt-1 text-xs text-white/40">
-            {rivalryLabel} · {closeMatches} close
-          </p>
-        </div>
-
-        <div className="relative overflow-hidden rounded-[1.35rem] border border-emerald-300/25 bg-gradient-to-br from-emerald-400/[0.16] via-emerald-400/[0.07] to-white/[0.03] p-5 shadow-[0_0_45px_rgba(16,185,129,0.16),inset_0_1px_0_rgba(255,255,255,0.08)]">
-          <div className="pointer-events-none absolute -right-10 -top-10 h-28 w-28 rounded-full bg-emerald-300/20 blur-2xl" />
-
-          <div className="relative z-10">
-            <div className="flex flex-wrap items-start justify-between gap-3">
-              <p className="text-xs font-semibold uppercase tracking-[0.25em] text-emerald-300/70">
-                Final Read
-              </p>
-
-              <DataSourceBadge label="Analytics Generated" />
-            </div>
-
-            <p className="mt-4 text-2xl font-black text-white">
-              {dominantTeam.name}
-            </p>
-
-            <p className="mt-1 text-sm font-black text-emerald-300">
-              Overall Edge + {edgeMagnitude}
-            </p>
-          </div>
-        </div>
+        <InsightCard
+          label="Final Read"
+          value={dominantTeam.short_name || dominantTeam.name}
+          description={`Overall edge +${edgeMagnitude} from ranking score, kills, WWCD and placement signals.`}
+          badge="Analytics Generated"
+          accent
+        />
       </section>
+
+      <RecentH2H
+        matches={h2hMatches}
+        firstTeam={firstTeam}
+        secondTeam={secondTeam}
+      />
     </main>
   );
 }
