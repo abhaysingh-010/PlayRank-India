@@ -1,102 +1,29 @@
 import Link from "next/link";
+import DataSourceBadge from "@/components/DataSourceBadge";
 
-const adminModules = 
-[
+type Tone = "healthy" | "warning" | "danger" | "neutral";
+type Status = "Protected" | "Live";
+
+type AdminModule = {
+  title: string;
+  label: string;
+  description: string;
+  href: string;
+  status: Status;
+  tone: Tone;
+  group: "System" | "PUBG Pipeline" | "Content Ops" | "Public Review";
+};
+
+const adminModules: AdminModule[] = [
   {
     title: "Data Health",
     label: "Quality Console",
-    description:"Check table counts, missing logos, broken slugs, orphan rankings, import health and PUBG promotion readiness.",
+    description:
+      "Check table counts, missing logos, broken slugs, orphan rankings, import health and promotion readiness.",
     href: "/admin/data-health",
     status: "Protected",
     tone: "healthy",
-  },
-  {
-    title: "PUBG Hub",
-    label: "API Control",
-    description:"Central PUBG API control hub for imports, staging data, mappings, promotion readiness and import jobs.",
-    href: "/admin/pubg",
-    status: "Protected",
-    tone: "warning",
-  },
-  {
-    title: "PUBG Imports",
-    label: "Import Review",
-    description:"Review imported PUBG API matches, blocked imports, mapped players and promotion eligibility.",
-    href: "/admin/pubg/imports",
-    status: "Protected",
-    tone: "warning",
-  },
-  {
-    title: "PUBG Mappings",
-    label: "Player Mapping",
-    description:"Map PUBG account IDs and imported player names to verified PlayRank player records.",
-    href: "/admin/pubg/mappings",
-    status: "Protected",
-    tone: "warning",
-  },
-  {
-    title: "Admin Matches",
-    label: "Match Ops",
-    description:"Manage and inspect structured match records powering PlayRank match intelligence.",
-    href: "/admin/matches",
-    status: "Protected",
-    tone: "neutral",
-  },
-  {
-    title: "Admin Players",
-    label: "Player Ops",
-    description:"Manage player records, team links, roles, slugs, source data and profile coverage.",
-    href: "/admin/players",
-    status: "Protected",
-    tone: "neutral",
-  },
-  {
-    title: "Admin Tournaments",
-    label: "Event Ops",
-    description:"Manage tournament records, event pages, standings context and tournament metadata.",
-    href: "/admin/tournaments",
-    status: "Protected",
-    tone: "neutral",
-  },
-   {
-    title: "Admin Teams",
-    label: "Team Ops",
-    description:"Manage team records, short names, logos, slugs, source data and team profile coverage.",
-    href: "/admin/teams",
-    status: "Protected",
-    tone: "neutral",
-  },
-  {
-    title: "Admin Rosters",
-    label: "Roster Ops",
-    description:"Link players to teams through active roster records and keep player team IDs synchronized.",
-    href: "/admin/rosters",
-    status: "Protected",
-    tone: "neutral",
-  },
-  {
-    title: "Data Trust Layer",
-    label: "Source Control",
-    description:"Review official rankings, PUBG API foundation, source rows, imports and ranking history.",
-    href: "/data",
-    status: "Live",
-    tone: "healthy",
-  },
-  {
-    title: "Rankings",
-    label: "Competitive Order",
-    description:"View active team and player rankings powering the public ranking experience.",
-    href: "/rankings",
-    status: "Live",
-    tone: "healthy",
-  },
-  {
-    title: "Compare",
-    label: "Edge Engine",
-    description:"Open team and player comparison flows for competitive edge analysis.",
-    href: "/compare",
-    status: "Live",
-    tone: "healthy",
+    group: "System",
   },
   {
     title: "Roster Health",
@@ -106,10 +33,138 @@ const adminModules =
     href: "/admin/rosters/health",
     status: "Protected",
     tone: "healthy",
+    group: "System",
+  },
+  {
+    title: "PUBG Hub",
+    label: "API Control",
+    description:
+      "Central PUBG API control hub for imports, staging data, mappings, promotion readiness and import jobs.",
+    href: "/admin/pubg",
+    status: "Protected",
+    tone: "warning",
+    group: "PUBG Pipeline",
+  },
+  {
+    title: "Import Match",
+    label: "Staging Import",
+    description:
+      "Import PUBG API match data into staging without touching public PlayRank core tables.",
+    href: "/admin/pubg/import",
+    status: "Protected",
+    tone: "warning",
+    group: "PUBG Pipeline",
+  },
+  {
+    title: "PUBG Imports",
+    label: "Import Review",
+    description:
+      "Review imported API matches, blocked imports, mapped players and promotion eligibility.",
+    href: "/admin/pubg/imports",
+    status: "Protected",
+    tone: "warning",
+    group: "PUBG Pipeline",
+  },
+  {
+    title: "PUBG Mappings",
+    label: "Player Mapping",
+    description:
+      "Map PUBG account IDs and imported player names to verified PlayRank player records.",
+    href: "/admin/pubg/mappings",
+    status: "Protected",
+    tone: "warning",
+    group: "PUBG Pipeline",
+  },
+  {
+    title: "Teams",
+    label: "Team Ops",
+    description:
+      "Manage team records, short names, logos, slugs, source data and team profile coverage.",
+    href: "/admin/teams",
+    status: "Protected",
+    tone: "neutral",
+    group: "Content Ops",
+  },
+  {
+    title: "Players",
+    label: "Player Ops",
+    description:
+      "Manage player records, team links, roles, slugs, source data and profile coverage.",
+    href: "/admin/players",
+    status: "Protected",
+    tone: "neutral",
+    group: "Content Ops",
+  },
+  {
+    title: "Rosters",
+    label: "Roster Ops",
+    description:
+      "Link players to teams through active roster records and keep player team IDs synchronized.",
+    href: "/admin/rosters",
+    status: "Protected",
+    tone: "neutral",
+    group: "Content Ops",
+  },
+  {
+    title: "Matches",
+    label: "Match Ops",
+    description:
+      "Manage structured match records powering PlayRank match intelligence.",
+    href: "/admin/matches",
+    status: "Protected",
+    tone: "neutral",
+    group: "Content Ops",
+  },
+  {
+    title: "Tournaments",
+    label: "Event Ops",
+    description:
+      "Manage tournament records, event pages, standings context and tournament metadata.",
+    href: "/admin/tournaments",
+    status: "Protected",
+    tone: "neutral",
+    group: "Content Ops",
+  },
+  {
+    title: "Data Trust",
+    label: "Source Layer",
+    description:
+      "Review public-facing source context, imports, official data notes and ranking trust layer.",
+    href: "/data",
+    status: "Live",
+    tone: "healthy",
+    group: "Public Review",
+  },
+  {
+    title: "Rankings",
+    label: "Competitive Order",
+    description:
+      "View active team and player rankings powering the public ranking experience.",
+    href: "/rankings",
+    status: "Live",
+    tone: "healthy",
+    group: "Public Review",
+  },
+  {
+    title: "Compare",
+    label: "Edge Engine",
+    description:
+      "Open team and player comparison flows for competitive edge analysis.",
+    href: "/compare",
+    status: "Live",
+    tone: "healthy",
+    group: "Public Review",
   },
 ];
 
-function statusClasses(tone: string) {
+const groups: AdminModule["group"][] = [
+  "System",
+  "PUBG Pipeline",
+  "Content Ops",
+  "Public Review",
+];
+
+function toneClass(tone: Tone) {
   if (tone === "healthy") {
     return "border-emerald-400/25 bg-emerald-400/10 text-emerald-300";
   }
@@ -122,57 +177,107 @@ function statusClasses(tone: string) {
     return "border-red-400/25 bg-red-400/10 text-red-300";
   }
 
-  return "border-white/10 bg-white/[0.04] text-white/60";
+  return "border-white/10 bg-white/[0.04] text-white/55";
 }
 
-function AdminModuleCard({
-  item,
-  index,
+function Stat({
+  label,
+  value,
+  tone = "neutral",
 }: {
-  item: {
-    title: string;
-    label: string;
-    description: string;
-    href: string;
-    status: string;
-    tone: string;
-  };
-  index: number;
+  label: string;
+  value: string | number;
+  tone?: Tone;
 }) {
-  const tone = statusClasses(item.tone);
-
   return (
-    <Link href={item.href} className="krafton-card group min-h-[300px] p-7">
-      <div className="flex items-start justify-between gap-5">
-        <p className="text-sm font-black uppercase tracking-[0.28em] text-[#ff4038]">
-          {item.label}
-        </p>
-
-        <span className="text-sm font-black text-white/30">
-          {String(index + 1).padStart(2, "0")}
-        </span>
-      </div>
-
-      <h2 className="mt-8 text-4xl font-black uppercase leading-[0.92] tracking-[-0.06em] text-white">
-        {item.title}
-      </h2>
-
-      <p className="mt-6 max-w-sm leading-7 text-white/50">
-        {item.description}
+    <div className="rounded-2xl border border-white/10 bg-white/[0.035] p-4">
+      <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/35">
+        {label}
       </p>
 
-      <div className="mt-8 flex items-center justify-between border-t border-white/10 pt-5">
-        <span
-          className={`rounded-full border px-3 py-1 text-[10px] font-black uppercase tracking-[0.14em] ${tone}`}
-        >
-          {item.status}
-        </span>
+      <p
+        className={`mt-2 text-3xl font-black ${
+          tone === "healthy"
+            ? "text-emerald-300"
+            : tone === "warning"
+              ? "text-yellow-300"
+              : tone === "danger"
+                ? "text-red-300"
+                : "text-white"
+        }`}
+      >
+        {value}
+      </p>
+    </div>
+  );
+}
 
-        <span className="text-sm font-black uppercase tracking-[0.18em] text-white/45 group-hover:text-[#ff4038]">
-          Open -&gt;
+function AdminModuleRow({ item }: { item: AdminModule }) {
+  return (
+    <Link
+      href={item.href}
+      className="group block rounded-2xl border border-white/10 bg-white/[0.025] p-4 transition hover:-translate-y-0.5 hover:border-[#ffd21a]/30 hover:bg-white/[0.045]"
+    >
+      <div className="flex items-start justify-between gap-4">
+        <div className="min-w-0">
+          <div className="flex flex-wrap items-center gap-2">
+            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[#ffd21a]">
+              {item.label}
+            </p>
+
+            <span
+              className={`rounded-full border px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.12em] ${toneClass(
+                item.tone
+              )}`}
+            >
+              {item.status}
+            </span>
+          </div>
+
+          <h3 className="mt-3 text-xl font-black text-white">{item.title}</h3>
+
+          <p className="mt-2 max-w-2xl text-sm leading-6 text-white/45">
+            {item.description}
+          </p>
+        </div>
+
+        <span className="shrink-0 text-sm font-black text-white/25 transition group-hover:text-[#ffd21a]">
+          Open
         </span>
       </div>
     </Link>
+  );
+}
+
+function GroupSection({
+  title,
+  items,
+}: {
+  title: string;
+  items: AdminModule[];
+}) {
+  return (
+    <section className="rounded-[2rem] border border-white/10 bg-[#080a0f] p-5 shadow-[0_24px_80px_rgba(0,0,0,0.28)]">
+      <div className="mb-5 flex items-center justify-between border-b border-white/10 pb-4">
+        <div>
+          <p className="text-xs font-black uppercase tracking-[0.25em] text-[#ffd21a]">
+            Module Group
+          </p>
+
+          <h2 className="mt-2 text-2xl font-black text-white">{title}</h2>
+        </div>
+
+        <span className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-xs font-black text-white/45">
+          {items.length}
+        </span>
+      </div>
+
+      <div className="grid gap-3">
+        {items.map((item) => (
+          <AdminModuleRow key={item.href} item={item} />
+        ))}
+      </div>
+    </section>
   );
 }
 
@@ -185,133 +290,98 @@ export default function AdminPage() {
     (module) => module.status === "Live"
   ).length;
 
+  const warningModules = adminModules.filter(
+    (module) => module.tone === "warning"
+  ).length;
+
   return (
-    <main className="min-h-screen bg-black text-white">
-      <section className="krafton-grid relative overflow-hidden border-b border-white/10 px-7 py-24 md:px-14">
-        <div className="blueprint-lines" />
+    <main className="min-h-screen bg-[#030406] text-white">
+      <section className="border-b border-white/10 bg-[#050609]">
+        <div className="mx-auto max-w-7xl px-5 py-12 md:py-16">
+          <div className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:items-end">
+            <div>
+              <div className="flex flex-wrap gap-2">
+                <DataSourceBadge label="Internal Console" size="md" />
+                <DataSourceBadge label="Protected" size="md" />
+                <DataSourceBadge label="PlayRank Ops" size="md" />
+              </div>
 
-        <div className="relative z-10 mx-auto max-w-[1600px]">
-          <p className="krafton-label">Internal Console</p>
+              <h1 className="mt-7 text-5xl font-black uppercase leading-[0.9] tracking-[-0.07em] text-white md:text-7xl">
+                Admin Control
+                <br />
+                Center
+              </h1>
 
-          <h1 className="krafton-display mt-6 max-w-[1450px] text-[15vw] md:text-[9vw] xl:text-[8rem]">
-            ADMIN
-            <br />
-            CONTROL
-            <br />
-            CENTER
-          </h1>
+              <p className="mt-6 max-w-3xl text-base leading-7 text-white/50">
+                Manage PlayRank’s data health, PUBG API pipeline, mappings,
+                teams, players, rosters, matches, tournaments and public review
+                routes from one protected console.
+              </p>
 
-          <p className="mt-8 max-w-4xl text-base font-black uppercase leading-6 tracking-[-0.03em] text-white md:text-xl">
-            Manage PlayRank's intelligence system from one internal access
-            point: data health, PUBG imports, player mappings, rankings, teams,
-            players, matches, tournaments and comparison flows.
-          </p>
+              <div className="mt-8 flex flex-wrap gap-3">
+                <Link
+                  href="/admin/data-health"
+                  className="rounded-full border border-[#ffd21a]/30 bg-[#ffd21a]/10 px-5 py-2.5 text-sm font-black text-[#ffd21a] transition hover:bg-[#ffd21a]/15"
+                >
+                  Data Health
+                </Link>
 
-          <div className="mt-10 flex flex-wrap gap-3">
-            <Link
-              href="/admin/data-health"
-              className="btn-primary px-6 py-3 text-sm"
-            >
-              Data Health
-            </Link>
+                <Link
+                  href="/admin/pubg"
+                  className="rounded-full border border-white/10 bg-white/[0.04] px-5 py-2.5 text-sm font-black text-white/65 transition hover:border-white/25 hover:text-white"
+                >
+                  PUBG Hub
+                </Link>
 
-            <Link
-              href="/admin/pubg"
-              className="btn-secondary px-6 py-3 text-sm"
-            >
-              PUBG Admin Hub
-            </Link>
+                <Link
+                  href="/admin/pubg/mappings"
+                  className="rounded-full border border-white/10 bg-white/[0.04] px-5 py-2.5 text-sm font-black text-white/65 transition hover:border-white/25 hover:text-white"
+                >
+                  Mappings
+                </Link>
+              </div>
+            </div>
 
-            <Link
-              href="/admin/pubg/imports"
-              className="btn-secondary px-6 py-3 text-sm"
-            >
-              PUBG Imports
-            </Link>
-
-            <Link
-              href="/admin/pubg/mappings"
-              className="btn-secondary px-6 py-3 text-sm"
-            >
-              PUBG Mappings
-            </Link>
+            <div className="grid grid-cols-2 gap-3">
+              <Stat label="Modules" value={adminModules.length} />
+              <Stat label="Protected" value={protectedModules} tone="warning" />
+              <Stat label="Live Review" value={liveModules} tone="healthy" />
+              <Stat label="Needs Care" value={warningModules} tone="warning" />
+            </div>
           </div>
         </div>
       </section>
 
-      <section className="border-b border-white/10 bg-black px-7 py-10 md:px-14">
-        <div className="mx-auto grid max-w-[1600px] gap-5 md:grid-cols-4">
-          <div>
-            <p className="data-label">Console</p>
-            <p className="mt-2 text-5xl font-black text-white">01</p>
-          </div>
-
-          <div>
-            <p className="data-label">Modules</p>
-            <p className="mt-2 text-5xl font-black text-white">
-              {adminModules.length}
-            </p>
-          </div>
-
-          <div>
-            <p className="data-label">Protected</p>
-            <p className="mt-2 text-5xl font-black text-yellow-300">
-              {protectedModules}
-            </p>
-          </div>
-
-          <div>
-            <p className="data-label">Live</p>
-            <p className="mt-2 text-5xl font-black text-emerald-300">
-              {liveModules}
-            </p>
-          </div>
-        </div>
+      <section className="mx-auto grid max-w-7xl gap-5 px-5 py-10 lg:grid-cols-2">
+        {groups.map((group) => (
+          <GroupSection
+            key={group}
+            title={group}
+            items={adminModules.filter((module) => module.group === group)}
+          />
+        ))}
       </section>
 
-      <section className="mx-auto max-w-[1600px] px-7 py-24 md:px-14">
-        <div className="mb-8 border-b border-white/10 pb-5">
-          <p className="krafton-label">System Modules</p>
-
-          <h2 className="mt-3 text-4xl font-black uppercase tracking-[-0.04em] text-white md:text-5xl">
-            Admin Shortcuts
-          </h2>
-        </div>
-
-        <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
-          {adminModules.map((item, index) => (
-            <AdminModuleCard key={item.title} item={item} index={index} />
-          ))}
-        </div>
-      </section>
-
-      <section className="border-y border-white/10 bg-[#050505] px-7 py-24 md:px-14">
-        <div className="mx-auto grid max-w-[1600px] gap-12 xl:grid-cols-[0.85fr_1.15fr]">
+      <section className="border-t border-white/10 bg-[#050609]">
+        <div className="mx-auto flex max-w-7xl flex-col gap-4 px-5 py-8 md:flex-row md:items-center md:justify-between">
           <div>
-            <p className="krafton-label">Operating Rule</p>
-
-            <h2 className="mt-4 text-5xl font-black uppercase leading-[0.9] tracking-[-0.07em] text-white md:text-7xl">
-              Protect
-              <br />
-              The
-              <br />
-              Source
-            </h2>
-          </div>
-
-          <div className="max-w-5xl">
-            <p className="text-2xl font-black uppercase leading-8 tracking-[-0.04em] text-white md:text-4xl md:leading-[1.05]">
-              PlayRank should never mix raw imports, normalized staging records
-              and public analytics without source control.
+            <p className="text-sm font-black text-white">
+              Admin rule: raw imports should not reach public tables without
+              source control, mapping and promotion checks.
             </p>
 
-            <p className="mt-8 max-w-3xl text-lg leading-8 text-white/50">
-              The admin layer exists to keep the product clean: protect import
-              endpoints, verify counts, monitor broken relationships, review
-              official ranking snapshots, map imported player identities and
-              block unsafe PUBG data before it reaches core PlayRank tables.
+            <p className="mt-1 max-w-3xl text-sm leading-6 text-white/40">
+              Keep staging, mappings, promotion readiness and public analytics
+              separate until the data is safe to publish.
             </p>
           </div>
+
+          <Link
+            href="/data"
+            className="text-sm font-black text-white/40 transition hover:text-[#ffd21a]"
+          >
+            Review Data Trust
+          </Link>
         </div>
       </section>
     </main>
