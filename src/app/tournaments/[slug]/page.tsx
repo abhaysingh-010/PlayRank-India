@@ -649,7 +649,6 @@ export default async function TournamentPage
   )
   .sort((a, b) => b.powerScore - a.powerScore);
   const powerLeader = powerRankings[0];
-
   const difficultyIndex = standings.length > 0? Math.round(standings.reduce((sum, item) => sum + n(item.points) + n(item.kills),0) / standings.length): 0;
   const difficultyLabel = difficultyIndex > 250 ? "Elite" : difficultyIndex > 150 ? "Hard" : "Moderate";
   const championOutput = champion? Math.round(n(champion.points) * 0.6 + n(champion.kills) * 0.4) : 0;
@@ -665,31 +664,15 @@ export default async function TournamentPage
         <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/30 to-transparent" />
         <div className="relative z-10 flex flex-col gap-7 lg:flex-row lg:items-end lg:justify-between">
           <div className="flex flex-col gap-5 md:flex-row md:items-center">
-            <TournamentLogo
-              name={tournament.name}
-              logoUrl={tournament.logo_url}
-            />
-
+            <TournamentLogo name={tournament.name}logoUrl={tournament.logo_url}/>
             <div>
               <div className="mb-4 flex flex-wrap gap-2">
-                <DataSourceBadge
-                  source={tournament.source}
-                  verified={tournament.verified}
-                  label={getTournamentBadgeLabel(tournament)}
-                  size="md"
-                />
+                <DataSourceBadge source={tournament.source}verified={tournament.verified}label={getTournamentBadgeLabel(tournament)}size="md"/>
                 <DataSourceBadge label="Standings Data" size="md" />
                 <DataSourceBadge label="Match Data" size="md" />
               </div>
-
-              <p className="text-xs font-black uppercase tracking-[0.28em] text-[#ffd21a]">
-                Tournament Profile
-              </p>
-
-              <h1 className="mt-2 max-w-4xl text-5xl font-black uppercase leading-[0.9] tracking-[-0.06em] text-white md:text-7xl">
-                {tournament.name}
-              </h1>
-
+              <p className="text-xs font-black uppercase tracking-[0.28em] text-[#ffd21a]">Tournament Profile</p>
+              <h1 className="mt-2 max-w-4xl text-5xl font-black uppercase leading-[0.9] tracking-[-0.06em] text-white md:text-7xl">{tournament.name}</h1>
               <p className="mt-4 text-white/45">
                 {tournament.organizer || "Organizer N/A"} ·{" "}
                 {tournament.location || "Location N/A"} ·{" "}
@@ -697,42 +680,27 @@ export default async function TournamentPage
               </p>
             </div>
           </div>
-
           <div className="flex flex-wrap gap-3">
-            <span
-              className={`rounded-full border px-5 py-2.5 text-sm font-black uppercase tracking-[0.12em] ${getStatusClass(
-                tournament.status
-              )}`}
-            >
+            <span className={`rounded-full border px-5 py-2.5 text-sm font-black uppercase tracking-[0.12em] ${getStatusClass(tournament.status)}`}>
               {tournament.status || "Status N/A"}
             </span>
-
             <span className="rounded-full border border-white/10 bg-white/[0.04] px-5 py-2.5 text-sm font-semibold text-white/65">
               {formatMoney(tournament.prize_pool)}
             </span>
-
-            <Link
-              href="/data"
-              className="rounded-full border border-white/10 bg-white/[0.04] px-5 py-2.5 text-sm font-semibold text-white/55 transition hover:border-white/25 hover:text-white"
-            >
+            <Link href="/data"className="rounded-full border border-white/10 bg-white/[0.04] px-5 py-2.5 text-sm font-semibold text-white/55 transition hover:border-white/25 hover:text-white">
               Data Trust
             </Link>
           </div>
         </div>
       </section>
-
       <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-6">
-        <Metric
-          label="Teams"
-          value={tournament.participating_teams || standings.length || "—"}
-        />
+        <Metric label="Teams"value={tournament.participating_teams || standings.length || "—"}/>
         <Metric label="Matches" value={totalMatches} />
         <Metric label="Total Kills" value={totalKills} />
         <Metric label="WWCD" value={totalWins} />
         <Metric label="Prize Pool" value={formatMoney(tournament.prize_pool)} muted />
         <Metric label="Difficulty" value={difficultyLabel} muted />
       </section>
-
       <section className="grid gap-4 md:grid-cols-3">
         <PodiumCard label="Champion" standing={champion} tone="gold" />
         <PodiumCard label="Runner Up" standing={runnerUp} tone="silver" />
@@ -747,38 +715,19 @@ export default async function TournamentPage
                 <DataSourceBadge label="Tournament Intelligence" />
                 <DataSourceBadge label="Analytics Generated" />
               </div>
-
-              <p className="text-xs font-black uppercase tracking-[0.28em] text-white/35">
-                Competitive Read
-              </p>
-
-              <h2 className="mt-2 text-2xl font-black text-white">
-                Event Difficulty
-              </h2>
+              <p className="text-xs font-black uppercase tracking-[0.28em] text-white/35">Competitive Read</p>
+              <h2 className="mt-2 text-2xl font-black text-white">Event Difficulty</h2>
             </div>
-
             <div className="text-right">
-              <p className="text-3xl font-black text-[#ffd21a]">
-                {difficultyIndex}
-              </p>
-
+              <p className="text-3xl font-black text-[#ffd21a]">{difficultyIndex}</p>
               <p className="text-xs text-white/35">Difficulty Index</p>
             </div>
           </div>
-
           <div className="grid gap-4 md:grid-cols-3">
-            <Metric
-              label="Power Leader"
-              value={
-                powerLeader?.team?.short_name ||
-                powerLeader?.team?.name ||
-                "—"
-              }
-            />
+            <Metric label="Power Leader"value={powerLeader?.team?.short_name || powerLeader?.team?.name ||"—"}/>
             <Metric label="Champion Output" value={championOutput} />
             <Metric label="Tier" value={difficultyLabel} muted />
           </div>
-
           <div className="mt-6 space-y-5">
             <Bar label="Kill Pressure" value={killPressure} />
             <Bar label="Win Density" value={winDensity} />
@@ -786,54 +735,37 @@ export default async function TournamentPage
             <Bar label="Difficulty" value={difficultyScore} />
           </div>
         </section>
-
         <section className={card + " p-6"}>
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div>
-              <p className="text-xs font-black uppercase tracking-[0.28em] text-white/35">
-                Featured Player
-              </p>
-
-              <h2 className="mt-2 text-2xl font-black text-white">
-                {featuredPlayer?.player.ign || "—"}
-              </h2>
+              <p className="text-xs font-black uppercase tracking-[0.28em] text-white/35">Featured Player</p>
+              <h2 className="mt-2 text-2xl font-black text-white">{featuredPlayer?.player.ign || "—"}</h2>
             </div>
-
             <DataSourceBadge label="Tournament Player Stats" />
           </div>
-
           <div className="mt-4">
-            <DataSourceBadge
-              source={featuredPlayer?.player.source}
-              verified={featuredPlayer?.player.verified}
-              label={getPlayerBadgeLabel(featuredPlayer?.player)}
-            />
+            <DataSourceBadge source={featuredPlayer?.player.source}verified={featuredPlayer?.player.verified}label={getPlayerBadgeLabel(featuredPlayer?.player)}/>
           </div>
-
           <p className="mt-4 leading-7 text-white/55">
             Featured player is calculated from player match stats linked to this
             tournament’s matches. The impact score weights kills, damage,
             assists, revives and MVP flags.
           </p>
-
           <div className="mt-6 grid gap-3 md:grid-cols-2">
             <Metric label="Impact" value={featuredPlayer?.impact ?? 0} />
             <Metric label="Kills" value={featuredPlayer?.kills ?? 0} muted />
             <Metric label="Damage" value={featuredPlayer?.damage ?? 0} />
             <Metric label="Matches" value={featuredPlayer?.matches ?? 0} muted />
           </div>
-
-          {featuredPlayer?.player.slug ? (
-            <Link
-              href={`/players/${featuredPlayer.player.slug}`}
-              className="mt-5 inline-flex rounded-full border border-[#ffd21a]/30 bg-[#ffd21a]/10 px-5 py-2.5 text-sm font-black text-[#ffd21a] transition hover:bg-[#ffd21a]/15"
-            >
-              View Player
-            </Link>
-          ) : null}
+          {featuredPlayer?.player.slug ? 
+            (
+              <Link href={`/players/${featuredPlayer.player.slug}`}className="mt-5 inline-flex rounded-full border border-[#ffd21a]/30 bg-[#ffd21a]/10 px-5 py-2.5 text-sm font-black text-[#ffd21a] transition hover:bg-[#ffd21a]/15">
+                View Player
+              </Link>
+            ) : null
+          }
         </section>
       </section>
-
       <section className={card + " p-6"}>
         <div className="mb-5 flex items-end justify-between gap-4">
           <div>
@@ -841,71 +773,51 @@ export default async function TournamentPage
               <DataSourceBadge label="Power Rankings" />
               <DataSourceBadge label="Analytics Generated" />
             </div>
-
-            <p className="text-xs font-black uppercase tracking-[0.28em] text-white/35">
-              Power Rankings
-            </p>
-
-            <h2 className="mt-2 text-2xl font-black text-white">
-              Top Tournament Teams
-            </h2>
+            <p className="text-xs font-black uppercase tracking-[0.28em] text-white/35">Power Rankings</p>
+            <h2 className="mt-2 text-2xl font-black text-white">Top Tournament Teams</h2>
           </div>
-
           <p className="text-sm text-white/35">Top 5 by tournament output</p>
         </div>
-
         <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-5">
-          {powerRankings.length > 0 ? (
-            powerRankings.map((team, index) => (
-              <article
-                key={team.id}
-                className="rounded-2xl border border-white/10 bg-white/[0.035] p-4 transition hover:border-[#ffd21a]/30 hover:bg-white/[0.05]"
-              >
-                <div className="flex items-center justify-between gap-3">
-                  <span className="text-sm font-black text-white/35">
-                    #{index + 1}
-                  </span>
+          {powerRankings.length > 0 ? 
+            (powerRankings.map
+              (
+                (team, index) => 
+                (
+                  <article key={team.id}className="rounded-2xl border border-white/10 bg-white/[0.035] p-4 transition hover:border-[#ffd21a]/30 hover:bg-white/[0.05]">
+                    <div className="flex items-center justify-between gap-3">
+                      <span className="text-sm font-black text-white/35">#{index + 1}</span>
+                      <p className="text-2xl font-black text-[#ffd21a]">{team.powerScore}</p>
+                    </div>
 
-                  <p className="text-2xl font-black text-[#ffd21a]">
-                    {team.powerScore}
-                  </p>
-                </div>
-
-                <div className="mt-4 flex items-center gap-3">
-                  <TeamLogo
-                    name={team.team?.name || "Team"}
-                    logoUrl={team.team?.logo_url || null}
-                  />
-
-                  <div className="min-w-0">
-                    {team.team?.slug ? (
-                      <Link
-                        href={`/teams/${team.team.slug}`}
-                        className="line-clamp-1 font-black text-white hover:underline"
-                      >
-                        {team.team.name}
-                      </Link>
-                    ) : (
-                      <p className="line-clamp-1 font-black text-white">
-                        Team N/A
-                      </p>
-                    )}
-
-                    <p className="mt-1 text-xs text-white/35">
-                      {team.points || 0} pts · {team.kills || 0} kills
-                    </p>
-                  </div>
-                </div>
-              </article>
-            ))
-          ) : (
-            <p className="rounded-2xl border border-white/10 bg-white/[0.03] p-5 text-sm text-white/45 md:col-span-2 xl:col-span-5">
-              No power ranking data available yet.
-            </p>
-          )}
+                    <div className="mt-4 flex items-center gap-3">
+                      <TeamLogo name={team.team?.name || "Team"}logoUrl={team.team?.logo_url || null}/>
+                      <div className="min-w-0">
+                        {team.team?.slug ? 
+                            (
+                              <Link href={`/teams/${team.team.slug}`}className="line-clamp-1 font-black text-white hover:underline">{team.team.name}</Link>
+                            ) 
+                            : 
+                            (
+                              <p className="line-clamp-1 font-black text-white">Team N/A</p>
+                            )
+                          }
+                        <p className="mt-1 text-xs text-white/35">{team.points || 0} pts · {team.kills || 0} kills</p>
+                      </div>
+                    </div>
+                  </article>
+                )
+              )
+            ) 
+            : 
+            (
+              <p className="rounded-2xl border border-white/10 bg-white/[0.03] p-5 text-sm text-white/45 md:col-span-2 xl:col-span-5">
+                No power ranking data available yet.
+              </p>
+            )
+          }
         </div>
       </section>
-
       <section className={card + " overflow-hidden"}>
         <div className="flex flex-col gap-2 border-b border-white/10 p-6 md:flex-row md:items-end md:justify-between">
           <div>
@@ -913,17 +825,10 @@ export default async function TournamentPage
               <DataSourceBadge label="Standings Data" />
               <DataSourceBadge label="Tournament Table" />
             </div>
-
-            <p className="text-xs font-black uppercase tracking-[0.28em] text-white/35">
-              Standings
-            </p>
-
-            <h2 className="mt-2 text-2xl font-black text-white">
-              Tournament Table
-            </h2>
+            <p className="text-xs font-black uppercase tracking-[0.28em] text-white/35">Standings</p>
+            <h2 className="mt-2 text-2xl font-black text-white">Tournament Table</h2>
           </div>
         </div>
-
         <div className="max-h-[760px] overflow-auto">
           <table className="w-full min-w-[920px] border-collapse text-left">
             <thead className="sticky top-0 z-20 backdrop-blur-xl">
@@ -937,91 +842,55 @@ export default async function TournamentPage
                 <th className="px-6 py-4 text-right">Matches</th>
               </tr>
             </thead>
-
             <tbody>
-              {standings.length > 0 ? (
-                standings.map((standing) => (
-                  <tr
-                    key={standing.id}
-                    className={`border-b border-white/[0.06] transition ${getRowStyle(
-                      standing.rank
-                    )}`}
-                  >
-                    <td className="px-6 py-5">
-                      <span
-                        className={`rounded-full border px-3 py-1 text-sm font-black ${getRankPillStyle(
-                          standing.rank
-                        )}`}
-                      >
-                        #{standing.rank || "—"}
-                      </span>
-                    </td>
+              {standings.length > 0 ? 
+                (standings.map
+                  ((standing) => 
+                    (
+                      <tr key={standing.id}className={`border-b border-white/[0.06] transition ${getRowStyle(standing.rank)}`}>
+                        <td className="px-6 py-5">
+                          <span className={`rounded-full border px-3 py-1 text-sm font-black ${getRankPillStyle(standing.rank)}`}>#{standing.rank || "—"}</span>
+                        </td>
 
-                    <td className="px-6 py-5">
-                      <div className="flex items-center gap-4">
-                        <TeamLogo
-                          name={standing.team?.name || "Team"}
-                          logoUrl={standing.team?.logo_url || null}
-                        />
-
-                        <div>
-                          {standing.team?.slug ? (
-                            <Link
-                              href={`/teams/${standing.team.slug}`}
-                              className="font-bold text-white hover:underline"
-                            >
-                              {standing.team.name}
-                            </Link>
-                          ) : (
-                            <p className="font-bold text-white">Team N/A</p>
-                          )}
-
-                          <p className="mt-1 text-xs uppercase tracking-[0.18em] text-white/35">
-                            {standing.team?.short_name ||
-                              standing.team?.country ||
-                              "TEAM"}
-                          </p>
-                        </div>
-                      </div>
-                    </td>
-
-                    <td className="px-6 py-5">
-                      <DataSourceBadge
-                        source={standing.team?.source}
-                        verified={standing.team?.verified}
-                        label={getTeamBadgeLabel(standing.team)}
-                      />
-                    </td>
-
-                    <td className="px-6 py-5 text-right font-black text-white">
-                      {standing.points ?? 0}
-                    </td>
-
-                    <td className="px-6 py-5 text-right text-white/65">
-                      {standing.kills ?? 0}
-                    </td>
-
-                    <td className="px-6 py-5 text-right text-white/45">
-                      {standing.wins ?? 0}
-                    </td>
-
-                    <td className="px-6 py-5 text-right text-white/45">
-                      {standing.matches_played ?? 0}
-                    </td>
+                        <td className="px-6 py-5">
+                          <div className="flex items-center gap-4">
+                            <TeamLogo name={standing.team?.name || "Team"}logoUrl={standing.team?.logo_url || null}/>
+                            <div>
+                              {standing.team?.slug ? 
+                                (
+                                  <Link href={`/teams/${standing.team.slug}`}className="font-bold text-white hover:underline">{standing.team.name}</Link>
+                                ) 
+                                : 
+                                (
+                                  <p className="font-bold text-white">Team N/A</p>
+                                )
+                              }
+                              <p className="mt-1 text-xs uppercase tracking-[0.18em] text-white/35">{standing.team?.short_name || standing.team?.country ||"TEAM"}</p>
+                            </div>
+                          </div>
+                        </td>
+                        <td className="px-6 py-5">
+                          <DataSourceBadge source={standing.team?.source}verified={standing.team?.verified}label={getTeamBadgeLabel(standing.team)}/>
+                        </td>
+                        <td className="px-6 py-5 text-right font-black text-white">{standing.points ?? 0}</td>
+                        <td className="px-6 py-5 text-right text-white/65">{standing.kills ?? 0}</td>
+                        <td className="px-6 py-5 text-right text-white/45">{standing.wins ?? 0}</td>
+                        <td className="px-6 py-5 text-right text-white/45">{standing.matches_played ?? 0}</td>
+                      </tr>
+                    )
+                  )
+                ) 
+                : 
+                (
+                  <tr>
+                    <td colSpan={7} className="px-6 py-8 text-white/45">No standings available yet.</td>
                   </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan={7} className="px-6 py-8 text-white/45">
-                    No standings available yet.
-                  </td>
-                </tr>
-              )}
+                )
+              }
             </tbody>
           </table>
         </div>
       </section>
-
       <section className={card + " p-6"}>
         <div className="mb-5 flex items-end justify-between gap-4">
           <div>
@@ -1029,30 +898,29 @@ export default async function TournamentPage
               <DataSourceBadge label="Match Data" />
               <DataSourceBadge label="Tournament Matches" />
             </div>
-
-            <p className="text-xs font-black uppercase tracking-[0.28em] text-white/35">
-              Matches
-            </p>
-
-            <h2 className="mt-2 text-2xl font-black text-white">
-              Tournament Matches
+            <p className="text-xs font-black uppercase tracking-[0.28em] text-white/35">Matches</p>
+            <h2 className="mt-2 text-2xl font-black text-white">Tournament Matches
             </h2>
           </div>
-
           <p className="text-sm text-white/35">{matches.length} matches</p>
         </div>
-
-        {matches.length > 0 ? (
-          <div className="grid gap-3 md:grid-cols-2">
-            {matches.map((match) => (
-              <MatchCard key={match.id} match={match} />
-            ))}
-          </div>
-        ) : (
-          <p className="rounded-2xl border border-white/10 bg-white/[0.03] p-5 text-sm text-white/45">
-            No tournament matches available yet.
-          </p>
-        )}
+        {matches.length > 0 ? 
+          (
+            <div className="grid gap-3 md:grid-cols-2">
+              {matches.map
+                ((match) => 
+                  (
+                    <MatchCard key={match.id} match={match} />
+                  )
+                )
+              }
+            </div>
+          ) 
+          : 
+          (
+            <p className="rounded-2xl border border-white/10 bg-white/[0.03] p-5 text-sm text-white/45">No tournament matches available yet.</p>
+          )
+        }
       </section>
     </main>
   );
