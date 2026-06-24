@@ -1,5 +1,7 @@
 import Link from "next/link";
+import type { ReactNode } from "react";
 import { supabase } from "@/lib/supabase";
+import DataSourceBadge from "@/components/DataSourceBadge";
 
 type RankingRow = {
   id: string;
@@ -16,10 +18,15 @@ type TeamRow = {
   short_name: string | null;
   slug: string;
   logo_url: string | null;
-  points: number | null;
-  wins: number | null;
-  kills: number | null;
-  matches_played: number | null;
+  source: string | null;
+  verified: boolean | null;
+};
+
+type PlayerTeam = {
+  id: string;
+  name: string;
+  slug: string;
+  short_name: string | null;
 };
 
 type PlayerRow = {
@@ -27,24 +34,18 @@ type PlayerRow = {
   ign: string;
   slug: string;
   role: string | null;
-  total_kills: number | null;
-  avg_damage: number | null;
-  mvp_count: number | null;
-  team: {
-    id: string;
-    name: string;
-    slug: string;
-    short_name: string | null;
-  } | null;
+  source: string | null;
+  verified: boolean | null;
+  team: PlayerTeam | null;
 };
 
 type PlayerRowRaw = Omit<PlayerRow, "team"> & {
-  team: {
-    id: string;
-    name: string;
-    slug: string;
-    short_name: string | null;
-  }[] | null;
+  team: PlayerTeam | PlayerTeam[] | null;
+};
+
+type MatchTeam = {
+  name: string;
+  slug: string;
 };
 
 type MatchRow = {
@@ -54,82 +55,52 @@ type MatchRow = {
   date: string | null;
   team1_score: number | null;
   team2_score: number | null;
-  team1: {
-    name: string;
-    slug: string;
-  }[] | null;
-  team2: {
-    name: string;
-    slug: string;
-  }[] | null;
-  winner: {
-    name: string;
-    slug: string;
-  }[] | null;
+  team1: MatchTeam | null;
+  team2: MatchTeam | null;
+  winner: MatchTeam | null;
+};
+
+type MatchRaw = Omit<MatchRow, "team1" | "team2" | "winner"> & {
+  team1: MatchTeam | MatchTeam[] | null;
+  team2: MatchTeam | MatchTeam[] | null;
+  winner: MatchTeam | MatchTeam[] | null;
 };
 
 type TournamentRow = {
   id: string;
   name: string;
   slug: string;
-  organizer: string | null;
-  location: string | null;
   status: string | null;
-  prize_pool: number | string | null;
-  participating_teams: number | null;
   start_date: string | null;
 };
 
-const ecosystemModules = [
+const quickLinks = [
   {
-    title: "Rankings Intelligence",
-    label: "Official competitive order",
-    description:
-      "Track team and player rank movement with verified scoring, snapshots and competitive context.",
+    label: "Rankings",
     href: "/rankings",
-    cta: "View Rankings",
+    description: "Team and player competitive order.",
   },
   {
-    title: "Team Intelligence",
-    label: "Roster and team strength",
-    description:
-      "Analyze team output, rank value, wins, kills, momentum and tournament consistency.",
+    label: "Teams",
     href: "/teams",
-    cta: "Explore Teams",
+    description: "Profiles, rosters and team strength.",
   },
   {
-    title: "Player Intelligence",
-    label: "Individual impact layer",
-    description:
-      "Profile fraggers, IGLs, support players and MVP performers through structured player data.",
+    label: "Players",
     href: "/players",
-    cta: "Explore Players",
+    description: "Impact, role and performance data.",
   },
   {
-    title: "Match Intelligence",
-    label: "Performance timeline",
-    description:
-      "Read match results, team output, MVP impact, score gaps and combat performance signals.",
-    href: "/matches",
-    cta: "View Matches",
-  },
-  {
-    title: "Tournament Intelligence",
-    label: "Event and standings layer",
-    description:
-      "Understand tournament standings, podium finishes, prize context and team performance paths.",
-    href: "/tournaments",
-    cta: "View Events",
-  },
-  {
-    title: "Compare Intelligence",
-    label: "Competitive edge engine",
-    description:
-      "Compare teams and players through overall edge, combat matrix and momentum analytics.",
+    label: "Compare",
     href: "/compare",
-    cta: "Start Comparing",
+    description: "Find the edge between teams or players.",
   },
 ];
+
+function one<T>(value: T | T[] | null): T | null {
+  if (Array.isArray(value)) return value[0] || null;
+  return value;
+}
 
 function n(value: unknown, fallback = 0) {
   const numberValue = Number(value);
@@ -146,19 +117,10 @@ function formatDate(value: string | null) {
   });
 }
 
-function formatMoney(value: unknown) {
-  const safe = n(value);
-  if (!safe) return "TBD";
-
-  return `₹${safe.toLocaleString("en-IN")}`;
-}
-
-function formatScore(value: unknown) {
+function formatScore(value: number | null | undefined) {
   const safe = n(value);
 
-  if (safe >= 1000) {
-    return `${(safe / 1000).toFixed(1)}k`;
-  }
+  if (safe >= 1000) return `${(safe / 1000).toFixed(1)}k`;
 
   return Math.round(safe).toString();
 }
@@ -173,15 +135,15 @@ function getInitials(name: string) {
     .toUpperCase();
 }
 
-function TeamLogo({
+function Logo({
   name,
   logoUrl,
 }: {
   name: string;
-  logoUrl: string | null;
+  logoUrl?: string | null;
 }) {
   return (
-    <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-white/10 bg-white/[0.04]">
+    <div className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-white/10 bg-white/[0.04]">
       {logoUrl ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img
@@ -200,7 +162,7 @@ function TeamLogo({
 
 function PlayerAvatar({ ign }: { ign: string }) {
   return (
-    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-white/10 bg-white/[0.04]">
+    <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-white/10 bg-white/[0.04]">
       <span className="text-xs font-black text-white/70">
         {getInitials(ign)}
       </span>
@@ -208,78 +170,96 @@ function PlayerAvatar({ ign }: { ign: string }) {
   );
 }
 
-function RankPill({ rank }: { rank: number }) {
+function Metric({
+  label,
+  value,
+}: {
+  label: string;
+  value: string | number;
+}) {
   return (
-    <span className="inline-flex h-8 min-w-8 items-center justify-center rounded-full border border-white/15 bg-white/[0.04] px-2 text-xs font-black text-white/70">
-      #{rank}
-    </span>
+    <div>
+      <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-white/35">
+        {label}
+      </p>
+      <p className="mt-1 text-2xl font-black text-white">{value}</p>
+    </div>
   );
 }
 
-function SectionTitle({
-  kicker,
+function SignalRow({
+  label,
   title,
+  meta,
   href,
-  cta,
+  right,
+  children,
 }: {
-  kicker: string;
+  label: string;
   title: string;
-  href?: string;
-  cta?: string;
+  meta: string;
+  href: string;
+  right?: string;
+  children?: ReactNode;
 }) {
   return (
-    <div className="mb-8 flex flex-col gap-4 border-b border-white/10 pb-5 md:flex-row md:items-end md:justify-between">
-      <div>
-        <p className="krafton-label">{kicker}</p>
+    <Link
+      href={href}
+      className="group flex items-center justify-between gap-4 rounded-2xl border border-white/10 bg-white/[0.025] p-4 transition hover:border-[#ffd21a]/30 hover:bg-white/[0.045]"
+    >
+      <div className="flex min-w-0 items-center gap-3">
+        {children}
 
-        <h2 className="mt-3 text-4xl font-black uppercase tracking-[-0.04em] text-white md:text-5xl">
-          {title}
-        </h2>
+        <div className="min-w-0">
+          <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/35">
+            {label}
+          </p>
+          <p className="mt-1 truncate font-black text-white">{title}</p>
+          <p className="mt-1 truncate text-sm text-white/40">{meta}</p>
+        </div>
       </div>
 
-      {href && cta ? (
-        <Link
-          href={href}
-          className="w-fit text-sm font-black uppercase tracking-[0.18em] text-white/50 transition hover:text-[#ff4038]"
-        >
-          {cta} →
-        </Link>
-      ) : null}
-    </div>
+      <div className="shrink-0 text-right">
+        {right ? (
+          <p className="font-black text-[#ffd21a]">{right}</p>
+        ) : null}
+
+        <p className="mt-1 text-xs font-black text-white/25 transition group-hover:text-[#ffd21a]">
+          Open
+        </p>
+      </div>
+    </Link>
   );
 }
 
 export default async function HomePage() {
   const [
-    { data: teamRankingsRaw },
-    { data: playerRankingsRaw },
-    { count: playerCount },
-    { count: teamCount },
-    { count: matchCount },
-    { count: tournamentCount },
-    { data: recentMatchesRaw },
-    { data: activeTournamentsRaw },
+    teamRankingResult,
+    playerRankingResult,
+    playerCountResult,
+    teamCountResult,
+    matchCountResult,
+    tournamentCountResult,
+    recentMatchResult,
+    tournamentResult,
   ] = await Promise.all([
     supabase
       .from("rankings")
       .select("id, entity_id, entity_type, rank, score, change")
       .eq("entity_type", "team")
       .order("rank", { ascending: true })
-      .limit(6),
+      .limit(1),
 
     supabase
       .from("rankings")
       .select("id, entity_id, entity_type, rank, score, change")
       .eq("entity_type", "player")
       .order("rank", { ascending: true })
-      .limit(6),
+      .limit(1),
 
     supabase.from("players").select("*", { count: "exact", head: true }),
-
     supabase.from("teams").select("*", { count: "exact", head: true }),
-
     supabase.from("matches").select("*", { count: "exact", head: true }),
-
     supabase.from("tournaments").select("*", { count: "exact", head: true }),
 
     supabase
@@ -307,40 +287,37 @@ export default async function HomePage() {
       `
       )
       .order("date", { ascending: false })
-      .limit(4),
+      .limit(1),
 
     supabase
       .from("tournaments")
-      .select(
-        "id, name, slug, organizer, location, status, prize_pool, participating_teams, start_date"
-      )
+      .select("id, name, slug, status, start_date")
       .order("start_date", { ascending: false })
-      .limit(3),
+      .limit(1),
   ]);
 
-  const teamRankings = (teamRankingsRaw || []) as RankingRow[];
-  const playerRankings = (playerRankingsRaw || []) as RankingRow[];
-  const recentMatches = (recentMatchesRaw || []) as MatchRow[];
-  const activeTournaments = (activeTournamentsRaw || []) as TournamentRow[];
+  const topTeamRanking = (teamRankingResult.data || [])[0] as
+    | RankingRow
+    | undefined;
 
-  const teamIds = teamRankings.map((item) => item.entity_id);
-  const playerIds = playerRankings.map((item) => item.entity_id);
+  const topPlayerRanking = (playerRankingResult.data || [])[0] as
+    | RankingRow
+    | undefined;
 
-  let teams: TeamRow[] = [];
-  let players: PlayerRow[] = [];
+  let topTeam: TeamRow | null = null;
+  let topPlayer: PlayerRow | null = null;
 
-  if (teamIds.length > 0) {
+  if (topTeamRanking?.entity_id) {
     const { data } = await supabase
       .from("teams")
-      .select(
-        "id, name, short_name, slug, logo_url, points, wins, kills, matches_played"
-      )
-      .in("id", teamIds);
+      .select("id, name, short_name, slug, logo_url, source, verified")
+      .eq("id", topTeamRanking.entity_id)
+      .maybeSingle();
 
-    teams = (data || []) as TeamRow[];
+    topTeam = (data || null) as TeamRow | null;
   }
 
-  if (playerIds.length > 0) {
+  if (topPlayerRanking?.entity_id) {
     const { data } = await supabase
       .from("players")
       .select(
@@ -349,9 +326,8 @@ export default async function HomePage() {
         ign,
         slug,
         role,
-        total_kills,
-        avg_damage,
-        mvp_count,
+        source,
+        verified,
         team:team_id (
           id,
           name,
@@ -360,352 +336,279 @@ export default async function HomePage() {
         )
       `
       )
-      .in("id", playerIds);
+      .eq("id", topPlayerRanking.entity_id)
+      .maybeSingle();
 
-    const rawPlayers = (data || []) as PlayerRowRaw[];
-    players = rawPlayers.map((player) => ({
-      ...player,
-      team: player.team && player.team.length > 0 ? player.team[0] : null,
-    }));
+    const rawPlayer = data as PlayerRowRaw | null;
+
+    topPlayer = rawPlayer
+      ? {
+          ...rawPlayer,
+          team: one(rawPlayer.team),
+        }
+      : null;
   }
 
-  const teamById = new Map(teams.map((team) => [team.id, team]));
-  const playerById = new Map(players.map((player) => [player.id, player]));
-
-  const trendingTeams = teamRankings
-    .map((ranking) => {
-      const team = teamById.get(ranking.entity_id);
-      return team ? { ranking, team } : null;
+  const recentMatch = ((recentMatchResult.data || []) as MatchRaw[]).map(
+    (match) => ({
+      ...match,
+      team1: one(match.team1),
+      team2: one(match.team2),
+      winner: one(match.winner),
     })
-    .filter(
-      (item): item is { ranking: RankingRow; team: TeamRow } => Boolean(item)
-    );
+  )[0] as MatchRow | undefined;
 
-  const trendingPlayers = playerRankings
-    .map((ranking) => {
-      const player = playerById.get(ranking.entity_id);
-      return player ? { ranking, player } : null;
-    })
-    .filter(
-      (item): item is { ranking: RankingRow; player: PlayerRow } =>
-        Boolean(item)
-    );
+  const latestTournament = (tournamentResult.data || [])[0] as
+    | TournamentRow
+    | undefined;
 
   return (
-    <main className="min-h-screen overflow-hidden bg-black text-white">
-      {/* HERO */}
-      <section className="krafton-grid relative min-h-[calc(100vh-82px)] overflow-hidden">
-        <div className="blueprint-lines" />
-
-        <div className="absolute left-[41%] top-[22%] hidden h-[420px] w-[420px] border border-white/20 opacity-30 lg:block" />
-        <div className="absolute left-[43%] top-[31%] hidden h-[280px] w-[520px] -skew-x-12 border border-white/20 opacity-30 lg:block" />
-
-        <div className="relative z-10 mx-auto flex min-h-[calc(100vh-82px)] max-w-[1600px] flex-col justify-center px-7 pb-20 pt-0 md:px-14">
-          <h1 className="krafton-display max-w-[1600px] text-[16vw] md:text-[10.5vw] xl:text-[9.8rem]">
-            PIONEER
-            <br />
-            THE
-            <br />
-            COMPETITIVE
-            <br />
-            LAYER
-          </h1>
-
-          <div className="mt-8 flex max-w-5xl items-start gap-6">
-            <p className="max-w-4xl text-base font-black uppercase leading-6 tracking-[-0.03em] text-white md:text-xl">
-              We pioneer the path to competitive intelligence. With rankings,
-              team analysis, player impact and match data, we build the esports
-              layer for India’s next generation of competitors.
-            </p>
-          </div>
-          <div className="mt-10 flex flex-wrap gap-3">
-            <Link href="/rankings" className="btn-primary px-6 py-3 text-sm">View Rankings</Link>
-            <Link href="/compare" className="btn-secondary px-6 py-3 text-sm">Compare Intelligence</Link>
-          </div>
-        </div>
-      </section>
-      {/* STATS */}
-      <section className="border-y border-white/10 bg-black px-7 py-8 md:px-14">
-        <div className="mx-auto grid max-w-[1600px] gap-5 md:grid-cols-4">
+    <main className="min-h-screen bg-[#030406] text-white">
+      <section className="border-b border-white/10">
+        <div className="mx-auto grid max-w-7xl gap-8 px-5 py-14 md:py-20 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
           <div>
-            <p className="data-label">Teams</p>
-            <p className="mt-2 text-5xl font-black text-white">{teamCount || 0}</p>
-          </div>
-          <div>
-            <p className="data-label">Players</p>
-            <p className="mt-2 text-5xl font-black text-white">{playerCount || 0}</p>
-          </div>
-          <div>
-            <p className="data-label">Matches</p>
-            <p className="mt-2 text-5xl font-black text-white">{matchCount || 0}</p>
-          </div>
-          <div>
-            <p className="data-label">Tournaments</p>
-            <p className="mt-2 text-5xl font-black text-white">{tournamentCount || 0}</p>
-          </div>
-        </div>
-      </section>
-      {/* ECOSYSTEM */}
-      <section className="mx-auto max-w-[1600px] px-7 py-24 md:px-14">
-        <SectionTitle kicker="PlayRank Ecosystem" title="Intelligence Modules" />
-          <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
-            {ecosystemModules.map
-              ((module, index) => 
-                (
-                    <Link key={module.title}href={module.href}className="krafton-card group min-h-[310px] p-7">
-                    <div className="flex items-start justify-between gap-5">
-                      <p className="text-sm font-black uppercase tracking-[0.28em] text-[#ff4038]">{module.label}</p>
-                      <span className="text-sm font-black text-white/30">0{index + 1}</span>
-                    </div>
-                    <h3 className="mt-8 text-4xl font-black uppercase leading-[0.92] tracking-[-0.06em] text-white">{module.title}</h3>
-                    <p className="mt-6 max-w-sm leading-7 text-white/45">{module.description}</p>
-                    <p className="mt-8 text-sm font-black uppercase tracking-[0.18em] text-white/45 group-hover:text-[#ff4038]">{module.cta} →</p>
-                  </Link>
-                )
-              )
-            }
-        </div>
-      </section>
-      {/* RANKINGS */}
-      <section className="border-y border-white/10 bg-[#050505]">
-        <div className="mx-auto grid max-w-[1600px] gap-10 px-7 py-24 md:px-14 xl:grid-cols-2">
-          <div>
-            <SectionTitle kicker="Rankings"title="Top Teams"href="/teams"cta="View Teams"/>
-            <div className="space-y-0 border border-white/10">
-              {trendingTeams.length > 0 ? 
-                (
-                  trendingTeams.map
-                  (({ ranking, team }) => 
-                    (
-                      <Link key={ranking.id}href={`/teams/${team.slug}`}className="flex items-center justify-between border-b border-white/10 bg-[#111] p-5 last:border-b-0 hover:bg-[#171717]">
-                        <div className="flex min-w-0 items-center gap-4">
-                          <RankPill rank={ranking.rank} />
-                          <TeamLogo name={team.name} logoUrl={team.logo_url} />
-                          <div className="min-w-0">
-                            <p className="truncate font-black text-white">{team.name}</p>
-                            <p className="mt-1 text-xs uppercase tracking-[0.18em] text-white/35">{team.short_name || "TEAM"}</p>
-                          </div>
-                        </div>
-                        <p className="font-black text-[#ff4038]">{formatScore(ranking.score)}</p>
-                      </Link>
-                    )
-                  )
-                ) 
-                :
-                (
-                  <p className="p-5 text-white/45">No team rankings available.</p>
-                )
-              }
+            <div className="flex flex-wrap gap-2">
+              <DataSourceBadge label="BGMI" size="md" />
+              <DataSourceBadge label="Rankings" size="md" />
+              <DataSourceBadge label="Stats" size="md" />
             </div>
-          </div>
-          <div>
-            <SectionTitle kicker="Rankings"title="Top Players"href="/players"cta="View Players"/>
-            <div className="space-y-0 border border-white/10">
-              {trendingPlayers.length > 0 ? (
-                trendingPlayers.map(({ ranking, player }) => (
-                  <Link
-                    key={ranking.id}
-                    href={`/players/${player.slug}`}
-                    className="flex items-center justify-between border-b border-white/10 bg-[#111] p-5 last:border-b-0 hover:bg-[#171717]"
-                  >
-                    <div className="flex min-w-0 items-center gap-4">
-                      <RankPill rank={ranking.rank} />
-                      <PlayerAvatar ign={player.ign} />
 
-                      <div className="min-w-0">
-                        <p className="truncate font-black text-white">
-                          {player.ign}
-                        </p>
-                        <p className="mt-1 text-xs uppercase tracking-[0.18em] text-white/35">
-                          {player.role || player.team?.short_name || "PLAYER"}
-                        </p>
-                      </div>
-                    </div>
-
-                    <p className="font-black text-[#ff4038]">
-                      {formatScore(ranking.score)}
-                    </p>
-                  </Link>
-                ))
-              ) : (
-                <p className="p-5 text-white/45">
-                  No player rankings available.
-                </p>
-              )}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* MATCHES + TOURNAMENTS */}
-      <section className="mx-auto grid max-w-[1600px] gap-10 px-7 py-24 md:px-14 xl:grid-cols-[1.1fr_0.9fr]">
-        <div>
-          <SectionTitle
-            kicker="Match Center"
-            title="Recent Matches"
-            href="/matches"
-            cta="View Matches"
-          />
-
-          <div className="grid gap-5 md:grid-cols-2">
-            {recentMatches.length > 0 ? (
-              recentMatches.map((match) => (
-                <Link
-                  key={match.id}
-                  href={`/match/${match.id}`}
-                  className="krafton-card p-6"
-                >
-                  <p className="data-label">{match.stage || "Match"}</p>
-
-                  <h3 className="mt-4 text-xl font-black text-white">
-                    {match.team1?.[0]?.name || "Team 1"}
-                    <span className="px-2 text-white/25">vs</span>
-                    {match.team2?.[0]?.name || "Team 2"}
-                  </h3>
-
-                  <p className="mt-5 text-3xl font-black text-white">
-                    {match.team1_score ?? 0}
-                    <span className="px-3 text-white/20">:</span>
-                    {match.team2_score ?? 0}
-                  </p>
-
-                  <p className="mt-4 text-sm text-white/40">
-                    {match.map_name || "Map N/A"} · {formatDate(match.date)}
-                  </p>
-
-                  <p className="mt-3 text-sm font-black text-[#ff4038]">
-                    Winner · {match.winner?.[0]?.name || "Pending"}
-                  </p>
-                </Link>
-              ))
-            ) : (
-              <p className="border border-white/10 bg-[#111] p-6 text-white/45 md:col-span-2">
-                No recent matches available.
-              </p>
-            )}
-          </div>
-        </div>
-
-        <div>
-          <SectionTitle
-            kicker="Tournament Layer"
-            title="Latest Events"
-            href="/tournaments"
-            cta="View All"
-          />
-
-          <div className="space-y-5">
-            {activeTournaments.length > 0 ? (
-              activeTournaments.map((tournament) => (
-                <Link
-                  key={tournament.id}
-                  href={`/tournaments/${tournament.slug}`}
-                  className="krafton-card block p-6"
-                >
-                  <div className="flex items-start justify-between gap-4">
-                    <div>
-                      <p className="text-xl font-black text-white">
-                        {tournament.name}
-                      </p>
-                      <p className="mt-2 text-sm text-white/40">
-                        {tournament.location || "Location N/A"} ·{" "}
-                        {formatDate(tournament.start_date)}
-                      </p>
-                    </div>
-
-                    <span className="border border-[#ff4038]/30 bg-[#ff4038]/10 px-3 py-1 text-xs font-black text-[#ff4038]">
-                      {tournament.status || "TBD"}
-                    </span>
-                  </div>
-
-                  <div className="mt-5 flex justify-between border-t border-white/10 pt-4 text-sm">
-                    <span className="text-white/40">Prize Pool</span>
-                    <span className="font-black text-white">
-                      {formatMoney(tournament.prize_pool)}
-                    </span>
-                  </div>
-                </Link>
-              ))
-            ) : (
-              <p className="border border-white/10 bg-[#111] p-6 text-white/45">
-                No tournaments available.
-              </p>
-            )}
-          </div>
-        </div>
-      </section>
-
-      {/* STORY */}
-      <section className="border-y border-white/10 bg-[#050505] px-7 py-24 md:px-14">
-        <div className="mx-auto grid max-w-[1600px] gap-10 xl:grid-cols-[0.8fr_1.2fr]">
-          <div>
-            <p className="krafton-label">Why PlayRank</p>
-
-            <h2 className="mt-4 text-5xl font-black uppercase leading-[0.9] tracking-[-0.07em] text-white md:text-7xl">
-              Built For
+            <h1 className="mt-7 max-w-4xl text-5xl font-black uppercase leading-[0.88] tracking-[-0.075em] text-white md:text-7xl">
+              Esports data,
               <br />
-              Serious
-              <br />
-              Esports
-            </h2>
-          </div>
+              made readable.
+            </h1>
 
-          <div className="max-w-4xl">
-            <p className="text-2xl font-black uppercase leading-8 tracking-[-0.04em] text-white md:text-4xl md:leading-[1.05]">
-              PlayRank turns India’s esports data into a connected intelligence
-              system — ranking teams, profiling players, reading matches and
-              comparing competitive edge in one product layer.
+            <p className="mt-6 max-w-2xl text-base leading-7 text-white/52 md:text-lg">
+              PlayRank gives Indian BGMI fans, teams and scouts a clean way to
+              read rankings, teams, players, matches and tournaments.
             </p>
 
-            <div className="mt-10 grid gap-4 md:grid-cols-3">
-              <div className="border border-white/10 bg-[#111] p-5">
-                <p className="data-label">Source Layer</p>
-                <p className="mt-3 text-lg font-black text-white">
-                  Official rankings, verified teams and structured match data.
-                </p>
-              </div>
+            <div className="mt-8 flex flex-wrap gap-3">
+              <Link
+                href="/rankings"
+                className="rounded-full border border-[#ffd21a]/30 bg-[#ffd21a]/10 px-5 py-2.5 text-sm font-black text-[#ffd21a] transition hover:bg-[#ffd21a]/15"
+              >
+                Explore Rankings
+              </Link>
 
-              <div className="border border-white/10 bg-[#111] p-5">
-                <p className="data-label">Analysis Layer</p>
-                <p className="mt-3 text-lg font-black text-white">
-                  Rankings, momentum, combat matrix and performance channels.
-                </p>
-              </div>
+              <Link
+                href="/compare"
+                className="rounded-full border border-white/10 bg-white/[0.04] px-5 py-2.5 text-sm font-black text-white/65 transition hover:border-white/25 hover:text-white"
+              >
+                Compare
+              </Link>
 
-              <div className="border border-white/10 bg-[#111] p-5">
-                <p className="data-label">Product Layer</p>
-                <p className="mt-3 text-lg font-black text-white">
-                  Teams, players, matches, tournaments and comparison flows.
-                </p>
-              </div>
+              <Link
+                href="/matches"
+                className="rounded-full border border-white/10 bg-white/[0.04] px-5 py-2.5 text-sm font-black text-white/65 transition hover:border-white/25 hover:text-white"
+              >
+                Matches
+              </Link>
             </div>
           </div>
+
+          <aside className="rounded-[2rem] border border-white/10 bg-[#080a0f] p-5 shadow-[0_24px_80px_rgba(0,0,0,0.34)]">
+            <div className="flex items-start justify-between gap-4 border-b border-white/10 pb-5">
+              <div>
+                <p className="text-xs font-black uppercase tracking-[0.24em] text-white/35">
+                  Live Pulse
+                </p>
+                <h2 className="mt-2 text-2xl font-black text-white">
+                  Competitive snapshot
+                </h2>
+              </div>
+
+              <DataSourceBadge label="Updated" />
+            </div>
+
+            <div className="grid grid-cols-4 gap-4 border-b border-white/10 py-5">
+              <Metric label="Teams" value={teamCountResult.count || 0} />
+              <Metric label="Players" value={playerCountResult.count || 0} />
+              <Metric label="Matches" value={matchCountResult.count || 0} />
+              <Metric label="Events" value={tournamentCountResult.count || 0} />
+            </div>
+
+            <div className="space-y-3 pt-5">
+              {topTeam && topTeamRanking ? (
+                <SignalRow
+                  label="Top Team"
+                  title={topTeam.name}
+                  meta={`#${topTeamRanking.rank} in team rankings`}
+                  right={formatScore(topTeamRanking.score)}
+                  href={`/teams/${topTeam.slug}`}
+                >
+                  <Logo name={topTeam.name} logoUrl={topTeam.logo_url} />
+                </SignalRow>
+              ) : null}
+
+              {topPlayer && topPlayerRanking ? (
+                <SignalRow
+                  label="Top Player"
+                  title={topPlayer.ign}
+                  meta={topPlayer.role || topPlayer.team?.short_name || "Player"}
+                  right={`#${topPlayerRanking.rank}`}
+                  href={`/players/${topPlayer.slug}`}
+                >
+                  <PlayerAvatar ign={topPlayer.ign} />
+                </SignalRow>
+              ) : null}
+            </div>
+          </aside>
         </div>
       </section>
 
-      {/* FINAL CTA */}
-      <section className="krafton-grid relative overflow-hidden border-t border-white/10 px-7 py-20 text-center md:px-14">
-        <div className="relative z-10 mx-auto max-w-5xl">
-          <p className="krafton-label">PlayRank</p>
+      <section className="mx-auto max-w-7xl px-5 py-10">
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          {quickLinks.map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              className="group rounded-[1.5rem] border border-white/10 bg-[#080a0f] p-5 transition hover:-translate-y-0.5 hover:border-[#ffd21a]/30 hover:bg-white/[0.035]"
+            >
+              <h3 className="text-xl font-black text-white">{item.label}</h3>
 
-          <h2 className="krafton-title mt-4 text-6xl text-white md:text-8xl">
-            Own The
-            <br />
-            Competitive Layer
-          </h2>
+              <p className="mt-3 text-sm leading-6 text-white/42">
+                {item.description}
+              </p>
 
-          <p className="mx-auto mt-6 max-w-2xl leading-7 text-white/45">
-            A connected intelligence system for BGMI rankings, teams, players,
-            matches and tournaments.
+              <p className="mt-5 text-xs font-black uppercase tracking-[0.18em] text-white/30 transition group-hover:text-[#ffd21a]">
+                Open
+              </p>
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      <section className="mx-auto grid max-w-7xl gap-5 px-5 pb-14 lg:grid-cols-2">
+        <div className="rounded-[2rem] border border-white/10 bg-[#080a0f] p-5">
+          <div className="mb-5 flex items-end justify-between gap-4">
+            <div>
+              <p className="text-xs font-black uppercase tracking-[0.24em] text-[#ffd21a]">
+                Latest
+              </p>
+              <h2 className="mt-2 text-2xl font-black text-white">
+                Match update
+              </h2>
+            </div>
+
+            <Link
+              href="/matches"
+              className="text-sm font-black text-white/35 transition hover:text-[#ffd21a]"
+            >
+              All matches
+            </Link>
+          </div>
+
+          {recentMatch ? (
+            <Link
+              href={`/match/${recentMatch.id}`}
+              className="block rounded-[1.5rem] border border-white/10 bg-white/[0.025] p-5 transition hover:border-[#ffd21a]/30 hover:bg-white/[0.045]"
+            >
+              <p className="text-xs uppercase tracking-[0.22em] text-white/35">
+                {recentMatch.stage || "Match"} ·{" "}
+                {recentMatch.map_name || "Map N/A"}
+              </p>
+
+              <div className="mt-5 grid grid-cols-[1fr_auto] gap-x-5 gap-y-3">
+                <p className="truncate text-lg font-black text-white">
+                  {recentMatch.team1?.name || "Team 1"}
+                </p>
+                <p className="text-lg font-black text-white">
+                  {recentMatch.team1_score ?? 0}
+                </p>
+
+                <p className="truncate text-lg font-black text-white">
+                  {recentMatch.team2?.name || "Team 2"}
+                </p>
+                <p className="text-lg font-black text-white">
+                  {recentMatch.team2_score ?? 0}
+                </p>
+              </div>
+
+              <p className="mt-5 border-t border-white/10 pt-4 text-sm text-white/42">
+                Winner:{" "}
+                <span className="font-black text-[#ffd21a]">
+                  {recentMatch.winner?.name || "Pending"}
+                </span>{" "}
+                · {formatDate(recentMatch.date)}
+              </p>
+            </Link>
+          ) : (
+            <p className="rounded-[1.5rem] border border-white/10 bg-white/[0.025] p-5 text-white/45">
+              No recent matches available.
+            </p>
+          )}
+        </div>
+
+        <div className="rounded-[2rem] border border-white/10 bg-[#080a0f] p-5">
+          <div className="mb-5 flex items-end justify-between gap-4">
+            <div>
+              <p className="text-xs font-black uppercase tracking-[0.24em] text-[#ffd21a]">
+                Event
+              </p>
+              <h2 className="mt-2 text-2xl font-black text-white">
+                Latest tournament
+              </h2>
+            </div>
+
+            <Link
+              href="/tournaments"
+              className="text-sm font-black text-white/35 transition hover:text-[#ffd21a]"
+            >
+              All events
+            </Link>
+          </div>
+
+          {latestTournament ? (
+            <Link
+              href={`/tournaments/${latestTournament.slug}`}
+              className="block rounded-[1.5rem] border border-white/10 bg-white/[0.025] p-5 transition hover:border-[#ffd21a]/30 hover:bg-white/[0.045]"
+            >
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <p className="text-lg font-black text-white">
+                    {latestTournament.name}
+                  </p>
+
+                  <p className="mt-2 text-sm text-white/42">
+                    Starts {formatDate(latestTournament.start_date)}
+                  </p>
+                </div>
+
+                <span className="shrink-0 rounded-full border border-[#ffd21a]/25 bg-[#ffd21a]/10 px-3 py-1 text-xs font-black uppercase tracking-[0.12em] text-[#ffd21a]">
+                  {latestTournament.status || "TBD"}
+                </span>
+              </div>
+
+              <p className="mt-5 border-t border-white/10 pt-4 text-sm text-white/42">
+                Open event page for standings, matches and team performance.
+              </p>
+            </Link>
+          ) : (
+            <p className="rounded-[1.5rem] border border-white/10 bg-white/[0.025] p-5 text-white/45">
+              No tournaments available.
+            </p>
+          )}
+        </div>
+      </section>
+
+      <section className="border-t border-white/10 bg-[#050609]">
+        <div className="mx-auto flex max-w-7xl flex-col gap-4 px-5 py-7 md:flex-row md:items-center md:justify-between">
+          <p className="max-w-2xl text-sm leading-6 text-white/45">
+            Start with rankings, open profiles, check recent matches, then use
+            compare to understand the competitive edge.
           </p>
 
-          <div className="mt-9 flex justify-center gap-3">
-            <Link href="/teams" className="btn-primary px-6 py-3 text-sm">
-              Explore Teams
+          <div className="flex flex-wrap gap-4 text-sm font-black">
+            <Link href="/standings" className="text-white/40 hover:text-[#ffd21a]">
+              Standings
             </Link>
-
-            <Link href="/matches" className="btn-secondary px-6 py-3 text-sm">
-              View Matches
+            <Link href="/data" className="text-white/40 hover:text-[#ffd21a]">
+              Data Trust
+            </Link>
+            <Link href="/tournaments" className="text-white/40 hover:text-[#ffd21a]">
+              Events
             </Link>
           </div>
         </div>
