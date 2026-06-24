@@ -9,7 +9,7 @@ function unauthorized() {
   });
 }
 
-export function middleware(req: NextRequest) {
+export default function proxy(req: NextRequest) {
   const pathname = req.nextUrl.pathname;
 
   const isProtectedRoute =
@@ -55,4 +55,4 @@ export function middleware(req: NextRequest) {
 
 export const config = {
   matcher: ["/admin/:path*", "/api/admin/:path*"],
-};  
+};
