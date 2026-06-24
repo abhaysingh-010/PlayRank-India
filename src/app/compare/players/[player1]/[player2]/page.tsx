@@ -38,10 +38,14 @@ type PlayerRow = {
   team?: TeamMini | null;
 };
 
+type PlayerRaw = Omit<PlayerRow, "team"> & {
+  team?: TeamMini | TeamMini[] | null;
+};
+
 type RankingRow = {
   entity_id: string;
-  rank: number;
-  score: number;
+  rank: number | null;
+  score: number | null;
   change: number | null;
 };
 
@@ -64,6 +68,11 @@ const surface =
 
 const panel =
   "rounded-[1.35rem] border border-white/[0.10] bg-white/[0.035] shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]";
+
+function one<T>(value: T | T[] | null | undefined): T | null {
+  if (Array.isArray(value)) return value[0] || null;
+  return value || null;
+}
 
 function n(value: unknown, fallback = 0) {
   const numberValue = Number(value);
@@ -128,36 +137,22 @@ function rankTone(rank: number | null | undefined) {
   if (rank === 1) return "border-yellow-400/30 bg-yellow-400/10 text-yellow-300";
   if (rank === 2) return "border-slate-300/25 bg-slate-300/10 text-slate-200";
   if (rank === 3) return "border-orange-400/25 bg-orange-400/10 text-orange-300";
-  if (rank <= 10) return "border-emerald-400/25 bg-emerald-400/10 text-emerald-300";
+  if (rank <= 10) return "border-blue-400/25 bg-blue-400/10 text-blue-300";
 
   return "border-white/10 bg-white/[0.04] text-white/70";
 }
 
 function getPlayerBadgeLabel(player?: PlayerRow | null) {
   if (!player) return "Player Record";
-
-  if (player.source === "krafton_india_esports") {
-    return "Official Krafton Player";
-  }
-
-  if (player.verified) {
-    return "Verified Player";
-  }
-
+  if (player.source === "krafton_india_esports") return "Official Krafton Player";
+  if (player.verified) return "Verified Player";
   return "Player Record";
 }
 
 function getTeamBadgeLabel(team?: TeamMini | null) {
   if (!team) return "Team Record";
-
-  if (team.source === "krafton_india_esports") {
-    return "Official Krafton Team";
-  }
-
-  if (team.verified) {
-    return "Verified Team";
-  }
-
+  if (team.source === "krafton_india_esports") return "Official Krafton Team";
+  if (team.verified) return "Verified Team";
   return "Team Record";
 }
 
@@ -198,14 +193,14 @@ function PlayerAvatar({
     size === "xl"
       ? "h-24 w-24"
       : size === "lg"
-      ? "h-16 w-16"
-      : size === "sm"
-      ? "h-10 w-10"
-      : "h-12 w-12";
+        ? "h-16 w-16"
+        : size === "sm"
+          ? "h-10 w-10"
+          : "h-12 w-12";
 
   return (
     <div
-      className={`${sizeClass} flex shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-white/[0.12] bg-gradient-to-br from-emerald-400/[0.18] via-white/[0.05] to-blue-400/[0.12] shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]`}
+      className={`${sizeClass} flex shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-white/[0.12] bg-gradient-to-br from-blue-400/[0.18] via-white/[0.05] to-[#ffd21a]/[0.12] shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]`}
     >
       <div className="text-center">
         <p className="text-xl font-black text-white">{getInitials(ign)}</p>
@@ -249,10 +244,10 @@ function getPlayerMomentum(stats: PlayerMatchStat[] = []) {
     score >= 90
       ? "Peak Form"
       : score >= 65
-      ? "Strong Form"
-      : score >= 40
-      ? "Stable"
-      : "Low Momentum";
+        ? "Strong Form"
+        : score >= 40
+          ? "Stable"
+          : "Low Momentum";
 
   return {
     matches,
@@ -283,9 +278,7 @@ function Mini({
 
       <p
         className={`mt-1 truncate text-lg font-black ${
-          highlight
-            ? "bg-gradient-to-r from-emerald-200 to-emerald-400 bg-clip-text text-transparent"
-            : "text-white"
+          highlight ? "text-[#ffd21a]" : "text-white"
         }`}
       >
         {value}
@@ -314,12 +307,12 @@ function PlayerCard({
   return (
     <Link
       href={`/players/${player.slug}`}
-      className="group relative block overflow-hidden rounded-[1.65rem] border border-white/[0.12] bg-gradient-to-br from-white/[0.075] via-white/[0.035] to-transparent p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] transition hover:-translate-y-0.5 hover:border-white/25 hover:bg-white/[0.07]"
+      className="group relative block overflow-hidden rounded-[1.65rem] border border-white/[0.12] bg-gradient-to-br from-white/[0.075] via-white/[0.035] to-transparent p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] transition hover:-translate-y-0.5 hover:border-[#ffd21a]/30 hover:bg-white/[0.07]"
     >
       <div
         className={`pointer-events-none absolute ${
           align === "right" ? "-left-16" : "-right-16"
-        } -top-16 h-40 w-40 rounded-full bg-emerald-400/10 blur-3xl opacity-0 transition group-hover:opacity-100`}
+        } -top-16 h-40 w-40 rounded-full bg-[#ffd21a]/10 blur-3xl opacity-0 transition group-hover:opacity-100`}
       />
 
       <div
@@ -352,6 +345,12 @@ function PlayerCard({
               verified={player.verified}
               label={getPlayerBadgeLabel(player)}
             />
+
+            {player.active === false ? (
+              <span className="rounded-full border border-red-400/25 bg-red-400/10 px-3 py-1 text-xs font-bold text-red-300">
+                Inactive
+              </span>
+            ) : null}
           </div>
 
           <h2 className="mt-3 truncate text-3xl font-black tracking-tight text-white">
@@ -404,13 +403,7 @@ function MetricRow({
 
   return (
     <div className="grid grid-cols-[1fr_150px_1fr] items-center gap-4 border-b border-white/[0.055] px-5 py-4 transition last:border-b-0 hover:bg-white/[0.025]">
-      <p
-        className={`text-left text-lg font-black ${
-          leftWins
-            ? "bg-gradient-to-r from-emerald-200 to-emerald-400 bg-clip-text text-transparent"
-            : "text-white/62"
-        }`}
-      >
+      <p className={`text-left text-lg font-black ${leftWins ? "text-[#ffd21a]" : "text-white/62"}`}>
         {left.toFixed(decimals)}
         {suffix}
       </p>
@@ -419,13 +412,7 @@ function MetricRow({
         {label}
       </p>
 
-      <p
-        className={`text-right text-lg font-black ${
-          rightWins
-            ? "bg-gradient-to-r from-emerald-200 to-emerald-400 bg-clip-text text-transparent"
-            : "text-white/62"
-        }`}
-      >
+      <p className={`text-right text-lg font-black ${rightWins ? "text-[#ffd21a]" : "text-white/62"}`}>
         {right.toFixed(decimals)}
         {suffix}
       </p>
@@ -453,8 +440,8 @@ function RadarChart({
   const secondPoints = buildRadarPoints(secondValues, radius, center);
 
   return (
-    <div className={surface}>
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_10%,rgba(16,185,129,0.12),transparent_34%),radial-gradient(circle_at_85%_15%,rgba(59,130,246,0.10),transparent_34%)]" />
+    <section className={surface}>
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_10%,rgba(250,204,21,0.12),transparent_34%),radial-gradient(circle_at_85%_15%,rgba(59,130,246,0.10),transparent_34%)]" />
       <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/30 to-transparent" />
 
       <div className="relative z-10 border-b border-white/10 px-5 py-4">
@@ -474,7 +461,7 @@ function RadarChart({
 
         <div className="mt-4 hidden items-center gap-4 text-xs md:flex">
           <div className="flex items-center gap-2">
-            <span className="h-2.5 w-2.5 rounded-full bg-emerald-300" />
+            <span className="h-2.5 w-2.5 rounded-full bg-[#ffd21a]" />
             <span className="text-white/45">{firstLabel}</span>
           </div>
 
@@ -487,7 +474,7 @@ function RadarChart({
 
       <div className="relative z-10 grid gap-5 p-5 lg:grid-cols-[320px_1fr] lg:items-center">
         <div className="relative mx-auto h-[300px] w-[300px]">
-          <div className="pointer-events-none absolute inset-8 rounded-full bg-emerald-300/10 blur-2xl" />
+          <div className="pointer-events-none absolute inset-8 rounded-full bg-[#ffd21a]/10 blur-2xl" />
 
           <svg viewBox={`0 0 ${size} ${size}`} className="relative h-full w-full">
             {[0.25, 0.5, 0.75, 1].map((level) => (
@@ -520,8 +507,8 @@ function RadarChart({
 
             <polygon
               points={firstPoints}
-              fill="rgba(16,185,129,0.20)"
-              stroke="rgba(110,231,183,0.95)"
+              fill="rgba(250,204,21,0.20)"
+              stroke="rgba(250,204,21,0.95)"
               strokeWidth="2.5"
             />
 
@@ -573,7 +560,7 @@ function RadarChart({
                 <div className="grid grid-cols-2 gap-2">
                   <div className="h-1.5 overflow-hidden rounded-full bg-white/10">
                     <div
-                      className="h-full rounded-full bg-emerald-300"
+                      className="h-full rounded-full bg-[#ffd21a]"
                       style={{ width: `${left}%` }}
                     />
                   </div>
@@ -586,7 +573,7 @@ function RadarChart({
                   </div>
                 </div>
 
-                <p className="text-right text-xs font-black text-emerald-300">
+                <p className="text-right text-xs font-black text-[#ffd21a]">
                   {left}
                 </p>
 
@@ -598,7 +585,45 @@ function RadarChart({
           })}
         </div>
       </div>
-    </div>
+    </section>
+  );
+}
+
+function InsightCard({
+  label,
+  value,
+  description,
+  badge,
+  accent = false,
+}: {
+  label: string;
+  value: string | number;
+  description: string;
+  badge: string;
+  accent?: boolean;
+}) {
+  return (
+    <article
+      className={
+        accent
+          ? "relative overflow-hidden rounded-[1.35rem] border border-[#ffd21a]/25 bg-gradient-to-br from-[#ffd21a]/[0.16] via-[#ffd21a]/[0.07] to-white/[0.03] p-5 shadow-[0_0_45px_rgba(250,204,21,0.14),inset_0_1px_0_rgba(255,255,255,0.08)]"
+          : `${panel} p-5`
+      }
+    >
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <p className="text-xs font-semibold uppercase tracking-[0.25em] text-white/35">
+          {label}
+        </p>
+
+        <DataSourceBadge label={badge} />
+      </div>
+
+      <p className={`mt-4 text-4xl font-black ${accent ? "text-[#ffd21a]" : "text-white"}`}>
+        {value}
+      </p>
+
+      <p className="mt-2 text-sm leading-6 text-white/45">{description}</p>
+    </article>
   );
 }
 
@@ -649,36 +674,43 @@ export default async function PlayerCompareDynamicPage({
       .maybeSingle(),
   ]);
 
-  const firstPlayer = firstPlayerResult.data as PlayerRow | null;
-  const secondPlayer = secondPlayerResult.data as PlayerRow | null;
+  const firstPlayerRaw = firstPlayerResult.data as PlayerRaw | null;
+  const secondPlayerRaw = secondPlayerResult.data as PlayerRaw | null;
 
-  if (!firstPlayer || !secondPlayer) {
+  if (!firstPlayerRaw || !secondPlayerRaw) {
     notFound();
   }
 
-  const [
-    rankingsResult,
-    firstRecentStatsResult,
-    secondRecentStatsResult,
-  ] = await Promise.all([
-    supabase
-      .from("rankings")
-      .select("entity_id, rank, score, change")
-      .eq("entity_type", "player")
-      .in("entity_id", [firstPlayer.id, secondPlayer.id]),
+  const firstPlayer: PlayerRow = {
+    ...firstPlayerRaw,
+    team: one(firstPlayerRaw.team),
+  };
 
-    supabase
-      .from("player_match_stats")
-      .select("*")
-      .eq("player_id", firstPlayer.id)
-      .limit(20),
+  const secondPlayer: PlayerRow = {
+    ...secondPlayerRaw,
+    team: one(secondPlayerRaw.team),
+  };
 
-    supabase
-      .from("player_match_stats")
-      .select("*")
-      .eq("player_id", secondPlayer.id)
-      .limit(20),
-  ]);
+  const [rankingsResult, firstRecentStatsResult, secondRecentStatsResult] =
+    await Promise.all([
+      supabase
+        .from("rankings")
+        .select("entity_id, rank, score, change")
+        .eq("entity_type", "player")
+        .in("entity_id", [firstPlayer.id, secondPlayer.id]),
+
+      supabase
+        .from("player_match_stats")
+        .select("*")
+        .eq("player_id", firstPlayer.id)
+        .limit(20),
+
+      supabase
+        .from("player_match_stats")
+        .select("*")
+        .eq("player_id", secondPlayer.id)
+        .limit(20),
+    ]);
 
   const rankings = (rankingsResult.data || []) as RankingRow[];
   const rank1 = rankings.find((row) => row.entity_id === firstPlayer.id);
@@ -709,26 +741,30 @@ export default async function PlayerCompareDynamicPage({
     firstPlayer.avg_kills !== undefined && firstPlayer.avg_kills !== null
       ? n(firstPlayer.avg_kills)
       : firstMatches > 0
-      ? firstKills / firstMatches
-      : 0;
+        ? firstKills / firstMatches
+        : 0;
 
   const secondAvgKills =
     secondPlayer.avg_kills !== undefined && secondPlayer.avg_kills !== null
       ? n(secondPlayer.avg_kills)
       : secondMatches > 0
-      ? secondKills / secondMatches
-      : 0;
+        ? secondKills / secondMatches
+        : 0;
 
   const firstMomentum = getPlayerMomentum(firstRecentStats);
   const secondMomentum = getPlayerMomentum(secondRecentStats);
 
   const firstScore =
     rank1?.score ??
-    Math.round(firstKills * 1.4 + firstDamage * 0.35 + firstKd * 100 + firstMvp * 30);
+    Math.round(
+      firstKills * 1.4 + firstDamage * 0.35 + firstKd * 100 + firstMvp * 30
+    );
 
   const secondScore =
     rank2?.score ??
-    Math.round(secondKills * 1.4 + secondDamage * 0.35 + secondKd * 100 + secondMvp * 30);
+    Math.round(
+      secondKills * 1.4 + secondDamage * 0.35 + secondKd * 100 + secondMvp * 30
+    );
 
   const scoreDiff = firstScore - secondScore;
   const killDiff = firstKills - secondKills;
@@ -783,10 +819,10 @@ export default async function PlayerCompareDynamicPage({
 
   return (
     <main className="page-shell relative space-y-5 py-6 text-white">
-      <div className="pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(circle_at_20%_10%,rgba(16,185,129,0.08),transparent_30%),radial-gradient(circle_at_80%_20%,rgba(59,130,246,0.07),transparent_30%)]" />
+      <div className="pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(circle_at_20%_10%,rgba(250,204,21,0.08),transparent_30%),radial-gradient(circle_at_80%_20%,rgba(59,130,246,0.07),transparent_30%)]" />
 
       <section className="relative overflow-hidden rounded-[2rem] border border-white/[0.10] bg-[#080a0f] px-6 py-6 shadow-[0_24px_80px_rgba(0,0,0,0.35)] md:px-8">
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_15%_20%,rgba(16,185,129,0.14),transparent_32%),radial-gradient(circle_at_85%_10%,rgba(59,130,246,0.10),transparent_32%)]" />
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_15%_20%,rgba(59,130,246,0.14),transparent_32%),radial-gradient(circle_at_85%_10%,rgba(250,204,21,0.10),transparent_32%)]" />
         <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/30 to-transparent" />
 
         <div className="relative z-10 flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
@@ -798,7 +834,7 @@ export default async function PlayerCompareDynamicPage({
               <DataSourceBadge label="Analytics Generated" size="md" />
             </div>
 
-            <p className="text-xs font-black uppercase tracking-[0.28em] text-emerald-300/70">
+            <p className="text-xs font-black uppercase tracking-[0.28em] text-[#ffd21a]">
               Player Duel Analyzer
             </p>
 
@@ -814,21 +850,30 @@ export default async function PlayerCompareDynamicPage({
             </p>
           </div>
 
-          <Link
-            href="/compare"
-            className="w-fit rounded-full border border-white/10 bg-white/[0.04] px-5 py-2.5 text-sm font-semibold text-white/55 transition hover:border-white/25 hover:text-white"
-          >
-            Change Players
-          </Link>
+          <div className="flex flex-wrap gap-3">
+            <Link
+              href="/players/compare"
+              className="w-fit rounded-full border border-[#ffd21a]/30 bg-[#ffd21a]/10 px-5 py-2.5 text-sm font-black text-[#ffd21a] transition hover:bg-[#ffd21a]/15"
+            >
+              Change Players
+            </Link>
+
+            <Link
+              href="/data"
+              className="w-fit rounded-full border border-white/10 bg-white/[0.04] px-5 py-2.5 text-sm font-semibold text-white/55 transition hover:border-white/25 hover:text-white"
+            >
+              Data Trust
+            </Link>
+          </div>
         </div>
       </section>
 
       <section className={surface}>
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_18%_18%,rgba(16,185,129,0.12),transparent_34%),radial-gradient(circle_at_82%_18%,rgba(59,130,246,0.10),transparent_34%)]" />
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_18%_18%,rgba(250,204,21,0.12),transparent_34%),radial-gradient(circle_at_82%_18%,rgba(59,130,246,0.10),transparent_34%)]" />
         <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/30 to-transparent" />
 
         <div className="relative z-10 grid gap-0 lg:grid-cols-[1fr_240px_1fr]">
-          <div className="border-b border-white/10 p-5 lg:border-b-0 lg:border-r">
+          <div className="border-b border-white/10 p-5 lg:border-b-0 lg:border-r lg:border-white/10">
             <PlayerCard
               player={firstPlayer}
               rank={rank1?.rank ?? null}
@@ -839,9 +884,9 @@ export default async function PlayerCompareDynamicPage({
             />
           </div>
 
-          <div className="relative flex flex-col items-center justify-center overflow-hidden border-b border-white/10 bg-gradient-to-b from-emerald-400/[0.075] via-white/[0.025] to-transparent p-5 text-center lg:border-b-0">
-            <div className="pointer-events-none absolute h-44 w-44 rounded-full border border-emerald-300/15" />
-            <div className="pointer-events-none absolute h-32 w-32 rounded-full border border-emerald-300/20" />
+          <div className="relative flex flex-col items-center justify-center overflow-hidden border-b border-white/10 bg-gradient-to-b from-[#ffd21a]/[0.075] via-white/[0.025] to-transparent p-5 text-center lg:border-b-0">
+            <div className="pointer-events-none absolute h-44 w-44 rounded-full border border-[#ffd21a]/15" />
+            <div className="pointer-events-none absolute h-32 w-32 rounded-full border border-[#ffd21a]/20" />
 
             <DataSourceBadge label="Analytics Generated" />
 
@@ -849,10 +894,10 @@ export default async function PlayerCompareDynamicPage({
               Comparative Edge
             </p>
 
-            <div className="relative z-10 mt-4 flex h-28 w-28 items-center justify-center rounded-full border border-emerald-400/25 bg-emerald-400/10 shadow-[0_0_45px_rgba(16,185,129,0.20)]">
+            <div className="relative z-10 mt-4 flex h-28 w-28 items-center justify-center rounded-full border border-[#ffd21a]/25 bg-[#ffd21a]/10 shadow-[0_0_45px_rgba(250,204,21,0.18)]">
               <div>
-                <p className="text-4xl font-black tracking-[-0.08em] text-emerald-300">
-                  +{edgeMagnitude}
+                <p className="text-4xl font-black tracking-[-0.08em] text-[#ffd21a]">
+                  {edgeMagnitude === 0 ? "EVEN" : `+${edgeMagnitude}`}
                 </p>
 
                 <p className="text-[10px] uppercase tracking-[0.24em] text-white/35">
@@ -870,7 +915,7 @@ export default async function PlayerCompareDynamicPage({
             </p>
           </div>
 
-          <div className="p-5 lg:border-l">
+          <div className="p-5 lg:border-l lg:border-white/10">
             <PlayerCard
               player={secondPlayer}
               rank={rank2?.rank ?? null}
@@ -906,9 +951,7 @@ export default async function PlayerCompareDynamicPage({
               {confidence.label}
             </p>
 
-            <p className="mt-1 text-xs opacity-80">
-              Sample size: {sampleSize}
-            </p>
+            <p className="mt-1 text-xs opacity-80">Sample size: {sampleSize}</p>
           </div>
         </div>
       </section>
@@ -922,7 +965,7 @@ export default async function PlayerCompareDynamicPage({
         />
 
         <section className={surface}>
-          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_90%_0%,rgba(16,185,129,0.10),transparent_34%)]" />
+          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_90%_0%,rgba(250,204,21,0.10),transparent_34%)]" />
 
           <div className="relative z-10 border-b border-white/10 px-5 py-4">
             <div className="flex flex-wrap items-start justify-between gap-3">
@@ -962,117 +1005,36 @@ export default async function PlayerCompareDynamicPage({
       </section>
 
       <section className="grid gap-4 lg:grid-cols-4">
-        <div className={`${panel} p-5`}>
-          <div className="flex flex-wrap items-start justify-between gap-3">
-            <p className="text-xs font-semibold uppercase tracking-[0.25em] text-white/35">
-              Team Context
-            </p>
+        <InsightCard
+          label="Team Context"
+          value={`${firstPlayer.team?.short_name || firstPlayer.team?.name || "—"} / ${
+            secondPlayer.team?.short_name || secondPlayer.team?.name || "—"
+          }`}
+          description="Team affiliation gives role and system context to the duel."
+          badge="Team Source"
+        />
 
-            <DataSourceBadge label="Team Source" />
-          </div>
+        <InsightCard
+          label="Momentum"
+          value={`${firstMomentum.score}-${secondMomentum.score}`}
+          description={`${firstPlayer.ign}: ${firstMomentum.label}. ${secondPlayer.ign}: ${secondMomentum.label}.`}
+          badge="Recent Form"
+        />
 
-          <div className="mt-4 grid grid-cols-2 gap-3">
-            <div>
-              <p className="text-xl font-black text-white">
-                {firstPlayer.team?.short_name || firstPlayer.team?.name || "—"}
-              </p>
-              <div className="mt-2">
-                <DataSourceBadge
-                  source={firstPlayer.team?.source}
-                  verified={firstPlayer.team?.verified}
-                  label={getTeamBadgeLabel(firstPlayer.team)}
-                />
-              </div>
-            </div>
+        <InsightCard
+          label="Sample"
+          value={`${firstRecentStats.length}-${secondRecentStats.length}`}
+          description="Recent match-stat records currently available for each player."
+          badge="Match Stats"
+        />
 
-            <div className="text-right">
-              <p className="text-xl font-black text-white">
-                {secondPlayer.team?.short_name || secondPlayer.team?.name || "—"}
-              </p>
-              <div className="mt-2 flex justify-end">
-                <DataSourceBadge
-                  source={secondPlayer.team?.source}
-                  verified={secondPlayer.team?.verified}
-                  label={getTeamBadgeLabel(secondPlayer.team)}
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div className={`${panel} p-5`}>
-          <div className="flex flex-wrap items-start justify-between gap-3">
-            <p className="text-xs font-semibold uppercase tracking-[0.25em] text-white/35">
-              Momentum
-            </p>
-
-            <DataSourceBadge label="Recent Form" />
-          </div>
-
-          <div className="mt-4 grid grid-cols-2 gap-3">
-            <div>
-              <p className="text-4xl font-black text-emerald-300">
-                {firstMomentum.score}
-              </p>
-              <p className="text-xs text-white/40">{firstMomentum.label}</p>
-            </div>
-
-            <div className="text-right">
-              <p className="text-4xl font-black text-emerald-300">
-                {secondMomentum.score}
-              </p>
-              <p className="text-xs text-white/40">{secondMomentum.label}</p>
-            </div>
-          </div>
-        </div>
-
-        <div className={`${panel} p-5`}>
-          <div className="flex flex-wrap items-start justify-between gap-3">
-            <p className="text-xs font-semibold uppercase tracking-[0.25em] text-white/35">
-              Sample
-            </p>
-
-            <DataSourceBadge label="Match Stats" />
-          </div>
-
-          <div className="mt-4 grid grid-cols-2 gap-3">
-            <div>
-              <p className="text-4xl font-black text-white">
-                {firstRecentStats.length}
-              </p>
-              <p className="text-xs text-white/40">{firstPlayer.ign}</p>
-            </div>
-
-            <div className="text-right">
-              <p className="text-4xl font-black text-white">
-                {secondRecentStats.length}
-              </p>
-              <p className="text-xs text-white/40">{secondPlayer.ign}</p>
-            </div>
-          </div>
-        </div>
-
-        <div className="relative overflow-hidden rounded-[1.35rem] border border-emerald-300/25 bg-gradient-to-br from-emerald-400/[0.16] via-emerald-400/[0.07] to-white/[0.03] p-5 shadow-[0_0_45px_rgba(16,185,129,0.16),inset_0_1px_0_rgba(255,255,255,0.08)]">
-          <div className="pointer-events-none absolute -right-10 -top-10 h-28 w-28 rounded-full bg-emerald-300/20 blur-2xl" />
-
-          <div className="relative z-10">
-            <div className="flex flex-wrap items-start justify-between gap-3">
-              <p className="text-xs font-semibold uppercase tracking-[0.25em] text-emerald-300/70">
-                Final Read
-              </p>
-
-              <DataSourceBadge label="Analytics Generated" />
-            </div>
-
-            <p className="mt-4 text-2xl font-black text-white">
-              {dominantPlayer.ign}
-            </p>
-
-            <p className="mt-1 text-sm font-black text-emerald-300">
-              Overall Edge + {edgeMagnitude}
-            </p>
-          </div>
-        </div>
+        <InsightCard
+          label="Final Read"
+          value={dominantPlayer.ign}
+          description={`Overall edge +${edgeMagnitude} from score, kills, damage, KD, MVP and recent form.`}
+          badge="Analytics Generated"
+          accent
+        />
       </section>
     </main>
   );
