@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import PlayerCompareSelector from "@/components/PlayerCompareSelector";
+import DataSourceBadge from "@/components/DataSourceBadge";
 
 type PlayerOption = {
   id: string;
@@ -24,6 +25,9 @@ type PlayerOption = {
   revives: number | null;
   knocks: number | null;
   recent_form: string | null;
+  source?: string | null;
+  verified?: boolean | null;
+  active?: boolean | null;
 };
 
 type RankingRow = {
@@ -64,6 +68,23 @@ function getInitials(name: string) {
     .toUpperCase();
 }
 
+function getPlayerBadgeLabel(player?: PlayerOption | null) {
+  if (!player) return "Player Record";
+  if (player.source === "krafton_india_esports") return "Official Krafton Player";
+  if (player.verified) return "Verified Player";
+  return "Player Record";
+}
+
+function rankTone(rank: number | null | undefined) {
+  if (!rank) return "border-white/10 bg-white/[0.04] text-white/60";
+  if (rank === 1) return "border-yellow-400/30 bg-yellow-400/10 text-yellow-300";
+  if (rank === 2) return "border-slate-300/25 bg-slate-300/10 text-slate-200";
+  if (rank === 3) return "border-orange-400/25 bg-orange-400/10 text-orange-300";
+  if (rank <= 10) return "border-blue-400/25 bg-blue-400/10 text-blue-300";
+
+  return "border-white/10 bg-white/[0.04] text-white/70";
+}
+
 function PlayerAvatar({
   ign,
   role,
@@ -78,10 +99,11 @@ function PlayerAvatar({
 
   return (
     <div
-      className={`${sizeClass} flex shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-white/[0.12] bg-gradient-to-br from-emerald-400/[0.18] via-white/[0.05] to-blue-400/[0.12] shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]`}
+      className={`${sizeClass} flex shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-white/[0.12] bg-gradient-to-br from-blue-400/[0.18] via-white/[0.05] to-[#ffd21a]/[0.12] shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]`}
     >
       <div className="text-center">
         <p className="text-sm font-black text-white">{getInitials(ign)}</p>
+
         {size !== "sm" ? (
           <p className="mt-0.5 text-[8px] font-bold uppercase tracking-[0.16em] text-white/35">
             {role || "Player"}
@@ -90,15 +112,6 @@ function PlayerAvatar({
       </div>
     </div>
   );
-}
-
-function rankTone(rank: number | null | undefined) {
-  if (!rank) return "border-white/10 bg-white/[0.04] text-white/60";
-  if (rank === 1) return "border-yellow-400/30 bg-yellow-400/10 text-yellow-300";
-  if (rank === 2) return "border-slate-300/25 bg-slate-300/10 text-slate-200";
-  if (rank === 3) return "border-orange-400/25 bg-orange-400/10 text-orange-300";
-  if (rank <= 10) return "border-emerald-400/25 bg-emerald-400/10 text-emerald-300";
-  return "border-white/10 bg-white/[0.04] text-white/70";
 }
 
 function Mini({
@@ -115,11 +128,10 @@ function Mini({
       <p className="text-[10px] uppercase tracking-[0.18em] text-white/35">
         {label}
       </p>
+
       <p
         className={`mt-1 truncate text-lg font-black ${
-          highlight
-            ? "bg-gradient-to-r from-emerald-200 to-emerald-400 bg-clip-text text-transparent"
-            : "text-white"
+          highlight ? "text-[#ffd21a]" : "text-white"
         }`}
       >
         {value}
@@ -140,7 +152,7 @@ function PlayerPreviewCard({
   return (
     <Link
       href={`/players/${player.slug}`}
-      className="group relative block overflow-hidden rounded-[1.35rem] border border-white/[0.10] bg-white/[0.035] p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] transition hover:-translate-y-0.5 hover:border-white/25 hover:bg-white/[0.055]"
+      className="group relative block overflow-hidden rounded-[1.35rem] border border-white/[0.10] bg-white/[0.035] p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] transition hover:-translate-y-0.5 hover:border-[#ffd21a]/30 hover:bg-white/[0.055]"
     >
       <div className="pointer-events-none absolute -right-14 -top-14 h-32 w-32 rounded-full bg-blue-400/10 blur-3xl opacity-0 transition group-hover:opacity-100" />
 
@@ -148,13 +160,13 @@ function PlayerPreviewCard({
         <PlayerAvatar ign={player.ign} role={player.role} size="sm" />
 
         <div className="min-w-0 flex-1">
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <span
               className={`rounded-full border px-2 py-0.5 text-[10px] font-black ${rankTone(
                 rank
               )}`}
             >
-              {rank ? `#${rank}` : "—"}
+              {rank ? `#${rank}` : "-"}
             </span>
 
             <span className="rounded-full border border-white/10 bg-white/[0.04] px-2 py-0.5 text-[10px] font-bold text-white/55">
@@ -170,6 +182,14 @@ function PlayerPreviewCard({
             {player.team_name || player.real_name || "PlayRank"}
           </p>
         </div>
+      </div>
+
+      <div className="relative z-10 mt-4 flex flex-wrap gap-2">
+        <DataSourceBadge
+          source={player.source}
+          verified={player.verified}
+          label={getPlayerBadgeLabel(player)}
+        />
       </div>
 
       <div className="relative z-10 mt-4 grid grid-cols-3 gap-2">
@@ -201,16 +221,17 @@ function SuggestedDuel({
   return (
     <Link
       href={`/compare/players/${firstPlayer.slug}/${secondPlayer.slug}`}
-      className="group relative block overflow-hidden rounded-[1.5rem] border border-white/[0.10] bg-white/[0.035] p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] transition hover:-translate-y-0.5 hover:border-blue-300/25 hover:bg-white/[0.055]"
+      className="group relative block overflow-hidden rounded-[1.5rem] border border-white/[0.10] bg-white/[0.035] p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] transition hover:-translate-y-0.5 hover:border-[#ffd21a]/30 hover:bg-white/[0.055]"
     >
       <div className="pointer-events-none absolute -right-16 -top-16 h-40 w-40 rounded-full bg-blue-400/10 blur-3xl opacity-0 transition group-hover:opacity-100" />
 
       <div className="relative z-10">
-        <p className="text-xs font-semibold uppercase tracking-[0.25em] text-blue-300/70">
-          {label}
-        </p>
+        <div className="flex flex-wrap gap-2">
+          <DataSourceBadge label={label} />
+          <DataSourceBadge label="Quick Duel" />
+        </div>
 
-        <div className="mt-4 flex items-center justify-between gap-4">
+        <div className="mt-5 grid items-center gap-4 md:grid-cols-[1fr_auto_1fr]">
           <div className="min-w-0">
             <div className="flex items-center gap-3">
               <PlayerAvatar
@@ -218,18 +239,20 @@ function SuggestedDuel({
                 role={firstPlayer.role}
                 size="sm"
               />
+
               <div className="min-w-0">
                 <p className="truncate font-black text-white">
                   {firstPlayer.ign}
                 </p>
+
                 <p className="text-xs text-white/35">
-                  #{firstRank || "—"} · {shortNumber(firstScore || 0)} score
+                  #{firstRank || "-"} · {shortNumber(firstScore || 0)} score
                 </p>
               </div>
             </div>
           </div>
 
-          <span className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-xs font-black text-white/35">
+          <span className="mx-auto rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-xs font-black text-white/35">
             VS
           </span>
 
@@ -240,12 +263,14 @@ function SuggestedDuel({
                 role={secondPlayer.role}
                 size="sm"
               />
+
               <div className="min-w-0">
                 <p className="truncate font-black text-white">
                   {secondPlayer.ign}
                 </p>
+
                 <p className="text-xs text-white/35">
-                  #{secondRank || "—"} · {shortNumber(secondScore || 0)} score
+                  #{secondRank || "-"} · {shortNumber(secondScore || 0)} score
                 </p>
               </div>
             </div>
@@ -254,12 +279,53 @@ function SuggestedDuel({
 
         <div className="mt-5 flex items-center justify-between border-t border-white/10 pt-4">
           <p className="text-sm text-white/45">Open player duel analysis</p>
-          <span className="text-sm font-black text-blue-300 transition group-hover:translate-x-1">
-            Compare →
+
+          <span className="text-sm font-black text-[#ffd21a] transition group-hover:translate-x-1">
+            Compare -&gt;
           </span>
         </div>
       </div>
     </Link>
+  );
+}
+
+function DataCoveragePanel({
+  players,
+  rankingsCount,
+}: {
+  players: PlayerOption[];
+  rankingsCount: number;
+}) {
+  const withTeam = players.filter((player) => player.team_name || player.team_id).length;
+  const withRole = players.filter((player) => player.role).length;
+  const withStats = players.filter(
+    (player) => n(player.total_kills) > 0 || n(player.avg_damage) > 0
+  ).length;
+  const verified = players.filter((player) => player.verified).length;
+
+  return (
+    <section className={surface}>
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(250,204,21,0.10),transparent_34%)]" />
+
+      <div className="relative z-10 border-b border-white/10 px-5 py-4">
+        <div className="flex flex-wrap gap-2">
+          <DataSourceBadge label="Comparison Pool" />
+          <DataSourceBadge label="Data Coverage" />
+        </div>
+
+        <h2 className="mt-4 text-2xl font-black tracking-tight text-white">
+          Player Data Coverage
+        </h2>
+      </div>
+
+      <div className="relative z-10 grid gap-3 p-5 md:grid-cols-5">
+        <Mini label="Ranked" value={rankingsCount} highlight />
+        <Mini label="Verified" value={verified} />
+        <Mini label="With Team" value={withTeam} />
+        <Mini label="With Role" value={withRole} />
+        <Mini label="With Stats" value={withStats} />
+      </div>
+    </section>
   );
 }
 
@@ -277,7 +343,7 @@ export default async function ComparePlayersPage({
     redirect(`/compare/players/${params.player1}/${params.player2}`);
   }
 
-  const { data: playerData } = await supabase
+  const { data: playerData, error: playerError } = await supabase
     .from("player_analytics")
     .select("*")
     .not("slug", "is", null)
@@ -285,10 +351,29 @@ export default async function ComparePlayersPage({
 
   const players = (playerData || []) as PlayerOption[];
 
+  if (playerError) {
+    return (
+      <main className="page-shell py-10 text-white">
+        <section className={surface}>
+          <div className="relative z-10 p-8">
+            <h1 className="text-3xl font-black text-white">
+              Player comparison unavailable
+            </h1>
+
+            <p className="mt-3 text-red-300">
+              Failed to load player analytics. Check the player_analytics view,
+              selected columns, or Supabase permissions.
+            </p>
+          </div>
+        </section>
+      </main>
+    );
+  }
+
   if (players.length < 2) {
     return (
       <main className="page-shell relative py-6 text-white">
-        <div className="pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(circle_at_20%_10%,rgba(16,185,129,0.08),transparent_30%),radial-gradient(circle_at_80%_20%,rgba(59,130,246,0.07),transparent_30%)]" />
+        <div className="pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(circle_at_20%_10%,rgba(250,204,21,0.08),transparent_30%),radial-gradient(circle_at_80%_20%,rgba(59,130,246,0.07),transparent_30%)]" />
 
         <section className={surface}>
           <div className="relative z-10 p-8">
@@ -333,6 +418,14 @@ export default async function ComparePlayersPage({
 
   const topPlayers = rankedPlayers.slice(0, 8);
 
+  const topFraggers = [...players].sort(
+    (a, b) => n(b.total_kills) - n(a.total_kills)
+  );
+
+  const topDamage = [...players].sort(
+    (a, b) => n(b.avg_damage) - n(a.avg_damage)
+  );
+
   const sameRolePair = (() => {
     for (const playerA of rankedPlayers) {
       const match = rankedPlayers.find(
@@ -360,21 +453,13 @@ export default async function ComparePlayersPage({
     },
     {
       label: "Fragging test",
-      firstPlayer: [...players].sort(
-        (a, b) => n(b.total_kills) - n(a.total_kills)
-      )[0],
-      secondPlayer: [...players].sort(
-        (a, b) => n(b.total_kills) - n(a.total_kills)
-      )[1],
+      firstPlayer: topFraggers[0],
+      secondPlayer: topFraggers[1],
     },
     {
       label: "Damage duel",
-      firstPlayer: [...players].sort(
-        (a, b) => n(b.avg_damage) - n(a.avg_damage)
-      )[0],
-      secondPlayer: [...players].sort(
-        (a, b) => n(b.avg_damage) - n(a.avg_damage)
-      )[1],
+      firstPlayer: topDamage[0],
+      secondPlayer: topDamage[1],
     },
     {
       label: "Role rivalry",
@@ -397,26 +482,34 @@ export default async function ComparePlayersPage({
 
   return (
     <main className="page-shell relative space-y-5 py-6 text-white">
-      <div className="pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(circle_at_20%_10%,rgba(16,185,129,0.08),transparent_30%),radial-gradient(circle_at_80%_20%,rgba(59,130,246,0.07),transparent_30%)]" />
+      <div className="pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(circle_at_20%_10%,rgba(250,204,21,0.08),transparent_30%),radial-gradient(circle_at_80%_20%,rgba(59,130,246,0.07),transparent_30%)]" />
 
       <section className="relative overflow-hidden rounded-[2rem] border border-white/[0.10] bg-[#080a0f] px-6 py-6 shadow-[0_24px_80px_rgba(0,0,0,0.35)] md:px-8">
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_15%_20%,rgba(59,130,246,0.14),transparent_32%),radial-gradient(circle_at_85%_10%,rgba(16,185,129,0.10),transparent_32%)]" />
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_15%_20%,rgba(59,130,246,0.14),transparent_32%),radial-gradient(circle_at_85%_10%,rgba(250,204,21,0.10),transparent_32%)]" />
         <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/30 to-transparent" />
 
         <div className="relative z-10 flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.34em] text-white/35">
+            <p className="text-xs font-semibold uppercase tracking-[0.34em] text-[#ffd21a]">
               PlayRank Player Intelligence
             </p>
 
-            <h1 className="mt-3 max-w-4xl text-5xl font-black tracking-[-0.06em] text-white md:text-7xl">
-              Player Duel Analyzer
+            <h1 className="mt-3 max-w-4xl text-5xl font-black uppercase leading-[0.9] tracking-[-0.06em] text-white md:text-7xl">
+              Player Duel
+              <br />
+              Analyzer
             </h1>
 
             <p className="mt-4 max-w-2xl text-sm leading-6 text-white/48 md:text-base">
               Select any two players and compare fragging, damage output, entry
               pressure, clutch value, support contribution and current form.
             </p>
+
+            <div className="mt-5 flex flex-wrap gap-2">
+              <DataSourceBadge label="Player Comparison" />
+              <DataSourceBadge label="Ranking Signals" />
+              <DataSourceBadge label="Radar Matrix" />
+            </div>
           </div>
 
           <div className="grid grid-cols-3 gap-3 md:min-w-[360px]">
@@ -424,6 +517,7 @@ export default async function ComparePlayersPage({
               <p className="text-[10px] uppercase tracking-[0.22em] text-white/35">
                 Players
               </p>
+
               <p className="mt-2 text-3xl font-black text-white">
                 {players.length}
               </p>
@@ -433,7 +527,8 @@ export default async function ComparePlayersPage({
               <p className="text-[10px] uppercase tracking-[0.22em] text-white/35">
                 Ranked
               </p>
-              <p className="mt-2 text-3xl font-black text-blue-300">
+
+              <p className="mt-2 text-3xl font-black text-[#ffd21a]">
                 {rankings.length}
               </p>
             </div>
@@ -442,6 +537,7 @@ export default async function ComparePlayersPage({
               <p className="text-[10px] uppercase tracking-[0.22em] text-white/35">
                 Radar
               </p>
+
               <p className="mt-2 text-3xl font-black text-white">ON</p>
             </div>
           </div>
@@ -453,10 +549,12 @@ export default async function ComparePlayersPage({
           <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_90%_0%,rgba(59,130,246,0.10),transparent_34%)]" />
 
           <div className="relative z-10 border-b border-white/10 px-5 py-4">
-            <p className="text-xs font-semibold uppercase tracking-[0.28em] text-white/35">
-              Select Players
-            </p>
-            <h2 className="mt-1 text-2xl font-black tracking-tight text-white">
+            <div className="flex flex-wrap gap-2">
+              <DataSourceBadge label="Select Players" />
+              <DataSourceBadge label="Duel Builder" />
+            </div>
+
+            <h2 className="mt-4 text-2xl font-black tracking-tight text-white">
               Build a Player Duel
             </h2>
           </div>
@@ -467,13 +565,15 @@ export default async function ComparePlayersPage({
         </section>
 
         <section className={surface}>
-          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_10%_0%,rgba(16,185,129,0.10),transparent_34%)]" />
+          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_10%_0%,rgba(250,204,21,0.10),transparent_34%)]" />
 
           <div className="relative z-10 border-b border-white/10 px-5 py-4">
-            <p className="text-xs font-semibold uppercase tracking-[0.28em] text-white/35">
-              Player Pool
-            </p>
-            <h2 className="mt-1 text-2xl font-black tracking-tight text-white">
+            <div className="flex flex-wrap gap-2">
+              <DataSourceBadge label="Top Pool" />
+              <DataSourceBadge label="Player Candidates" />
+            </div>
+
+            <h2 className="mt-4 text-2xl font-black tracking-tight text-white">
               Top Duel Candidates
             </h2>
           </div>
@@ -495,15 +595,19 @@ export default async function ComparePlayersPage({
         </section>
       </section>
 
+      <DataCoveragePanel players={players} rankingsCount={rankings.length} />
+
       <section className={surface}>
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(59,130,246,0.10),transparent_34%)]" />
 
         <div className="relative z-10 flex flex-col gap-2 border-b border-white/10 px-5 py-4 md:flex-row md:items-end md:justify-between">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.28em] text-white/35">
-              Suggested Duels
-            </p>
-            <h2 className="mt-1 text-2xl font-black tracking-tight text-white">
+            <div className="flex flex-wrap gap-2">
+              <DataSourceBadge label="Suggested Duels" />
+              <DataSourceBadge label="Fast Start" />
+            </div>
+
+            <h2 className="mt-4 text-2xl font-black tracking-tight text-white">
               Quick Matchups
             </h2>
           </div>
