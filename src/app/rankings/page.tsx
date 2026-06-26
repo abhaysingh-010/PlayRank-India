@@ -45,6 +45,13 @@ type PlayerRow = {
   active?: boolean | null;
 };
 
+type TrustCard = {
+  label: string;
+  title: string;
+  description: string;
+  tone: "official" | "analytics" | "warning" | "neutral";
+};
+
 function n(value: unknown, fallback = 0) {
   const numberValue = Number(value);
   return Number.isFinite(numberValue) ? numberValue : fallback;
@@ -61,7 +68,7 @@ function getInitials(name: string) {
 }
 
 function formatDate(value: string | null) {
-  if (!value) return "Snapshot unavailable";
+  if (!value) return "Not available";
 
   return new Date(value).toLocaleDateString("en-IN", {
     day: "2-digit",
@@ -72,7 +79,6 @@ function formatDate(value: string | null) {
 
 function formatChange(value: number | null) {
   if (!value) return "—";
-
   if (value > 0) return `+${value}`;
 
   return String(value);
@@ -81,6 +87,7 @@ function formatChange(value: number | null) {
 function changeTone(value: number | null) {
   if (!value) return "text-white/35";
   if (value > 0) return "text-emerald-300";
+
   return "text-red-300";
 }
 
@@ -163,6 +170,36 @@ function getTableRowStyles(rank: number) {
   if (rank === 3) return "bg-orange-400/[0.05] hover:bg-orange-400/[0.075]";
 
   return "hover:bg-white/[0.025]";
+}
+
+function trustToneClass(tone: TrustCard["tone"]) {
+  if (tone === "official") {
+    return "border-blue-400/20 bg-blue-400/[0.06] text-blue-200";
+  }
+
+  if (tone === "analytics") {
+    return "border-[#ffd21a]/20 bg-[#ffd21a]/[0.06] text-[#ffd21a]";
+  }
+
+  if (tone === "warning") {
+    return "border-red-400/20 bg-red-400/[0.06] text-red-200";
+  }
+
+  return "border-white/10 bg-white/[0.035] text-white/65";
+}
+
+function TrustCardView({ item }: { item: TrustCard }) {
+  return (
+    <article className={`rounded-2xl border p-4 ${trustToneClass(item.tone)}`}>
+      <p className="text-[10px] font-black uppercase tracking-[0.2em] opacity-75">
+        {item.label}
+      </p>
+      <h3 className="mt-3 text-lg font-black text-white">{item.title}</h3>
+      <p className="mt-2 text-sm leading-6 text-white/50">
+        {item.description}
+      </p>
+    </article>
+  );
 }
 
 export default async function RankingsPage() {
@@ -262,7 +299,43 @@ export default async function RankingsPage() {
     latestSnapshotResult.data?.created_at ||
     null;
 
+  const latestGlobalSnapshot =
+    latestSnapshotResult.data?.snapshot_date ||
+    latestSnapshotResult.data?.created_at ||
+    null;
+
   const totalRankedEntities = rankedTeams.length + rankedPlayers.length;
+
+  const trustCards: TrustCard[] = [
+    {
+      label: "Team Ranking Source",
+      title: "Official and verified team layer",
+      description:
+        "Team rankings are shown with source and verification labels wherever available.",
+      tone: "official",
+    },
+    {
+      label: "Player Ranking Source",
+      title: "PlayRank-generated player order",
+      description:
+        "Player rankings are calculated from available player, match and performance data.",
+      tone: "analytics",
+    },
+    {
+      label: "Confidence Rule",
+      title: "Player rankings are directional",
+      description:
+        "Early player rankings should be treated as directional until match sample size grows.",
+      tone: "warning",
+    },
+    {
+      label: "Last Updated",
+      title: formatDate(latestGlobalSnapshot),
+      description:
+        "When reliable timestamps exist, PlayRank shows them. When unavailable, it says not available.",
+      tone: "neutral",
+    },
+  ];
 
   if (
     teamRankingsResult.error ||
@@ -274,7 +347,6 @@ export default async function RankingsPage() {
       <main className="page-shell py-10">
         <section className="rounded-[2rem] border border-red-500/20 bg-red-500/5 p-8">
           <h1 className="text-2xl font-black text-white">Rankings</h1>
-
           <p className="mt-3 text-red-300">
             Failed to load rankings. Check Supabase permissions and selected
             columns.
@@ -306,17 +378,28 @@ export default async function RankingsPage() {
             </p>
 
             <div className="mt-5 flex flex-wrap gap-2">
-              <DataSourceBadge label="Official Krafton Team Ranking" verified />
+              <DataSourceBadge
+                source="krafton_india_esports"
+                label="Official Krafton Team Ranking"
+                verified
+              />
               <DataSourceBadge label="PlayRank Player Ranking" />
               <DataSourceBadge label="Ranking Snapshot" />
+              <DataSourceBadge label="Confidence Aware" />
             </div>
 
             <div className="mt-7 flex flex-wrap gap-3">
-              <Link href="/rankings/teams" className="btn-primary px-5 py-3 text-sm">
+              <Link
+                href="/rankings/teams"
+                className="btn-primary px-5 py-3 text-sm"
+              >
                 Team Rankings
               </Link>
 
-              <Link href="/rankings/players" className="btn-secondary px-5 py-3 text-sm">
+              <Link
+                href="/rankings/players"
+                className="btn-secondary px-5 py-3 text-sm"
+              >
                 Player Rankings
               </Link>
 
@@ -329,7 +412,6 @@ export default async function RankingsPage() {
           <div className="grid gap-3 md:grid-cols-2 lg:text-left">
             <div className="rounded-2xl border border-white/10 bg-white/[0.035] p-4">
               <p className="data-label">Team Snapshot</p>
-
               <p className="mt-2 text-xl font-black text-white">
                 {formatDate(latestTeamUpdate)}
               </p>
@@ -337,7 +419,6 @@ export default async function RankingsPage() {
 
             <div className="rounded-2xl border border-white/10 bg-white/[0.035] p-4">
               <p className="data-label">Player Snapshot</p>
-
               <p className="mt-2 text-xl font-black text-white">
                 {formatDate(latestPlayerUpdate)}
               </p>
@@ -345,7 +426,6 @@ export default async function RankingsPage() {
 
             <div className="rounded-2xl border border-white/10 bg-white/[0.035] p-4">
               <p className="data-label">Ranked Entities</p>
-
               <p className="mt-2 text-xl font-black text-white">
                 {totalRankedEntities.toLocaleString("en-IN")}
               </p>
@@ -353,13 +433,39 @@ export default async function RankingsPage() {
 
             <div className="rounded-2xl border border-white/10 bg-white/[0.035] p-4">
               <p className="data-label">Database Coverage</p>
-
               <p className="mt-2 text-xl font-black text-white">
                 {n(teamCountResult.count) + n(playerCountResult.count)}
               </p>
             </div>
           </div>
         </div>
+      </section>
+
+      <section className="rounded-[2rem] border border-red-400/20 bg-red-400/[0.06] p-6">
+        <div className="flex flex-wrap gap-2">
+          <DataSourceBadge label="Independent Platform" />
+          <DataSourceBadge label="Source Attribution" />
+          <DataSourceBadge label="No Predictions" />
+        </div>
+
+        <h2 className="mt-4 text-2xl font-black uppercase tracking-[-0.04em] text-white">
+          Rankings are intelligence signals, not official predictions
+        </h2>
+
+        <p className="mt-3 max-w-5xl text-sm leading-7 text-white/55">
+          PlayRank is an independent esports intelligence platform. It is not
+          affiliated with, endorsed by, or operated by Krafton, PUBG, BGMI, or
+          tournament organizers. Official source data is credited where
+          available. PlayRank rankings, edge scores and confidence labels are
+          independently calculated from available source, roster, match and
+          ranking data.
+        </p>
+      </section>
+
+      <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+        {trustCards.map((item) => (
+          <TrustCardView key={item.label} item={item} />
+        ))}
       </section>
 
       <section className="space-y-5">
@@ -374,7 +480,11 @@ export default async function RankingsPage() {
             </h2>
 
             <div className="mt-3">
-              <DataSourceBadge label="Official Krafton Ranking" verified />
+              <DataSourceBadge
+                source="krafton_india_esports"
+                label="Official Krafton Ranking"
+                verified
+              />
             </div>
           </div>
 
@@ -465,8 +575,13 @@ export default async function RankingsPage() {
         <div className="flex flex-col gap-4 border-b border-white/10 p-6 md:flex-row md:items-end md:justify-between">
           <div>
             <div className="flex flex-wrap gap-2">
-              <DataSourceBadge label="Official Krafton Ranking" verified />
+              <DataSourceBadge
+                source="krafton_india_esports"
+                label="Official Krafton Ranking"
+                verified
+              />
               <DataSourceBadge label="Ranking Snapshot" />
+              <DataSourceBadge label={`Last Updated: ${formatDate(latestTeamUpdate)}`} />
             </div>
 
             <h2 className="mt-4 text-2xl font-black tracking-tight text-white">
@@ -474,7 +589,9 @@ export default async function RankingsPage() {
             </h2>
 
             <p className="mt-2 text-sm text-white/45">
-              Top 20 official and PlayRank-mapped teams.
+              Top 20 official and PlayRank-mapped teams. Team rows show source,
+              verification, ranking movement and latest available ranking
+              timestamp.
             </p>
           </div>
 
@@ -609,6 +726,8 @@ export default async function RankingsPage() {
             <div className="flex flex-wrap gap-2">
               <DataSourceBadge label="PlayRank Player Ranking" />
               <DataSourceBadge label="Analytics Generated" />
+              <DataSourceBadge label="Directional Confidence" />
+              <DataSourceBadge label={`Last Updated: ${formatDate(latestPlayerUpdate)}`} />
             </div>
 
             <h2 className="mt-4 text-2xl font-black tracking-tight text-white">
@@ -617,7 +736,8 @@ export default async function RankingsPage() {
 
             <p className="mt-2 text-sm text-white/45">
               Player ranking is generated from PlayRank match, stat and seed
-              data. Treat early rankings as directional until match sample size grows.
+              data. Treat early rankings as directional until match sample size
+              grows.
             </p>
           </div>
 

@@ -1,7 +1,7 @@
+import Image from "next/image";
 import Link from "next/link";
 
-const productLinks = 
-[
+const productLinks = [
   { label: "Teams", href: "/teams" },
   { label: "Players", href: "/players" },
   { label: "Matches", href: "/matches" },
@@ -10,39 +10,33 @@ const productLinks =
   { label: "Tournaments", href: "/tournaments" },
 ];
 
-const dataLinks = 
-[
+const dataLinks = [
   { label: "Data Trust Layer", href: "/data" },
   { label: "Official Rankings", href: "/rankings" },
   { label: "Team Database", href: "/teams" },
   { label: "Player Database", href: "/players" },
   { label: "Match Intelligence", href: "/matches" },
   { label: "Data Health", href: "/admin/data-health" },
+  { label: "Ranking Sync", href: "/admin/rankings-sync" },
 ];
 
-const companyLinks = 
-[
+const companyLinks = [
   { label: "About PlayRank", href: "/about" },
   { label: "Admin Console", href: "/admin" },
   { label: "Esports Intelligence", href: "/compare" },
-  { label: "Contact", href: "/" },
-  { label: "Privacy", href: "/" },
+  { label: "Methodology", href: "/data" },
 ];
 
-function FooterColumn
-(
-    {title,links,}
-    : 
-    {
-        title: string;
-        links: 
-        {
-            label: string;
-            href: string;
-        }[];
-    }
-)   
-{
+function FooterColumn({
+  title,
+  links,
+}: {
+  title: string;
+  links: {
+    label: string;
+    href: string;
+  }[];
+}) {
   return (
     <div>
       <p className="text-xs font-black uppercase tracking-[0.28em] text-white/45">
@@ -64,6 +58,14 @@ function FooterColumn
   );
 }
 
+function FooterBadge({ label }: { label: string }) {
+  return (
+    <span className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-[10px] font-black uppercase tracking-[0.14em] text-white/45">
+      {label}
+    </span>
+  );
+}
+
 export default function Footer() {
   return (
     <footer className="border-t border-white/10 bg-black px-7 py-16 text-white md:px-14">
@@ -71,17 +73,26 @@ export default function Footer() {
         <div className="grid gap-12 lg:grid-cols-[1.2fr_0.8fr_0.8fr_0.8fr]">
           <div>
             <Link href="/" className="inline-flex items-center">
-              <img
+              <Image
                 src="/brand/playrank-logo.png"
                 alt="PlayRank"
+                width={180}
+                height={48}
                 className="h-10 w-auto object-contain"
+                priority={false}
               />
             </Link>
 
             <p className="mt-5 max-w-md text-sm leading-7 text-white/55">
-              India’s esports intelligence platform for rankings, teams,
+              India&apos;s esports intelligence platform for rankings, teams,
               players, matches, tournaments and competitive comparison.
             </p>
+
+            <div className="mt-6 flex flex-wrap gap-2">
+              <FooterBadge label="Independent Platform" />
+              <FooterBadge label="Source Attribution" />
+              <FooterBadge label="No Predictions" />
+            </div>
 
             <div className="mt-8 flex flex-wrap gap-3">
               <Link
@@ -97,26 +108,46 @@ export default function Footer() {
               >
                 Compare
               </Link>
+
+              <Link
+                href="/data"
+                className="rounded-full border border-white/15 bg-white/[0.04] px-5 py-2.5 text-xs font-black uppercase tracking-[0.14em] text-white transition hover:border-[#ffd21a] hover:text-[#ffd21a]"
+              >
+                Data Trust
+              </Link>
             </div>
           </div>
+
           <FooterColumn title="Product" links={productLinks} />
           <FooterColumn title="Data" links={dataLinks} />
           <FooterColumn title="Company" links={companyLinks} />
         </div>
-        
-        <div className="mt-14 flex flex-col gap-4 border-t border-white/10 pt-7 md:flex-row md:items-center md:justify-between">
+
+        <div className="mt-14 rounded-[2rem] border border-red-400/20 bg-red-400/[0.06] p-5">
+          <p className="text-xs font-black uppercase tracking-[0.22em] text-red-200">
+            Independent Platform Disclaimer
+          </p>
+
+          <p className="mt-3 max-w-5xl text-xs leading-6 text-white/45">
+            PlayRank is an independent esports intelligence platform. It is not
+            affiliated with, endorsed by, or operated by Krafton, PUBG, BGMI, or
+            tournament organizers. Official rankings and source data are
+            attributed where available. PlayRank analytics, rankings, edge
+            scores and confidence labels are independently calculated from
+            available source, roster, match and ranking data.
+          </p>
+        </div>
+
+        <div className="mt-8 flex flex-col gap-4 border-t border-white/10 pt-7 md:flex-row md:items-center md:justify-between">
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-white/40">
             © {new Date().getFullYear()} PlayRank. All rights reserved.
           </p>
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-white/40">Built for India’s competitive esports ecosystem.</p>
+
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-white/40">
+            Built for India&apos;s competitive esports ecosystem.
+          </p>
         </div>
       </div>
-      <br />
-      <p className="max-w-3xl text-xs leading-6 text-white/35">
-        PlayRank is an independent esports analytics platform. Official rankings and
-        source data are attributed where available. PlayRank is not an official
-        Krafton product.
-      </p>
     </footer>
   );
 }

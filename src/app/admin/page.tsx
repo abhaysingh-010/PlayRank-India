@@ -35,6 +35,15 @@ const adminModules: AdminModule[] =
     group: "System",
   },
   {
+    title: "Ranking Sync",
+    label: "Drift Guard",
+    description:"Protected ranking recalculation control, ranking history checks and internal sync job review.",
+    href: "/admin/rankings-sync",
+    status: "Protected",
+    tone: "warning",
+    group: "System",
+  },
+  {
     title: "PUBG Hub",
     label: "API Control",
     description:"Central PUBG API control hub for imports, staging data, mappings, promotion readiness and import jobs.",
@@ -199,7 +208,7 @@ function Stat
 function AdminModuleRow({ item }: { item: AdminModule }) 
 {
   return (
-    <Link href={item.href}className="group block rounded-2xl border border-white/10 bg-white/[0.025] p-4 transition hover:-translate-y-0.5 hover:border-[#ffd21a]/30 hover:bg-white/[0.045]">
+    <Link href={item.href} className="group block rounded-2xl border border-white/10 bg-white/[0.025] p-4 transition hover:-translate-y-0.5 hover:border-[#ffd21a]/30 hover:bg-white/[0.045]">
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">
