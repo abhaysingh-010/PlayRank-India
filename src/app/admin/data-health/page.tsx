@@ -1,17 +1,20 @@
 import Link from "next/link";
+import DataSourceBadge from "@/components/DataSourceBadge";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
+
+type Status = "healthy" | "warning" | "danger" | "neutral";
 
 type CountCard = {
   label: string;
   value: number;
-  status: "healthy" | "warning" | "danger" | "neutral";
+  status: Status;
   description: string;
 };
 
 type IssueCard = {
   label: string;
   value: number;
-  status: "healthy" | "warning" | "danger";
+  status: Exclude<Status, "neutral">;
   description: string;
   href?: string;
 };
@@ -44,12 +47,23 @@ type RosterHealthRow = {
   promotion_safe: boolean | null;
 };
 
+type SafeCount = {
+  count: number;
+  error: string | null;
+};
+
+const shell =
+  "rounded-[2rem] border border-white/10 bg-[#080a0f] shadow-[0_24px_80px_rgba(0,0,0,0.28)]";
+
+const panel =
+  "rounded-2xl border border-white/10 bg-white/[0.035] shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]";
+
 function n(value: unknown, fallback = 0) {
   const numberValue = Number(value);
   return Number.isFinite(numberValue) ? numberValue : fallback;
 }
 
-async function safeCount(table: string) {
+async function safeCount(table: string): Promise<SafeCount> {
   const { count, error } = await supabaseAdmin
     .from(table)
     .select("*", { count: "exact", head: true });
@@ -60,82 +74,160 @@ async function safeCount(table: string) {
   };
 }
 
-function statusClass(status: CountCard["status"] | IssueCard["status"]) {
+function statusStyle(status: Status) {
   if (status === "healthy") {
-    return {
-      border: "border-emerald-400/25",
-      text: "text-emerald-300",
-      bg: "bg-emerald-400/10",
-    };
+    return "border-emerald-400/25 bg-emerald-400/10 text-emerald-300";
   }
 
   if (status === "warning") {
-    return {
-      border: "border-yellow-400/25",
-      text: "text-yellow-300",
-      bg: "bg-yellow-400/10",
-    };
+    return "border-yellow-400/25 bg-yellow-400/10 text-yellow-300";
   }
 
   if (status === "danger") {
-    return {
-      border: "border-red-400/30",
-      text: "text-red-300",
-      bg: "bg-red-400/10",
-    };
+    return "border-red-400/30 bg-red-400/10 text-red-300";
   }
 
-  return {
-    border: "border-white/10",
-    text: "text-white/70",
-    bg: "bg-white/[0.04]",
-  };
+  return "border-white/10 bg-white/[0.04] text-white/55";
 }
 
-function HealthCard({ item }: { item: CountCard }) {
-  const tone = statusClass(item.status);
+function statusText(status: Status) {
+  if (status === "healthy") return "Healthy";
+  if (status === "warning") return "Review";
+  if (status === "danger") return "Fix";
+  return "Neutral";
+}
 
+function formatStatus(value: string | null) {
+  return (value || "unknown").replace(/_/g, " ");
+}
+
+function StatBlock({
+  label,
+  value,
+  status = "neutral",
+}: {
+  label: string;
+  value: number;
+  status?: Status;
+}) {
   return (
-    <div className={`krafton-card p-6 ${tone.border}`}>
-      <div className="flex items-start justify-between gap-4">
-        <p className="data-label">{item.label}</p>
-
-        <span
-          className={`rounded-full border px-3 py-1 text-[10px] font-black uppercase tracking-[0.14em] ${tone.border} ${tone.bg} ${tone.text}`}
-        >
-          {item.status}
-        </span>
-      </div>
-
-      <p className="mt-5 text-5xl font-black tracking-[-0.06em] text-white">
-        {item.value.toLocaleString("en-IN")}
+    <div className={panel + " p-4"}>
+      <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/35">
+        {label}
       </p>
 
-      <p className="mt-4 leading-7 text-white/50">{item.description}</p>
+      <p
+        className={`mt-2 text-3xl font-black ${
+          status === "healthy"
+            ? "text-emerald-300"
+            : status === "warning"
+              ? "text-yellow-300"
+              : status === "danger"
+                ? "text-red-300"
+                : "text-white"
+        }`}
+      >
+        {value.toLocaleString("en-IN")}
+      </p>
     </div>
   );
 }
 
-function IssueCardView({ item }: { item: IssueCard }) {
-  const tone = statusClass(item.status);
+function SectionHeader({
+  eyebrow,
+  title,
+  actionHref,
+  actionLabel,
+}: {
+  eyebrow: string;
+  title: string;
+  actionHref?: string;
+  actionLabel?: string;
+}) {
+  return (
+    <div className="mb-5 flex flex-col gap-3 border-b border-white/10 pb-4 md:flex-row md:items-end md:justify-between">
+      <div>
+        <p className="text-xs font-black uppercase tracking-[0.25em] text-[#ffd21a]">
+          {eyebrow}
+        </p>
 
-  const content = (
-    <div className={`krafton-card p-6 ${tone.border}`}>
-      <div className="flex items-start justify-between gap-4">
-        <p className="data-label">{item.label}</p>
-
-        <span
-          className={`rounded-full border px-3 py-1 text-[10px] font-black uppercase tracking-[0.14em] ${tone.border} ${tone.bg} ${tone.text}`}
-        >
-          {item.status}
-        </span>
+        <h2 className="mt-2 text-2xl font-black tracking-[-0.04em] text-white">
+          {title}
+        </h2>
       </div>
 
-      <p className={`mt-5 text-5xl font-black tracking-[-0.06em] ${tone.text}`}>
+      {actionHref && actionLabel ? (
+        <Link
+          href={actionHref}
+          className="w-fit text-sm font-black text-white/40 transition hover:text-[#ffd21a]"
+        >
+          {actionLabel} →
+        </Link>
+      ) : null}
+    </div>
+  );
+}
+
+function CountHealthRow({ item }: { item: CountCard }) {
+  return (
+    <div className="flex flex-col gap-4 rounded-2xl border border-white/10 bg-white/[0.025] p-4 md:flex-row md:items-center md:justify-between">
+      <div>
+        <div className="flex flex-wrap items-center gap-2">
+          <p className="text-sm font-black text-white">{item.label}</p>
+
+          <span
+            className={`rounded-full border px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.12em] ${statusStyle(
+              item.status
+            )}`}
+          >
+            {statusText(item.status)}
+          </span>
+        </div>
+
+        <p className="mt-2 max-w-3xl text-sm leading-6 text-white/45">
+          {item.description}
+        </p>
+      </div>
+
+      <p className="shrink-0 text-3xl font-black text-white">
         {item.value.toLocaleString("en-IN")}
       </p>
+    </div>
+  );
+}
 
-      <p className="mt-4 leading-7 text-white/50">{item.description}</p>
+function IssueRow({ item }: { item: IssueCard }) {
+  const content = (
+    <div className="flex flex-col gap-4 rounded-2xl border border-white/10 bg-white/[0.025] p-4 transition hover:border-[#ffd21a]/30 hover:bg-white/[0.045] md:flex-row md:items-center md:justify-between">
+      <div>
+        <div className="flex flex-wrap items-center gap-2">
+          <p className="text-sm font-black text-white">{item.label}</p>
+
+          <span
+            className={`rounded-full border px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.12em] ${statusStyle(
+              item.status
+            )}`}
+          >
+            {statusText(item.status)}
+          </span>
+        </div>
+
+        <p className="mt-2 max-w-3xl text-sm leading-6 text-white/45">
+          {item.description}
+        </p>
+      </div>
+
+      <p
+        className={`shrink-0 text-3xl font-black ${
+          item.status === "healthy"
+            ? "text-emerald-300"
+            : item.status === "warning"
+              ? "text-yellow-300"
+              : "text-red-300"
+        }`}
+      >
+        {item.value.toLocaleString("en-IN")}
+      </p>
     </div>
   );
 
@@ -157,128 +249,93 @@ function PubgReadinessPanel({
   blocked: number;
   latest: PubgPromotionReadinessRow | null;
 }) {
-  const status: CountCard["status"] =
+  const status: Status =
     readyForPromotion > 0
       ? "healthy"
       : totalImportedMatches > 0
         ? "warning"
         : "neutral";
 
-  const tone = statusClass(status);
-
   return (
-    <div className={`krafton-card p-6 ${tone.border}`}>
-      <div className="flex items-start justify-between gap-4">
-        <div>
-          <p className="data-label">PUBG Import Readiness</p>
+    <section className={shell + " p-5 md:p-6"}>
+      <SectionHeader
+        eyebrow="PUBG API Gate"
+        title="Promotion Readiness"
+        actionHref="/admin/pubg/imports"
+        actionLabel="Open Imports"
+      />
 
-          <h3 className="mt-3 text-3xl font-black uppercase tracking-[-0.04em] text-white">
-            Promotion Gate
-          </h3>
-        </div>
-
-        <span
-          className={`rounded-full border px-3 py-1 text-[10px] font-black uppercase tracking-[0.14em] ${tone.border} ${tone.bg} ${tone.text}`}
-        >
-          {readyForPromotion > 0 ? "ready" : blocked > 0 ? "blocked" : "neutral"}
-        </span>
+      <div className="grid gap-3 md:grid-cols-3">
+        <StatBlock label="Imported Matches" value={totalImportedMatches} />
+        <StatBlock label="Ready" value={readyForPromotion} status="healthy" />
+        <StatBlock label="Blocked" value={blocked} status={blocked > 0 ? "warning" : "healthy"} />
       </div>
 
-      <div className="mt-8 grid gap-4 md:grid-cols-3">
-        <div className="border border-white/10 bg-white/[0.03] p-5">
-          <p className="data-label">Imported</p>
-
-          <p className="mt-3 text-4xl font-black text-white">
-            {totalImportedMatches.toLocaleString("en-IN")}
-          </p>
-        </div>
-
-        <div className="border border-emerald-400/20 bg-emerald-400/10 p-5">
-          <p className="data-label text-emerald-300">Ready</p>
-
-          <p className="mt-3 text-4xl font-black text-emerald-300">
-            {readyForPromotion.toLocaleString("en-IN")}
-          </p>
-        </div>
-
-        <div className="border border-yellow-400/20 bg-yellow-400/10 p-5">
-          <p className="data-label text-yellow-300">Blocked</p>
-
-          <p className="mt-3 text-4xl font-black text-yellow-300">
-            {blocked.toLocaleString("en-IN")}
-          </p>
-        </div>
-      </div>
-
-      {latest ? (
-        <div className="mt-8 border-t border-white/10 pt-6">
-          <p className="data-label">Latest Imported Match</p>
-
-          <div className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+      <div className="mt-5 rounded-2xl border border-white/10 bg-white/[0.025] p-4">
+        {latest ? (
+          <div className="grid gap-5 lg:grid-cols-[1.2fr_0.8fr]">
             <div>
-              <p className="text-xs uppercase tracking-[0.16em] text-white/40">
-                External Match
-              </p>
+              <div className="flex flex-wrap items-center gap-2">
+                <DataSourceBadge label="Latest Import" />
 
-              <p className="mt-2 break-all text-sm font-black text-white">
+                <span
+                  className={`rounded-full border px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.12em] ${statusStyle(
+                    status
+                  )}`}
+                >
+                  {latest.promotion_allowed ? "Ready" : "Blocked"}
+                </span>
+              </div>
+
+              <p className="mt-4 break-all text-sm font-black text-white">
                 {latest.external_match_id}
               </p>
-            </div>
 
-            <div>
-              <p className="text-xs uppercase tracking-[0.16em] text-white/40">
-                Map / Mode
-              </p>
-
-              <p className="mt-2 text-sm font-black text-white">
-                {latest.map_name || "Unknown"} /{" "}
-                {latest.game_mode || "Unknown"}
+              <p className="mt-2 text-sm text-white/45">
+                {latest.map_name || "Unknown map"} ·{" "}
+                {latest.game_mode || "Unknown mode"} · {latest.shard}
               </p>
             </div>
 
-            <div>
-              <p className="text-xs uppercase tracking-[0.16em] text-white/40">
-                Mapped Players
-              </p>
-
-              <p className="mt-2 text-sm font-black text-white">
-                {latest.mapped_players || 0} /{" "}
-                {latest.total_participants || 0}
-              </p>
+            <div className="grid grid-cols-3 gap-3">
+              <StatBlock
+                label="Players"
+                value={n(latest.mapped_players)}
+                status={n(latest.mapped_players) > 0 ? "healthy" : "warning"}
+              />
+              <StatBlock
+                label="Total"
+                value={n(latest.total_participants)}
+              />
+              <StatBlock
+                label="Teams"
+                value={n(latest.mapped_teams)}
+                status={n(latest.mapped_teams) > 0 ? "healthy" : "warning"}
+              />
             </div>
 
-            <div>
-              <p className="text-xs uppercase tracking-[0.16em] text-white/40">
-                Mapped Teams
+            <div className="lg:col-span-2 rounded-2xl border border-yellow-400/20 bg-yellow-400/10 p-4">
+              <p className="text-xs font-black uppercase tracking-[0.16em] text-yellow-300">
+                Promotion Status
               </p>
 
-              <p className="mt-2 text-sm font-black text-white">
-                {latest.mapped_teams || 0}
+              <p className="mt-2 text-sm font-black uppercase text-white">
+                {formatStatus(latest.promotion_status)}
+              </p>
+
+              <p className="mt-3 text-sm leading-6 text-white/55">
+                This match remains in PUBG staging until enough imported player
+                identities are mapped to verified PlayRank players and teams.
               </p>
             </div>
           </div>
-
-          <div className="mt-6 border border-yellow-400/20 bg-yellow-400/10 p-5">
-            <p className="text-xs font-black uppercase tracking-[0.16em] text-yellow-300">
-              Promotion Status
-            </p>
-
-            <p className="mt-2 text-sm font-black uppercase text-white">
-              {(latest.promotion_status || "unknown").replace(/_/g, " ")}
-            </p>
-
-            <p className="mt-3 text-sm leading-6 text-white/55">
-              This match will stay in PUBG staging tables until enough players
-              are mapped to verified PlayRank players and teams.
-            </p>
-          </div>
-        </div>
-      ) : (
-        <p className="mt-6 text-white/50">
-          No PUBG API match imports found yet.
-        </p>
-      )}
-    </div>
+        ) : (
+          <p className="text-sm text-white/45">
+            No PUBG API match imports found yet.
+          </p>
+        )}
+      </div>
+    </section>
   );
 }
 
@@ -421,20 +478,6 @@ export default async function DataHealthPage() {
       status: players.count > 0 ? "healthy" : "warning",
       description:
         "Player records used for profile pages, rankings and player comparison.",
-    },
-    {
-      label: "Roster Healthy",
-      value: rosterHealthy,
-      status: rosterHealthIssues === 0 ? "healthy" : "warning",
-      description:
-        "Players with synced player.team_id and active roster team.",
-    },
-    {
-      label: "Promotion Safe Players",
-      value: rosterPromotionSafe,
-      status: rosterPromotionSafe > 0 ? "healthy" : "warning",
-      description:
-        "Players safe for PUBG/player identity promotion workflows.",
     },
     {
       label: "Matches",
@@ -592,282 +635,187 @@ export default async function DataHealthPage() {
   );
 
   return (
-    <main className="min-h-screen bg-black text-white">
-      <section className="krafton-grid relative overflow-hidden border-b border-white/10 px-7 py-24 md:px-14">
-        <div className="blueprint-lines" />
+    <main className="min-h-screen bg-[#030406] text-white">
+      <section className="border-b border-white/10 bg-[#050609]">
+        <div className="mx-auto max-w-7xl px-5 py-12 md:py-16">
+          <div className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:items-end">
+            <div>
+              <div className="flex flex-wrap gap-2">
+                <DataSourceBadge label="Admin Console" size="md" />
+                <DataSourceBadge label="Data Health" size="md" />
+                <DataSourceBadge label="Protected" size="md" />
+              </div>
 
-        <div className="relative z-10 mx-auto max-w-[1600px]">
-          <p className="krafton-label">Admin Console</p>
+              <h1 className="mt-7 text-5xl font-black uppercase leading-[0.9] tracking-[-0.07em] text-white md:text-7xl">
+                Data Health
+                <br />
+                Control
+              </h1>
 
-          <h1 className="krafton-display mt-6 max-w-[1450px] text-[15vw] md:text-[9vw] xl:text-[8rem]">
-            DATA
-            <br />
-            HEALTH
-            <br />
-            CONTROL
-          </h1>
+              <p className="mt-6 max-w-3xl text-base leading-7 text-white/50">
+                Internal quality console for PlayRank teams, players, rankings,
+                match data, source imports, roster sync and PUBG API staging.
+              </p>
 
-          <p className="mt-8 max-w-4xl text-base font-black uppercase leading-6 tracking-[-0.03em] text-white md:text-xl">
-            Internal quality console for PlayRank&apos;s teams, players,
-            rankings, match data, source imports and PUBG API foundation.
-          </p>
+              <div className="mt-8 flex flex-wrap gap-3">
+                <Link
+                  href="/admin"
+                  className="rounded-full border border-white/10 bg-white/[0.04] px-5 py-2.5 text-sm font-black text-white/65 transition hover:border-white/25 hover:text-white"
+                >
+                  Admin Home
+                </Link>
 
-          <div className="mt-10 flex flex-wrap gap-3">
-            <Link href="/data" className="btn-primary px-6 py-3 text-sm">
-              View Trust Layer
-            </Link>
+                <Link
+                  href="/admin/pubg"
+                  className="rounded-full border border-[#ffd21a]/30 bg-[#ffd21a]/10 px-5 py-2.5 text-sm font-black text-[#ffd21a] transition hover:bg-[#ffd21a]/15"
+                >
+                  PUBG Hub
+                </Link>
 
-            <Link href="/rankings" className="btn-secondary px-6 py-3 text-sm">
-              View Rankings
-            </Link>
+                <Link
+                  href="/admin/rosters/health"
+                  className="rounded-full border border-white/10 bg-white/[0.04] px-5 py-2.5 text-sm font-black text-white/65 transition hover:border-white/25 hover:text-white"
+                >
+                  Roster Health
+                </Link>
+              </div>
+            </div>
 
-            <Link href="/admin/pubg" className="btn-secondary px-6 py-3 text-sm">
-              PUBG Admin Hub
-            </Link>
-
-            <Link
-              href="/admin/pubg/imports"
-              className="btn-secondary px-6 py-3 text-sm"
-            >
-              PUBG Imports
-            </Link>
-
-            <Link
-              href="/admin/pubg/mappings"
-              className="btn-secondary px-6 py-3 text-sm"
-            >
-              PUBG Mappings
-            </Link>
-
-            <Link
-              href="/admin/rosters/health"
-              className="btn-secondary px-6 py-3 text-sm"
-            >
-              Roster Health
-            </Link>
+            <div className="grid grid-cols-2 gap-3">
+              <StatBlock
+                label="Product Records"
+                value={
+                  teams.count + players.count + matches.count + tournaments.count
+                }
+                status="neutral"
+              />
+              <StatBlock
+                label="Ranking Rows"
+                value={rankings.count + rankingHistory.count}
+                status={rankings.count > 0 ? "healthy" : "danger"}
+              />
+              <StatBlock
+                label="Import Rows"
+                value={rawImports.count + pubgMatches.count + pubgParticipants.count}
+                status={pubgMatches.count > 0 ? "healthy" : "neutral"}
+              />
+              <StatBlock
+                label="Open Issues"
+                value={openIssueCount}
+                status={openIssueCount === 0 ? "healthy" : "warning"}
+              />
+            </div>
           </div>
         </div>
       </section>
 
-      <section className="border-b border-white/10 bg-black px-7 py-10 md:px-14">
-        <div className="mx-auto grid max-w-[1600px] gap-5 md:grid-cols-4">
-          <div>
-            <p className="data-label">Product Records</p>
-
-            <p className="mt-2 text-5xl font-black text-white">
-              {(
-                teams.count +
-                players.count +
-                matches.count +
-                tournaments.count
-              ).toLocaleString("en-IN")}
-            </p>
-          </div>
-
-          <div>
-            <p className="data-label">Ranking Rows</p>
-
-            <p className="mt-2 text-5xl font-black text-white">
-              {(rankings.count + rankingHistory.count).toLocaleString("en-IN")}
-            </p>
-          </div>
-
-          <div>
-            <p className="data-label">Import Rows</p>
-
-            <p className="mt-2 text-5xl font-black text-white">
-              {(
-                rawImports.count +
-                pubgMatches.count +
-                pubgParticipants.count
-              ).toLocaleString("en-IN")}
-            </p>
-          </div>
-
-          <div>
-            <p className="data-label">Open Issues</p>
-
-            <p className="mt-2 text-5xl font-black text-[#ff4038]">
-              {openIssueCount.toLocaleString("en-IN")}
-            </p>
-          </div>
-        </div>
-      </section>
-
-      <section className="mx-auto max-w-[1600px] px-7 py-24 md:px-14">
-        <div className="mb-8 border-b border-white/10 pb-5">
-          <p className="krafton-label">PUBG API Gate</p>
-
-          <h2 className="mt-3 text-4xl font-black uppercase tracking-[-0.04em] text-white md:text-5xl">
-            Import Promotion Readiness
-          </h2>
-        </div>
-
+      <section className="mx-auto grid max-w-7xl gap-5 px-5 py-10 lg:grid-cols-[1.05fr_0.95fr]">
         <PubgReadinessPanel
           totalImportedMatches={pubgReadinessRows.length}
           readyForPromotion={pubgReadyForPromotionCount}
           blocked={pubgBlockedPromotionCount}
           latest={latestPubgReadiness}
         />
-      </section>
 
-      <section className="mx-auto max-w-[1600px] px-7 py-16 md:px-14">
-        <div className="mb-8 border-b border-white/10 pb-5">
-          <p className="krafton-label">Roster Guard</p>
+        <section className={shell + " p-5 md:p-6"}>
+          <SectionHeader
+            eyebrow="Roster Guard"
+            title="Roster Promotion Safety"
+            actionHref="/admin/rosters/health"
+            actionLabel="Open Roster Health"
+          />
 
-          <h2 className="mt-3 text-4xl font-black uppercase tracking-[-0.04em] text-white md:text-5xl">
-            Roster Health
-          </h2>
-        </div>
-
-        <div className="grid gap-5 md:grid-cols-3">
-          <Link
-            href="/admin/rosters/health"
-            className="krafton-card border-emerald-400/25 p-6"
-          >
-            <p className="data-label text-emerald-300">Healthy Players</p>
-
-            <p className="mt-3 text-5xl font-black text-emerald-300">
-              {rosterHealthy.toLocaleString("en-IN")}
-            </p>
-
-            <p className="mt-4 text-sm leading-6 text-white/50">
-              Players with clean player/team/roster alignment.
-            </p>
-          </Link>
-
-          <Link
-            href="/admin/rosters/health"
-            className="krafton-card border-emerald-400/25 p-6"
-          >
-            <p className="data-label text-emerald-300">Promotion Safe</p>
-
-            <p className="mt-3 text-5xl font-black text-emerald-300">
-              {rosterPromotionSafe.toLocaleString("en-IN")}
-            </p>
-
-            <p className="mt-4 text-sm leading-6 text-white/50">
-              Players safe for imported PUBG identity and team promotion.
-            </p>
-          </Link>
-
-          <Link
-            href="/admin/rosters/health"
-            className={`krafton-card p-6 ${
-              rosterHealthIssues === 0
-                ? "border-emerald-400/25"
-                : "border-red-400/25"
-            }`}
-          >
-            <p
-              className={`data-label ${
-                rosterHealthIssues === 0
-                  ? "text-emerald-300"
-                  : "text-red-300"
-              }`}
-            >
-              Roster Issues
-            </p>
-
-            <p
-              className={`mt-3 text-5xl font-black ${
-                rosterHealthIssues === 0
-                  ? "text-emerald-300"
-                  : "text-red-300"
-              }`}
-            >
-              {rosterHealthIssues.toLocaleString("en-IN")}
-            </p>
-
-            <p className="mt-4 text-sm leading-6 text-white/50">
-              Issues that can block promotion safety or corrupt team-linked
-              analytics.
-            </p>
-          </Link>
-        </div>
-
-        {rosterHealthResult.error ? (
-          <div className="mt-5 border border-red-400/20 bg-red-400/10 p-5">
-            <p className="font-black uppercase text-red-300">
-              Roster health view error
-            </p>
-
-            <p className="mt-2 text-sm text-white/60">
-              {rosterHealthResult.error.message}
-            </p>
-          </div>
-        ) : null}
-      </section>
-
-      <section className="mx-auto max-w-[1600px] px-7 py-24 md:px-14">
-        <div className="mb-8 border-b border-white/10 pb-5">
-          <p className="krafton-label">System Overview</p>
-
-          <h2 className="mt-3 text-4xl font-black uppercase tracking-[-0.04em] text-white md:text-5xl">
-            Table Health
-          </h2>
-        </div>
-
-        <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
-          {countCards.map((item) => (
-            <HealthCard key={item.label} item={item} />
-          ))}
-        </div>
-      </section>
-
-      <section className="border-y border-white/10 bg-[#050505] px-7 py-24 md:px-14">
-        <div className="mx-auto max-w-[1600px]">
-          <div className="mb-8 border-b border-white/10 pb-5">
-            <p className="krafton-label">Quality Checks</p>
-
-            <h2 className="mt-3 text-4xl font-black uppercase tracking-[-0.04em] text-white md:text-5xl">
-              Open Data Issues
-            </h2>
+          <div className="grid gap-3">
+            <StatBlock
+              label="Healthy Players"
+              value={rosterHealthy}
+              status={rosterHealthIssues === 0 ? "healthy" : "warning"}
+            />
+            <StatBlock
+              label="Promotion Safe"
+              value={rosterPromotionSafe}
+              status={rosterPromotionSafe > 0 ? "healthy" : "warning"}
+            />
+            <StatBlock
+              label="Roster Issues"
+              value={rosterHealthIssues}
+              status={rosterHealthIssues === 0 ? "healthy" : "danger"}
+            />
           </div>
 
-          <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
+          {rosterHealthResult.error ? (
+            <div className="mt-4 rounded-2xl border border-red-400/20 bg-red-400/10 p-4">
+              <p className="font-black uppercase text-red-300">
+                Roster health view error
+              </p>
+
+              <p className="mt-2 text-sm text-white/60">
+                {rosterHealthResult.error.message}
+              </p>
+            </div>
+          ) : null}
+        </section>
+      </section>
+
+      <section className="mx-auto grid max-w-7xl gap-5 px-5 pb-10 lg:grid-cols-[0.92fr_1.08fr]">
+        <section className={shell + " p-5 md:p-6"}>
+          <SectionHeader
+            eyebrow="Quality Checks"
+            title="Open Data Issues"
+          />
+
+          <div className="grid gap-3">
             {issueCards.map((item) => (
-              <IssueCardView key={item.label} item={item} />
+              <IssueRow key={item.label} item={item} />
             ))}
           </div>
-        </div>
+        </section>
+
+        <section className={shell + " p-5 md:p-6"}>
+          <SectionHeader
+            eyebrow="System Overview"
+            title="Table Health"
+          />
+
+          <div className="grid gap-3">
+            {countCards.map((item) => (
+              <CountHealthRow key={item.label} item={item} />
+            ))}
+          </div>
+        </section>
       </section>
 
-      <section className="mx-auto max-w-[1600px] px-7 py-24 md:px-14">
-        <div className="mb-8 border-b border-white/10 pb-5">
-          <p className="krafton-label">Errors</p>
+      <section className="border-t border-white/10 bg-[#050609]">
+        <div className="mx-auto max-w-7xl px-5 py-10">
+          <SectionHeader eyebrow="Errors" title="Table Access Report" />
 
-          <h2 className="mt-3 text-4xl font-black uppercase tracking-[-0.04em] text-white md:text-5xl">
-            Table Access Report
-          </h2>
+          {tableErrors.length > 0 ? (
+            <div className="space-y-3">
+              {tableErrors.map(([table, error]) => (
+                <div
+                  key={table}
+                  className="rounded-2xl border border-red-400/20 bg-red-400/10 p-4"
+                >
+                  <p className="font-black uppercase tracking-[0.16em] text-red-300">
+                    {table}
+                  </p>
+
+                  <p className="mt-2 text-sm text-white/60">{error}</p>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="rounded-2xl border border-emerald-400/20 bg-emerald-400/10 p-5">
+              <p className="text-lg font-black text-emerald-300">
+                No table access errors detected.
+              </p>
+
+              <p className="mt-2 text-sm text-white/55">
+                All checked tables and health views responded successfully.
+              </p>
+            </div>
+          )}
         </div>
-
-        {tableErrors.length > 0 ? (
-          <div className="space-y-3">
-            {tableErrors.map(([table, error]) => (
-              <div
-                key={table}
-                className="border border-red-400/20 bg-red-400/10 p-5"
-              >
-                <p className="font-black uppercase tracking-[0.16em] text-red-300">
-                  {table}
-                </p>
-
-                <p className="mt-2 text-sm text-white/60">{error}</p>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <div className="border border-emerald-400/20 bg-emerald-400/10 p-6">
-            <p className="text-xl font-black uppercase tracking-[-0.03em] text-emerald-300">
-              No table access errors detected.
-            </p>
-
-            <p className="mt-3 text-white/55">
-              All checked tables responded successfully.
-            </p>
-          </div>
-        )}
       </section>
     </main>
   );

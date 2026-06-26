@@ -1,11 +1,14 @@
 import Link from "next/link";
+import DataSourceBadge from "@/components/DataSourceBadge";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
-import PubgPromoteButton from "@/components/admin/PubgPromoteButton";
 
-type PubgReadinessRow = 
-{
+export const dynamic = "force-dynamic";
+
+type Tone = "neutral" | "healthy" | "warning" | "danger";
+
+type ReadinessRow = {
   external_match_id: string;
-  shard: string;
+  shard: string | null;
   map_name: string | null;
   game_mode: string | null;
   created_at_api: string | null;
@@ -18,189 +21,622 @@ type PubgReadinessRow =
   promotion_allowed: boolean | null;
 };
 
-function n(value: unknown, fallback = 0) 
-{
+type ApiImportJob = {
+  id: string;
+  provider: string | null;
+  job_type: string | null;
+  status: string | null;
+  raw_import_count: number | null;
+  normalized_match_count: number | null;
+  error_message: string | null;
+  started_at: string | null;
+  completed_at: string | null;
+};
+
+type SafeCount = {
+  count: number;
+  error: string | null;
+};
+
+const shell =
+  "rounded-[2rem] border border-white/10 bg-[#080a0f] shadow-[0_24px_80px_rgba(0,0,0,0.28)]";
+
+const panel =
+  "rounded-2xl border border-white/10 bg-white/[0.035] shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]";
+
+function n(value: unknown, fallback = 0) {
   const numberValue = Number(value);
   return Number.isFinite(numberValue) ? numberValue : fallback;
 }
 
-function statusTone(row: PubgReadinessRow) 
-{
-  if (row.promotion_allowed) 
-  {
-    return {
-      label: "Ready",
-      border: "border-emerald-400/30",
-      bg: "bg-emerald-400/10",
-      text: "text-emerald-300",
-    };
-  }
-
-  if (row.promotion_status === "not_ready_no_players_mapped") 
-  {
-    return {
-      label: "No Players Mapped",
-      border: "border-red-400/30",
-      bg: "bg-red-400/10",
-      text: "text-red-300",
-    };
-  }
+async function safeCount(table: string): Promise<SafeCount> {
+  const { count, error } = await supabaseAdmin
+    .from(table)
+    .select("*", { count: "exact", head: true });
 
   return {
-    label: "Blocked",
-    border: "border-yellow-400/30",
-    bg: "bg-yellow-400/10",
-    text: "text-yellow-300",
+    count: n(count),
+    error: error?.message || null,
   };
 }
 
-export default async function PubgImportsPage() 
-{
-  const { data, error } = await supabaseAdmin.from("pubg_match_promotion_readiness").select("*").order("created_at_api", { ascending: false });
-  const rows = (data || []) as PubgReadinessRow[];
-  const totalImported = rows.length;
-  const readyCount = rows.filter((row) => row.promotion_allowed === true).length;
-  const blockedCount = rows.filter((row) => row.promotion_allowed !== true).length;
-  const totalParticipants = rows.reduce((sum, row) => sum + n(row.total_participants),0);
-  const totalMappedPlayers = rows.reduce((sum, row) => sum + n(row.mapped_players),0);
+function toneStyle(tone: Tone) {
+  if (tone === "healthy") {
+    return "border-emerald-400/25 bg-emerald-400/10 text-emerald-300";
+  }
+
+  if (tone === "warning") {
+    return "border-yellow-400/25 bg-yellow-400/10 text-yellow-300";
+  }
+
+  if (tone === "danger") {
+    return "border-red-400/25 bg-red-400/10 text-red-300";
+  }
+
+  return "border-white/10 bg-white/[0.04] text-white/60";
+}
+
+function formatDate(value: string | null) {
+  if (!value) return "TBD";
+
+  return new Date(value).toLocaleString("en-IN", {
+    day: "2-digit",
+    month: "short",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
+
+function formatStatus(value: string | null) {
+  return (value || "unknown").replace(/_/g, " ");
+}
+
+function getReadinessTone(row: ReadinessRow): Tone {
+  if (row.promotion_allowed === true) return "healthy";
+
+  const mappedPlayers = n(row.mapped_players);
+  const totalParticipants = n(row.total_participants);
+
+  if (totalParticipants > 0 && mappedPlayers === 0) return "danger";
+
+  return "warning";
+}
+
+function SectionHeader({
+  eyebrow,
+  title,
+  actionHref,
+  actionLabel,
+}: {
+  eyebrow: string;
+  title: string;
+  actionHref?: string;
+  actionLabel?: string;
+}) {
+  return (
+    <div className="mb-5 flex flex-col gap-3 border-b border-white/10 pb-4 md:flex-row md:items-end md:justify-between">
+      <div>
+        <p className="text-xs font-black uppercase tracking-[0.25em] text-[#ffd21a]">
+          {eyebrow}
+        </p>
+
+        <h2 className="mt-2 text-2xl font-black tracking-[-0.04em] text-white">
+          {title}
+        </h2>
+      </div>
+
+      {actionHref && actionLabel ? (
+        <Link
+          href={actionHref}
+          className="w-fit text-sm font-black text-white/40 transition hover:text-[#ffd21a]"
+        >
+          {actionLabel} →
+        </Link>
+      ) : null}
+    </div>
+  );
+}
+
+function StatBlock({
+  label,
+  value,
+  tone = "neutral",
+}: {
+  label: string;
+  value: number;
+  tone?: Tone;
+}) {
+  return (
+    <div className={panel + " p-4"}>
+      <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/35">
+        {label}
+      </p>
+
+      <p
+        className={`mt-2 text-3xl font-black ${
+          tone === "healthy"
+            ? "text-emerald-300"
+            : tone === "warning"
+              ? "text-yellow-300"
+              : tone === "danger"
+                ? "text-red-300"
+                : "text-white"
+        }`}
+      >
+        {value.toLocaleString("en-IN")}
+      </p>
+    </div>
+  );
+}
+
+function ReadinessCard({ row }: { row: ReadinessRow }) {
+  const tone = getReadinessTone(row);
+  const totalParticipants = n(row.total_participants);
+  const mappedPlayers = n(row.mapped_players);
+  const mappedTeams = n(row.mapped_teams);
+  const mappedPercent =
+    row.mapped_player_percentage === null
+      ? totalParticipants > 0
+        ? Math.round((mappedPlayers / totalParticipants) * 100)
+        : 0
+      : n(row.mapped_player_percentage);
 
   return (
-    <main className="min-h-screen bg-black text-white">
-      <section className="border-b border-white/10 px-7 py-20 md:px-14">
-        <div className="mx-auto max-w-[1600px]">
-          <p className="krafton-label">Admin Console</p>
-          <h1 className="mt-5 text-5xl font-black uppercase tracking-[-0.06em] md:text-7xl">
-            PUBG Import
-            <br />
-            Review
-          </h1>
-          <p className="mt-6 max-w-3xl text-white/55">
-            Review imported PUBG API matches before they are allowed into
-            PlayRank core match, player and team-stat tables.
+    <article className="rounded-2xl border border-white/10 bg-white/[0.025] p-4">
+      <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+        <div className="min-w-0">
+          <div className="flex flex-wrap items-center gap-2">
+            <span
+              className={`rounded-full border px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.12em] ${toneStyle(
+                tone
+              )}`}
+            >
+              {row.promotion_allowed ? "Ready" : "Blocked"}
+            </span>
+
+            <DataSourceBadge label={row.shard || "Shard N/A"} />
+          </div>
+
+          <p className="mt-3 break-all text-sm font-black text-white">
+            {row.external_match_id}
           </p>
-          <div className="mt-8 flex flex-wrap gap-3">
-            <Link href="/admin/data-health" className="btn-secondary px-6 py-3 text-sm">Data Health</Link>
-            <Link href="/admin/pubg/mappings" className="btn-secondary px-6 py-3 text-sm">Player Mappings</Link>
-            <Link href="/admin" className="btn-secondary px-6 py-3 text-sm">Admin Home</Link>
+
+          <p className="mt-2 text-sm text-white/45">
+            {row.map_name || "Unknown map"} ·{" "}
+            {row.game_mode || "Unknown mode"} · {formatDate(row.created_at_api)}
+          </p>
+        </div>
+
+        <div className="shrink-0 text-left md:text-right">
+          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/35">
+            Promotion Status
+          </p>
+
+          <p
+            className={`mt-2 text-sm font-black uppercase ${
+              tone === "healthy"
+                ? "text-emerald-300"
+                : tone === "danger"
+                  ? "text-red-300"
+                  : "text-yellow-300"
+            }`}
+          >
+            {formatStatus(row.promotion_status)}
+          </p>
+        </div>
+      </div>
+
+      <div className="mt-5 grid gap-3 md:grid-cols-4">
+        <StatBlock label="Participants" value={totalParticipants} />
+        <StatBlock
+          label="Mapped"
+          value={mappedPlayers}
+          tone={mappedPlayers > 0 ? "healthy" : "warning"}
+        />
+        <StatBlock
+          label="Teams"
+          value={mappedTeams}
+          tone={mappedTeams > 0 ? "healthy" : "warning"}
+        />
+        <StatBlock
+          label="Mapped %"
+          value={mappedPercent}
+          tone={mappedPercent >= 80 ? "healthy" : mappedPercent > 0 ? "warning" : "danger"}
+        />
+      </div>
+
+      {!row.promotion_allowed ? (
+        <div className="mt-5 rounded-2xl border border-yellow-400/20 bg-yellow-400/10 p-4">
+          <p className="text-xs font-black uppercase tracking-[0.16em] text-yellow-300">
+            Blocked Reason
+          </p>
+
+          <p className="mt-2 text-sm leading-6 text-white/60">
+            This match cannot be promoted yet. Review player mappings and roster
+            health before moving data into PlayRank core tables.
+          </p>
+
+          <div className="mt-4 flex flex-wrap gap-3">
+            <Link
+              href="/admin/pubg/mappings"
+              className="text-sm font-black text-yellow-300 transition hover:text-yellow-200"
+            >
+              Open Mappings →
+            </Link>
+
+            <Link
+              href="/admin/rosters/health"
+              className="text-sm font-black text-yellow-300 transition hover:text-yellow-200"
+            >
+              Roster Health →
+            </Link>
+          </div>
+        </div>
+      ) : (
+        <div className="mt-5 rounded-2xl border border-emerald-400/20 bg-emerald-400/10 p-4">
+          <p className="text-xs font-black uppercase tracking-[0.16em] text-emerald-300">
+            Ready For Promotion
+          </p>
+
+          <p className="mt-2 text-sm leading-6 text-white/60">
+            This match passed the readiness gate. Promotion should still be
+            reviewed before writing into core PlayRank tables.
+          </p>
+        </div>
+      )}
+    </article>
+  );
+}
+
+function JobRow({ job }: { job: ApiImportJob }) {
+  const tone: Tone =
+    job.status === "completed"
+      ? "healthy"
+      : job.status === "failed"
+        ? "danger"
+        : "warning";
+
+  return (
+    <div className="grid gap-4 rounded-2xl border border-white/10 bg-white/[0.025] p-4 md:grid-cols-[1fr_0.8fr_0.8fr_1.3fr]">
+      <div>
+        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/35">
+          Job
+        </p>
+
+        <p className="mt-2 text-sm font-black text-white">
+          {job.job_type || "Unknown"}
+        </p>
+
+        <p className="mt-1 text-xs text-white/35">
+          Started {formatDate(job.started_at)}
+        </p>
+      </div>
+
+      <div>
+        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/35">
+          Status
+        </p>
+
+        <span
+          className={`mt-2 inline-flex rounded-full border px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.12em] ${toneStyle(
+            tone
+          )}`}
+        >
+          {job.status || "unknown"}
+        </span>
+      </div>
+
+      <div>
+        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/35">
+          Normalized
+        </p>
+
+        <p className="mt-2 text-sm font-black text-white">
+          {n(job.normalized_match_count)}
+        </p>
+      </div>
+
+      <div>
+        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/35">
+          Error
+        </p>
+
+        <p className="mt-2 text-sm leading-6 text-white/45">
+          {job.error_message || "No error"}
+        </p>
+      </div>
+    </div>
+  );
+}
+
+export default async function PubgImportsPage() {
+  const [
+    rawImports,
+    apiJobs,
+    pubgMatches,
+    pubgParticipants,
+    pubgMappings,
+    readinessResult,
+    latestJobsResult,
+  ] = await Promise.all([
+    safeCount("raw_esports_imports"),
+    safeCount("api_import_jobs"),
+    safeCount("pubg_api_matches"),
+    safeCount("pubg_api_participants"),
+    safeCount("pubg_player_mappings"),
+
+    supabaseAdmin
+      .from("pubg_match_promotion_readiness")
+      .select("*")
+      .order("created_at_api", { ascending: false })
+      .limit(50),
+
+    supabaseAdmin
+      .from("api_import_jobs")
+      .select(
+        "id, provider, job_type, status, raw_import_count, normalized_match_count, error_message, started_at, completed_at"
+      )
+      .eq("provider", "pubg_developer_api")
+      .order("started_at", { ascending: false })
+      .limit(10),
+  ]);
+
+  const readinessRows = (readinessResult.data || []) as ReadinessRow[];
+  const latestJobs = (latestJobsResult.data || []) as ApiImportJob[];
+
+  const readyCount = readinessRows.filter(
+    (row) => row.promotion_allowed === true
+  ).length;
+
+  const blockedCount = readinessRows.filter(
+    (row) => row.promotion_allowed !== true
+  ).length;
+
+  const totalParticipants = readinessRows.reduce(
+    (sum, row) => sum + n(row.total_participants),
+    0
+  );
+
+  const mappedPlayers = readinessRows.reduce(
+    (sum, row) => sum + n(row.mapped_players),
+    0
+  );
+
+  const tableErrorEntries: Array<[string, string | null | undefined]> = [
+    ["raw_esports_imports", rawImports.error],
+    ["api_import_jobs", apiJobs.error],
+    ["pubg_api_matches", pubgMatches.error],
+    ["pubg_api_participants", pubgParticipants.error],
+    ["pubg_player_mappings", pubgMappings.error],
+    ["pubg_match_promotion_readiness", readinessResult.error?.message],
+    ["api_import_jobs_recent", latestJobsResult.error?.message],
+  ];
+
+  const tableErrors = tableErrorEntries.filter(
+    (entry): entry is [string, string] => Boolean(entry[1])
+  );
+
+  return (
+    <main className="min-h-screen bg-[#030406] text-white">
+      <section className="border-b border-white/10 bg-[#050609]">
+        <div className="mx-auto max-w-7xl px-5 py-12 md:py-16">
+          <div className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:items-end">
+            <div>
+              <div className="flex flex-wrap gap-2">
+                <DataSourceBadge label="Admin Console" size="md" />
+                <DataSourceBadge label="PUBG Imports" size="md" />
+                <DataSourceBadge label="Promotion Gate" size="md" />
+              </div>
+
+              <h1 className="mt-7 text-5xl font-black uppercase leading-[0.9] tracking-[-0.07em] text-white md:text-7xl">
+                PUBG Import
+                <br />
+                Review
+              </h1>
+
+              <p className="mt-6 max-w-3xl text-base leading-7 text-white/50">
+                Review imported PUBG API matches, readiness status, mapping
+                coverage, blocked reasons and recent import jobs before any
+                core promotion.
+              </p>
+
+              <div className="mt-8 flex flex-wrap gap-3">
+                <Link
+                  href="/admin/pubg/import"
+                  className="rounded-full border border-[#ffd21a]/30 bg-[#ffd21a]/10 px-5 py-2.5 text-sm font-black text-[#ffd21a] transition hover:bg-[#ffd21a]/15"
+                >
+                  Import Match
+                </Link>
+
+                <Link
+                  href="/admin/pubg"
+                  className="rounded-full border border-white/10 bg-white/[0.04] px-5 py-2.5 text-sm font-black text-white/65 transition hover:border-white/25 hover:text-white"
+                >
+                  PUBG Hub
+                </Link>
+
+                <Link
+                  href="/admin/pubg/mappings"
+                  className="rounded-full border border-white/10 bg-white/[0.04] px-5 py-2.5 text-sm font-black text-white/65 transition hover:border-white/25 hover:text-white"
+                >
+                  Player Mappings
+                </Link>
+
+                <Link
+                  href="/admin/data-health"
+                  className="rounded-full border border-white/10 bg-white/[0.04] px-5 py-2.5 text-sm font-black text-white/65 transition hover:border-white/25 hover:text-white"
+                >
+                  Data Health
+                </Link>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <StatBlock label="Imported" value={readinessRows.length} />
+              <StatBlock
+                label="Ready"
+                value={readyCount}
+                tone={readyCount > 0 ? "healthy" : "neutral"}
+              />
+              <StatBlock
+                label="Blocked"
+                value={blockedCount}
+                tone={blockedCount > 0 ? "warning" : "healthy"}
+              />
+              <StatBlock
+                label="Mappings"
+                value={pubgMappings.count}
+                tone={pubgMappings.count > 0 ? "healthy" : "warning"}
+              />
+            </div>
           </div>
         </div>
       </section>
-      <section className="border-b border-white/10 px-7 py-10 md:px-14">
-        <div className="mx-auto grid max-w-[1600px] gap-5 md:grid-cols-4">
-          <div className="krafton-card p-6">
-            <p className="data-label">Imported Matches</p>
-            <p className="mt-3 text-5xl font-black">{totalImported.toLocaleString("en-IN")}</p>
+
+      <section className="mx-auto grid max-w-7xl gap-5 px-5 py-10 lg:grid-cols-[0.9fr_1.1fr]">
+        <section className={shell + " p-5 md:p-6"}>
+          <SectionHeader
+            eyebrow="Coverage"
+            title="Import Mapping Coverage"
+            actionHref="/admin/pubg/mappings"
+            actionLabel="Open Mappings"
+          />
+
+          <div className="grid gap-3">
+            <StatBlock
+              label="PUBG Matches"
+              value={pubgMatches.count}
+              tone={pubgMatches.count > 0 ? "healthy" : "neutral"}
+            />
+            <StatBlock
+              label="Participants"
+              value={pubgParticipants.count}
+              tone={pubgParticipants.count > 0 ? "healthy" : "neutral"}
+            />
+            <StatBlock
+              label="Mapped Players"
+              value={mappedPlayers}
+              tone={mappedPlayers > 0 ? "healthy" : "warning"}
+            />
+            <StatBlock label="Total Participants" value={totalParticipants} />
           </div>
-          <div className="krafton-card border-emerald-400/25 p-6">
-            <p className="data-label text-emerald-300">Ready</p>
-            <p className="mt-3 text-5xl font-black text-emerald-300">{readyCount.toLocaleString("en-IN")}</p>
+        </section>
+
+        <section className={shell + " p-5 md:p-6"}>
+          <SectionHeader
+            eyebrow="Promotion Logic"
+            title="What Blocks Promotion?"
+          />
+
+          <div className="grid gap-3">
+            <div className="rounded-2xl border border-white/10 bg-white/[0.025] p-4">
+              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[#ffd21a]">
+                Identity Mapping
+              </p>
+
+              <p className="mt-3 text-sm leading-6 text-white/50">
+                PUBG account IDs and imported player names must be mapped to
+                existing verified PlayRank player records.
+              </p>
+            </div>
+
+            <div className="rounded-2xl border border-white/10 bg-white/[0.025] p-4">
+              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[#ffd21a]">
+                Team Safety
+              </p>
+
+              <p className="mt-3 text-sm leading-6 text-white/50">
+                Mapped players must have safe team linkage through active roster
+                records before promotion.
+              </p>
+            </div>
+
+            <div className="rounded-2xl border border-white/10 bg-white/[0.025] p-4">
+              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[#ffd21a]">
+                Core Protection
+              </p>
+
+              <p className="mt-3 text-sm leading-6 text-white/50">
+                Imported rows stay in staging until promotion_allowed is true in
+                the readiness view.
+              </p>
+            </div>
           </div>
-          <div className="krafton-card border-yellow-400/25 p-6">
-            <p className="data-label text-yellow-300">Blocked</p>
-            <p className="mt-3 text-5xl font-black text-yellow-300">{blockedCount.toLocaleString("en-IN")}</p>
+        </section>
+      </section>
+
+      <section className="mx-auto max-w-7xl px-5 pb-10">
+        <section className={shell + " p-5 md:p-6"}>
+          <SectionHeader
+            eyebrow="Imported Matches"
+            title="Promotion Readiness"
+          />
+
+          {readinessRows.length === 0 ? (
+            <div className="rounded-2xl border border-white/10 bg-white/[0.025] p-5">
+              <p className="font-black text-white">No imported matches found.</p>
+
+              <p className="mt-2 text-sm leading-6 text-white/45">
+                Import a PUBG match first, then return here to review readiness.
+              </p>
+            </div>
+          ) : (
+            <div className="grid gap-4">
+              {readinessRows.map((row) => (
+                <ReadinessCard key={row.external_match_id} row={row} />
+              ))}
+            </div>
+          )}
+        </section>
+      </section>
+
+      <section className="border-y border-white/10 bg-[#050609]">
+        <div className="mx-auto max-w-7xl px-5 py-10">
+          <SectionHeader eyebrow="Recent Activity" title="Import Jobs" />
+
+          {latestJobs.length === 0 ? (
+            <div className="rounded-2xl border border-white/10 bg-white/[0.025] p-5">
+              <p className="font-black text-white">No PUBG API jobs found.</p>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {latestJobs.map((job) => (
+                <JobRow key={job.id} job={job} />
+              ))}
+            </div>
+          )}
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-7xl px-5 py-10">
+        <SectionHeader eyebrow="Errors" title="Import Review Access Report" />
+
+        {tableErrors.length > 0 ? (
+          <div className="space-y-3">
+            {tableErrors.map(([table, error]) => (
+              <div
+                key={table}
+                className="rounded-2xl border border-red-400/20 bg-red-400/10 p-4"
+              >
+                <p className="font-black uppercase tracking-[0.16em] text-red-300">
+                  {table}
+                </p>
+
+                <p className="mt-2 text-sm text-white/60">{error}</p>
+              </div>
+            ))}
           </div>
-          <div className="krafton-card p-6">
-            <p className="data-label">Mapped Players</p>
-            <p className="mt-3 text-5xl font-black">{totalMappedPlayers.toLocaleString("en-IN")}
-              <span className="text-white/30">/{totalParticipants.toLocaleString("en-IN")}</span>
+        ) : (
+          <div className="rounded-2xl border border-emerald-400/20 bg-emerald-400/10 p-5">
+            <p className="text-lg font-black text-emerald-300">
+              No import review table errors detected.
+            </p>
+
+            <p className="mt-2 text-sm text-white/55">
+              Import readiness, mapping and job tables responded successfully.
             </p>
           </div>
-        </div>
-      </section>
-      <section className="mx-auto max-w-[1600px] px-7 py-14 md:px-14">
-        <div className="mb-8 border-b border-white/10 pb-5">
-          <p className="krafton-label">Promotion Queue</p>
-          <h2 className="mt-3 text-4xl font-black uppercase tracking-[-0.04em]">Imported PUBG Matches</h2>
-        </div>
-        {error ? 
-          (
-            <div className="border border-red-400/25 bg-red-400/10 p-6">
-              <p className="font-black uppercase text-red-300">Failed to load PUBG imports</p>
-              <p className="mt-3 text-white/55">{error.message}</p>
-            </div>
-          ) 
-          : null
-        }
-        <div className="space-y-5">
-          {rows.length === 0 ? 
-            (
-              <div className="border border-white/10 bg-white/[0.03] p-6">
-                <p className="font-black uppercase text-white">No PUBG matches imported yet.</p>
-                <p className="mt-3 text-white/50">Import a PUBG match first using the protected admin import route.</p>
-              </div>
-            ) : null
-          }
-          {rows.map
-            ((row) => 
-              {
-                const tone = statusTone(row);
-                const mappedPlayers = n(row.mapped_players);
-                const totalPlayers = n(row.total_participants);
-                const mappedTeams = n(row.mapped_teams);
-                const percentage = n(row.mapped_player_percentage);
-
-                return (
-                  <div key={row.external_match_id}className={`krafton-card p-6 ${tone.border}`}>
-                    <div className="flex flex-wrap items-start justify-between gap-5">
-                      <div>
-                        <div className="flex flex-wrap items-center gap-3">
-                          <h3 className="break-all text-2xl font-black tracking-[-0.04em]">{row.external_match_id}</h3>
-                          <span className={`rounded-full border px-3 py-1 text-[10px] font-black uppercase tracking-[0.14em] ${tone.border} ${tone.bg} ${tone.text}`}>
-                            {tone.label}
-                          </span>
-                        </div>
-
-                        <p className="mt-3 text-sm text-white/45">
-                          {row.shard} • {row.map_name || "Unknown Map"} •{" "}{row.game_mode || "Unknown Mode"}
-                        </p>
-
-                        <p className="mt-1 text-sm text-white/35">
-                          Imported match date:{" "}{row.created_at_api? new Date(row.created_at_api).toLocaleString("en-IN") : "Unknown"}
-                        </p>
-                      </div>
-
-                      <div className="flex flex-wrap gap-3">
-                        <Link href={`/admin/pubg/mappings?q=${encodeURIComponent(row.external_match_id)}`}className="rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-xs font-black uppercase tracking-[0.14em] text-white/60 hover:text-white">
-                          View Mappings
-                        </Link>
-                        <PubgPromoteButton externalMatchId={row.external_match_id}promotionAllowed={row.promotion_allowed === true}/>
-                      </div>
-                    </div>
-                    <div className="mt-8 grid gap-4 md:grid-cols-4">
-                      <div className="border border-white/10 bg-white/[0.03] p-5">
-                        <p className="data-label">Participants</p>
-                        <p className="mt-3 text-3xl font-black text-white">{totalPlayers.toLocaleString("en-IN")}</p>
-                      </div>
-                      <div className="border border-white/10 bg-white/[0.03] p-5">
-                        <p className="data-label">Mapped Players</p>
-                        <p className="mt-3 text-3xl font-black text-white">{mappedPlayers.toLocaleString("en-IN")}
-                          <span className="text-white/30">/{totalPlayers.toLocaleString("en-IN")}</span>
-                        </p>
-                      </div>
-                      <div className="border border-white/10 bg-white/[0.03] p-5">
-                        <p className="data-label">Mapped Teams</p>
-                        <p className="mt-3 text-3xl font-black text-white">{mappedTeams.toLocaleString("en-IN")}</p>
-                      </div>
-                      <div className="border border-white/10 bg-white/[0.03] p-5">
-                        <p className="data-label">Mapped %</p>
-                        <p className="mt-3 text-3xl font-black text-white">{percentage.toFixed(2)}%</p>
-                      </div>
-                    </div>
-                    <div className={`mt-6 border p-5 ${tone.border} ${tone.bg}`}>
-                      <p className={`text-xs font-black uppercase tracking-[0.16em] ${tone.text}`}>Promotion Status</p>
-                      <p className="mt-2 text-sm font-black uppercase text-white">{(row.promotion_status || "unknown").replace(/_/g, " ")}</p>
-                      <p className="mt-3 max-w-4xl text-sm leading-6 text-white/55">
-                        A PUBG API match is only allowed into PlayRank core data
-                        when enough players are mapped to real PlayRank players and
-                        those players are linked to teams.
-                      </p>
-                    </div>
-                  </div>
-                );
-              }
-            )
-          }
-        </div>
+        )}
       </section>
     </main>
   );

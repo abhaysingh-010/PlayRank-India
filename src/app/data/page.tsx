@@ -415,12 +415,8 @@ export default async function DataPage()
             <p className="krafton-label">Data Foundation</p>
             <DataSourceBadge label="Normalized Records" />
           </div>
-
-          <h2 className="mt-3 text-4xl font-black uppercase tracking-[-0.04em] text-white md:text-5xl">
-            Product Records
-          </h2>
+          <h2 className="mt-3 text-4xl font-black uppercase tracking-[-0.04em] text-white md:text-5xl">Product Records</h2>
         </div>
-
         <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
           {productCounts.map
             ((item) => 
@@ -436,27 +432,21 @@ export default async function DataPage()
           <div className="mb-8 border-b border-white/10 pb-5">
             <div className="flex flex-wrap items-center gap-3">
               <p className="krafton-label">Ranking Source Control</p>
-
-              <DataSourceBadge
-                source="krafton_india_esports"
-                verified
-                label="Official Krafton Ranking"
-              />
+              <DataSourceBadge source="krafton_india_esports" verified label="Official Krafton Ranking"/>
             </div>
-
-            <h2 className="mt-3 text-4xl font-black uppercase tracking-[-0.04em] text-white md:text-5xl">
-              Ranking Data
-            </h2>
+            <h2 className="mt-3 text-4xl font-black uppercase tracking-[-0.04em] text-white md:text-5xl">Ranking Data</h2>
           </div>
-
           <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
-            {rankingCounts.map((item) => (
-              <DataMetric key={item.label} item={item} />
-            ))}
+            {rankingCounts.map
+              ((item) => 
+                (
+                  <DataMetric key={item.label} item={item} />
+                )
+              )
+            }
           </div>
         </div>
       </section>
-
       <section className="mx-auto max-w-[1600px] px-7 py-24 md:px-14">
         <div className="mb-8 border-b border-white/10 pb-5">
           <div className="flex flex-wrap items-center gap-3">
@@ -464,19 +454,18 @@ export default async function DataPage()
             <DataSourceBadge label="Raw Import Control" />
             <DataSourceBadge source="pubg_api" label="PUBG API Data" />
           </div>
-
-          <h2 className="mt-3 text-4xl font-black uppercase tracking-[-0.04em] text-white md:text-5xl">
-            Raw And API Data
-          </h2>
+          <h2 className="mt-3 text-4xl font-black uppercase tracking-[-0.04em] text-white md:text-5xl">Raw And API Data</h2>
         </div>
-
         <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
-          {importCounts.map((item) => (
-            <DataMetric key={item.label} item={item} />
-          ))}
+          {importCounts.map
+            ((item) => 
+              (
+                <DataMetric key={item.label} item={item} />
+              )
+            )
+          }
         </div>
       </section>
-
       <section className="border-y border-white/10 bg-[#050505] px-7 py-24 md:px-14">
         <div className="mx-auto max-w-[1600px]">
           <div className="mb-8 border-b border-white/10 pb-5">
@@ -485,42 +474,34 @@ export default async function DataPage()
               <DataSourceBadge label="Promotion Guard" />
               <DataSourceBadge label="Roster Guard" />
             </div>
-
-            <h2 className="mt-3 text-4xl font-black uppercase tracking-[-0.04em] text-white md:text-5xl">
-              Staging And Promotion Safety
-            </h2>
+            <h2 className="mt-3 text-4xl font-black uppercase tracking-[-0.04em] text-white md:text-5xl">Staging And Promotion Safety</h2>
           </div>
-
           <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
-            {safetyCounts.map((item) => (
-              <DataMetric key={item.label} item={item} />
-            ))}
+            {safetyCounts.map
+              ((item) => 
+                (
+                  <DataMetric key={item.label} item={item} />
+                )
+              )
+            }
           </div>
-
           <div className="mt-8 border border-yellow-400/20 bg-yellow-400/10 p-6">
-            <p className="text-xs font-black uppercase tracking-[0.18em] text-yellow-300">
-              Public Data Rule
-            </p>
-
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-yellow-300">Public Data Rule</p>
             <p className="mt-3 max-w-4xl text-sm leading-6 text-white/60">
               PUBG API data is not automatically treated as PlayRank product
               data. Imported matches stay in staging until player identities are
               mapped, roster links are healthy and promotion guards pass.
             </p>
-
             <p className="mt-3 text-sm font-black uppercase tracking-[0.14em] text-white/45">
-              Current PUBG mapping: {pubgTotalMappedPlayers}/
-              {pubgTotalParticipants} participants mapped.
+              Current PUBG mapping: {pubgTotalMappedPlayers}/{pubgTotalParticipants} participants mapped.
             </p>
           </div>
         </div>
       </section>
-
       <section className="mx-auto max-w-[1600px] px-7 py-24 md:px-14">
         <div className="mx-auto grid max-w-[1600px] gap-12 xl:grid-cols-[0.85fr_1.15fr]">
           <div>
             <p className="krafton-label">Trust Model</p>
-
             <h2 className="mt-4 text-5xl font-black uppercase leading-[0.9] tracking-[-0.07em] text-white md:text-7xl">
               How Data
               <br />
@@ -529,79 +510,57 @@ export default async function DataPage()
               Intelligence
             </h2>
           </div>
-
           <div className="grid gap-5 md:grid-cols-2">
-            {trustLayers.map((item, index) => (
-              <div key={item.title} className="krafton-card p-6">
-                <div className="flex items-start justify-between">
-                  <p className="text-sm font-black uppercase tracking-[0.28em] text-[#ff4038]">
-                    {item.label}
-                  </p>
+            {trustLayers.map
+              ((item, index) => 
+                (
+                  <div key={item.title} className="krafton-card p-6">
+                    <div className="flex items-start justify-between">
+                      <p className="text-sm font-black uppercase tracking-[0.28em] text-[#ff4038]">
+                        {item.label}
+                      </p>
 
-                  <span className="text-sm font-black text-white/30">
-                    {String(index + 1).padStart(2, "0")}
-                  </span>
-                </div>
-
-                <div className="mt-5">
-                  <DataSourceBadge
-                    label={item.badge}
-                    verified={item.badge.toLowerCase().includes("official")}
-                    source={
-                      item.badge.toLowerCase().includes("pubg")
-                        ? "pubg_api"
-                        : item.badge.toLowerCase().includes("krafton")
-                          ? "krafton_india_esports"
-                          : undefined
-                    }
-                  />
-                </div>
-
-                <h3 className="mt-8 text-3xl font-black uppercase leading-[0.95] tracking-[-0.055em] text-white">
-                  {item.title}
-                </h3>
-
-                <p className="mt-5 leading-7 text-white/50">
-                  {item.description}
-                </p>
-              </div>
-            ))}
+                      <span className="text-sm font-black text-white/30">
+                        {String(index + 1).padStart(2, "0")}
+                      </span>
+                    </div>
+                    <div className="mt-5">
+                      <DataSourceBadge label={item.badge}verified={item.badge.toLowerCase().includes("official")}source={item.badge.toLowerCase().includes("pubg")? "pubg_api" : item.badge.toLowerCase().includes("krafton")? "krafton_india_esports": undefined}/>
+                    </div>
+                    <h3 className="mt-8 text-3xl font-black uppercase leading-[0.95] tracking-[-0.055em] text-white">{item.title}</h3>
+                    <p className="mt-5 leading-7 text-white/50">{item.description}</p>
+                  </div>
+                )
+              )
+            }
           </div>
         </div>
       </section>
-
       <section className="mx-auto max-w-[1600px] px-7 py-24 md:px-14">
         <MethodologySection />
       </section>
-
       <section className="krafton-grid relative overflow-hidden px-7 py-20 text-center md:px-14">
         <div className="relative z-10 mx-auto max-w-5xl">
           <p className="krafton-label">PlayRank Data Layer</p>
-
-          <h2 className="krafton-title mt-4 text-6xl text-white md:text-8xl">
+           <h2 className="krafton-title mt-4 text-6xl text-white md:text-8xl">
             Build Trust
             <br />
             Before Insight
           </h2>
-
           <div className="mt-6 flex justify-center">
             <DataSourceBadge label="Source Controlled Intelligence" size="md" />
           </div>
-
           <p className="mx-auto mt-6 max-w-2xl leading-7 text-white/50">
             Every product page should clearly separate official source data,
             normalized records, staged imports and analytics output.
           </p>
-
           <div className="mt-9 flex justify-center gap-3">
             <Link href="/rankings" className="btn-primary px-6 py-3 text-sm">
               View Rankings
             </Link>
-
             <Link href="/teams" className="btn-secondary px-6 py-3 text-sm">
               Explore Teams
             </Link>
-
             <Link href="/matches" className="btn-secondary px-6 py-3 text-sm">
               View Matches
             </Link>

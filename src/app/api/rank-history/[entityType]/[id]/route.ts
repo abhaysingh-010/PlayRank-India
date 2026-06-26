@@ -19,8 +19,10 @@ export async function GET(
     .eq("entity_id", id)
     .order("snapshot_date", { ascending: true });
 
-  if (error) {
-    return NextResponse.json(
+  if (error) 
+  {
+    return NextResponse.json
+    (
       { error: error.message },
       { status: 500 }
     );
@@ -28,8 +30,10 @@ export async function GET(
 
   return NextResponse.json(data);
 }
-export function calculateMomentum(history: any[]) {
-  if (!history || history.length < 2) {
+export function calculateMomentum(history: any[]) 
+{
+  if (!history || history.length < 2) 
+  {
     return {
       momentum: 0,
       trend: "stable",
@@ -41,10 +45,7 @@ export function calculateMomentum(history: any[]) {
 
   const diff = prev.rank - last.rank;
 
-  const momentum =
-    diff * 10 +
-    (last.score || 0) * 0.05;
-
+  const momentum = diff * 10 + (last.score || 0) * 0.05;
   let trend = "stable";
 
   if (diff > 0) trend = "up";
@@ -56,35 +57,42 @@ export function calculateMomentum(history: any[]) {
     change: diff,
   };
 }
-export function calculateStreak(matches: any[]) {
-  if (!matches || matches.length === 0) {
+export function calculateStreak(matches: any[]) 
+{
+  if (!matches || matches.length === 0) 
+  {
     return { streak: 0, type: "none" };
   }
 
   let streak = 0;
   let type = null;
 
-  for (let i = matches.length - 1; i >= 0; i--) {
+  for (let i = matches.length - 1; i >= 0; i--) 
+  {
     const match = matches[i];
 
     const isWin = match.result === "win";
 
-    if (type === null) {
+    if (type === null) 
+    {
       type = isWin ? "win" : "loss";
       streak = 1;
-    } else if (
-      (type === "win" && isWin) ||
-      (type === "loss" && !isWin)
-    ) {
+    } else if 
+    (
+      (type === "win" && isWin) || (type === "loss" && !isWin)
+    ) 
+    {
       streak++;
-    } else {
+    } else 
+    {
       break;
     }
   }
 
   return { streak, type };
 }
-export function detectForm(momentum: number) {
+export function detectForm(momentum: number) 
+{
   if (momentum >= 50) return "HOT";
   if (momentum >= 20) return "WARM";
   if (momentum >= 0) return "NEUTRAL";

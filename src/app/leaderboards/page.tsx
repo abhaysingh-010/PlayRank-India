@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from "react"
 
-export default function LeaderboardsPage() {
+export default function LeaderboardsPage() 
+{
 
   const [tab, setTab] = useState("players")
   const [data, setData] = useState<any[]>([])
@@ -27,7 +28,6 @@ export default function LeaderboardsPage() {
         <p className="uppercase tracking-wide text-sm text-zinc-500">Global Rankings</p>
         <h1 className="text-6xl font-black mt-4">Leaderboards</h1>
       </div>
-
       {/* FILTERS */}
       <div className="flex gap-4 mb-10">
         <button onClick={()=>setTab("players")}className={`px-6 py-3 rounded-2xl border ${tab === "players" ? "bg-indigo-500 border-indigo-500" : "bg-white/5 border-white/10"}`}>Players</button>

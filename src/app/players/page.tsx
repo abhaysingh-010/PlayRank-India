@@ -2,7 +2,8 @@ import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import DataSourceBadge from "@/components/DataSourceBadge";
 
-type RankingRow = {
+type RankingRow = 
+{
   entity_id: string;
   rank: number;
   score: number;
@@ -10,14 +11,16 @@ type RankingRow = {
   updated_at?: string | null;
 };
 
-type PlayerTeamRow = {
+type PlayerTeamRow = 
+{
   id: string;
   name: string;
   slug: string;
   short_name: string | null;
 };
 
-type PlayerRow = {
+type PlayerRow = 
+{
   id: string;
   ign: string;
   real_name: string | null;
@@ -38,88 +41,98 @@ type PlayerRow = {
   team: PlayerTeamRow | null;
 };
 
-type PlayerQueryRow = Omit<PlayerRow, "team"> & {
+type PlayerQueryRow = Omit<PlayerRow, "team"> & 
+{
   team: PlayerTeamRow | PlayerTeamRow[] | null;
 };
 
 const PAGE_SIZE = 10;
 
-function n(value: unknown, fallback = 0) {
+function n(value: unknown, fallback = 0) 
+{
   const numberValue = Number(value);
   return Number.isFinite(numberValue) ? numberValue : fallback;
 }
 
-function toValidPage(value: string | undefined) {
+function toValidPage(value: string | undefined) 
+{
   const page = Number(value || "1");
   if (!Number.isFinite(page) || page < 1) return 1;
   return Math.floor(page);
 }
 
-function getInitials(name: string) {
+function getInitials(name: string) 
+{
   return name
-    .split(" ")
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((word) => word[0])
-    .join("")
-    .toUpperCase();
+  .split(" ")
+  .filter(Boolean)
+  .slice(0, 2)
+  .map((word) => word[0])
+  .join("")
+  .toUpperCase();
 }
 
-function formatDate(value: string | null | undefined) {
+function formatDate(value: string | null | undefined) 
+{
   if (!value) return "Snapshot unavailable";
-
-  return new Date(value).toLocaleDateString("en-IN", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-  });
+  return new Date(value).toLocaleDateString
+  ("en-IN", 
+    {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    }
+  );
 }
 
-function formatChange(value: number | null | undefined) {
+function formatChange(value: number | null | undefined) 
+{
   if (!value) return "—";
   if (value > 0) return `+${value}`;
   return String(value);
 }
 
-function changeTone(value: number | null | undefined) {
+function changeTone(value: number | null | undefined) 
+{
   if (!value) return "text-white/35";
   if (value > 0) return "text-emerald-300";
   return "text-red-300";
 }
 
-function PlayerAvatar({
-  ign,
-  role,
-  size = "md",
-}: {
-  ign: string;
-  role: string | null;
-  size?: "sm" | "md" | "lg";
-}) {
-  const sizeClass =
-    size === "lg" ? "h-16 w-16" : size === "sm" ? "h-10 w-10" : "h-12 w-12";
-
+function PlayerAvatar
+(
+  {
+    ign,
+    role,
+    size = "md",
+  }
+  : 
+  {
+    ign: string;
+    role: string | null;
+    size?: "sm" | "md" | "lg";
+  }
+) 
+{
+  const sizeClass = size === "lg" ? "h-16 w-16" : size === "sm" ? "h-10 w-10" : "h-12 w-12";
   return (
-    <div
-      className={`${sizeClass} flex shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-white/10 bg-white/[0.04] shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]`}
-    >
+    <div className={`${sizeClass} flex shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-white/10 bg-white/[0.04] shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]`}>
       <div className="text-center">
-        <span className="block text-sm font-black tracking-tight text-white/70">
-          {getInitials(ign)}
-        </span>
-
-        {size === "lg" ? (
-          <span className="mt-1 block text-[8px] font-bold uppercase tracking-[0.16em] text-white/30">
-            {role || "Player"}
-          </span>
-        ) : null}
+        <span className="block text-sm font-black tracking-tight text-white/70">{getInitials(ign)}</span>
+        {size === "lg" ? 
+          (
+            <span className="mt-1 block text-[8px] font-bold uppercase tracking-[0.16em] text-white/30">{role || "Player"}</span>
+          ) : null
+        }
       </div>
     </div>
   );
 }
 
-function getTopPlayerCardStyles(rank: number) {
-  if (rank === 1) {
+function getTopPlayerCardStyles(rank: number) 
+{
+  if (rank === 1) 
+  {
     return {
       card: "border-yellow-400/30 bg-gradient-to-br from-yellow-500/20 via-[#15110a] to-[#0b0d12] shadow-[0_0_34px_rgba(250,204,21,0.24)]",
       badge: "border-yellow-400/30 bg-yellow-400/15 text-yellow-300",
@@ -128,7 +141,8 @@ function getTopPlayerCardStyles(rank: number) {
     };
   }
 
-  if (rank === 2) {
+  if (rank === 2) 
+  {
     return {
       card: "border-slate-300/25 bg-gradient-to-br from-slate-300/15 via-[#101216] to-[#0b0d12] shadow-[0_0_30px_rgba(226,232,240,0.17)]",
       badge: "border-slate-300/25 bg-slate-300/10 text-slate-200",
@@ -137,7 +151,8 @@ function getTopPlayerCardStyles(rank: number) {
     };
   }
 
-  if (rank === 3) {
+  if (rank === 3) 
+  {
     return {
       card: "border-orange-400/25 bg-gradient-to-br from-orange-500/15 via-[#14100d] to-[#0b0d12] shadow-[0_0_28px_rgba(251,146,60,0.2)]",
       badge: "border-orange-400/25 bg-orange-400/10 text-orange-300",
@@ -154,7 +169,8 @@ function getTopPlayerCardStyles(rank: number) {
   };
 }
 
-function getTableRowStyles(rank: number) {
+function getTableRowStyles(rank: number) 
+{
   if (rank === 1) return "bg-yellow-400/[0.055] hover:bg-yellow-400/[0.08]";
   if (rank === 2) return "bg-slate-300/[0.045] hover:bg-slate-300/[0.07]";
   if (rank === 3) return "bg-orange-400/[0.05] hover:bg-orange-400/[0.075]";
@@ -162,7 +178,8 @@ function getTableRowStyles(rank: number) {
   return "hover:bg-white/[0.025]";
 }
 
-function getRankPillStyles(rank: number) {
+function getRankPillStyles(rank: number) 
+{
   if (rank === 1) return "border-yellow-400/30 bg-yellow-400/10 text-yellow-300";
   if (rank === 2) return "border-slate-300/25 bg-slate-300/10 text-slate-200";
   if (rank === 3) return "border-orange-400/25 bg-orange-400/10 text-orange-300";
@@ -171,70 +188,83 @@ function getRankPillStyles(rank: number) {
   return "border-white/10 bg-white/[0.035] text-white/75";
 }
 
-export default async function PlayersPage({
-  searchParams,
-}: {
-  searchParams?: Promise<{ page?: string }>;
-}) {
+export default async function PlayersPage
+(
+  {
+    searchParams,
+  }
+  : 
+  {
+    searchParams?: Promise<{ page?: string }>;
+  }
+) 
+{
   const resolvedSearchParams = await searchParams;
   const currentPage = toValidPage(resolvedSearchParams?.page);
 
   const from = (currentPage - 1) * PAGE_SIZE;
   const to = from + PAGE_SIZE - 1;
 
-  const [
+  const 
+  [
     topRankingsResult,
     pageRankingsResult,
     latestSnapshotResult,
     playerCountResult,
-  ] = await Promise.all([
-    supabase
+  ] 
+  = await Promise.all
+  (
+    [
+      supabase
       .from("rankings")
       .select("entity_id, rank, score, change, updated_at")
       .eq("entity_type", "player")
       .order("rank", { ascending: true })
       .range(0, 9),
 
-    supabase
+      supabase
       .from("rankings")
       .select("entity_id, rank, score, change, updated_at", { count: "exact" })
       .eq("entity_type", "player")
       .order("rank", { ascending: true })
       .range(from, to),
 
-    supabase
+      supabase
       .from("ranking_history")
       .select("snapshot_date, created_at")
       .order("snapshot_date", { ascending: false })
       .limit(1)
       .maybeSingle(),
 
-    supabase.from("players").select("*", { count: "exact", head: true }),
-  ]);
-
+      supabase
+      .from("players")
+      .select("*", { count: "exact", head: true }),
+    ]
+  );
   const topRankings = (topRankingsResult.data || []) as RankingRow[];
   const pageRankings = (pageRankingsResult.data || []) as RankingRow[];
-
-  const allPlayerIds = Array.from(
-    new Set([
-      ...topRankings.map((row) => row.entity_id),
-      ...pageRankings.map((row) => row.entity_id),
-    ])
+  const allPlayerIds = Array.from
+  (
+    new Set
+    (
+      [
+        ...topRankings.map((row) => row.entity_id),
+        ...pageRankings.map((row) => row.entity_id),
+      ]
+    )
   );
-
-  const playersResult =
-    allPlayerIds.length > 0
-      ? await supabase
-          .from("players")
-          .select(
-            `
-            id,
-            ign,
-            real_name,
-            slug,
-            team_id,
-            role,
-            country,
+  const playersResult = allPlayerIds.length > 0? await supabase
+  .from("players")
+  .select
+  (
+    `
+      id,
+      ign,
+      real_name,
+      slug,
+      team_id,
+      role,
+      country,
             kd_ratio,
             avg_damage,
             win_rate,

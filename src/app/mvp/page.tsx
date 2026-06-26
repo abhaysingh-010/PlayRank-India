@@ -1,14 +1,16 @@
 import Link from "next/link"
 import { supabase } from "@/lib/supabase"
 
-export default async function MVPPage() {
+export default async function MVPPage() 
+{
 
-  // PLAYER RANKINGS
+
   const { data: playerRankings } = await supabase.from("rankings").select("*").eq("entity_type", "player").order("score", { ascending: false })
   const playerIds = playerRankings?.map((p) => p.entity_id) ?? []
   const { data: players } = await supabase.from("players").select("*").in("id", playerIds)
   const leaderboard = playerRankings?.map
-  ((rank) => 
+  (
+    (rank) => 
     (
       {
         ...rank,
@@ -29,7 +31,6 @@ export default async function MVPPage() {
         <h1 className="text-6xl font-black mt-4">🏆 MVP Leaderboard</h1>
         <p className="text-zinc-400 mt-4 text-lg">Discover the highest-performing players</p>
       </div>
-
       {/* LIST */}
       <div className="space-y-5">
         {leaderboard.map
@@ -47,7 +48,6 @@ export default async function MVPPage() {
                       <p className="text-zinc-400 mt-2">{item.player?.team}</p>
                     </div>
                   </div>
-
                   {/* STATS */}
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                     <div className="bg-white/[0.03] rounded-2xl p-5 min-w-[140px]">

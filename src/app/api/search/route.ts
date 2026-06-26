@@ -16,7 +16,8 @@ export async function GET(req: Request)
   (
     [
       ...(players || []).map
-      ((p) => 
+      (
+        (p) => 
         (
           {
             ...p,type: "player",
@@ -25,7 +26,8 @@ export async function GET(req: Request)
       ),
 
       ...(teams || []).map
-      ((t) => 
+      (
+        (t) => 
         (
           {
             ...t,type: "team",

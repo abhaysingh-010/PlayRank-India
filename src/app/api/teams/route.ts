@@ -1,7 +1,8 @@
 import { supabase } from "@/lib/supabase"
 import { NextResponse } from "next/server"
 
-export async function GET() {
+export async function GET() 
+{
 
   const { data: rankings, error } = await supabase.from("rankings").select("*").eq("entity_type", "team").order("rank", {ascending: true})
   if (error) {return NextResponse.json([])}

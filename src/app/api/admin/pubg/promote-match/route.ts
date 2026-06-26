@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
 
 export const dynamic = "force-dynamic";
-
 export async function POST(request: NextRequest) 
 {
   try 
@@ -91,10 +90,8 @@ export async function POST(request: NextRequest)
         ok: false,
         promoted: false,
         blocked: false,
-        error:
-          "Promotion gate passed, but core promotion function is not installed yet.",
-        next_step:
-          "Create promote_pubg_api_match_to_playrank_core() before enabling actual promotion.",
+        error:"Promotion gate passed, but core promotion function is not installed yet.",
+        next_step:"Create promote_pubg_api_match_to_playrank_core() before enabling actual promotion.",
         readiness,
       },
       {

@@ -618,23 +618,28 @@ export default async function ComparePlayersPage({
         </div>
 
         <div className="relative z-10 grid gap-4 p-5 lg:grid-cols-2">
-          {suggestedPairs.map((pair) => {
-            const firstRanking = getRank(pair.firstPlayer.id);
-            const secondRanking = getRank(pair.secondPlayer.id);
+          {suggestedPairs.map
+            (
+              (pair) => 
+              {
+                const firstRanking = getRank(pair.firstPlayer.id);
+                const secondRanking = getRank(pair.secondPlayer.id);
 
-            return (
-              <SuggestedDuel
-                key={`${pair.label}-${pair.firstPlayer.id}-${pair.secondPlayer.id}`}
-                label={pair.label}
-                firstPlayer={pair.firstPlayer}
-                secondPlayer={pair.secondPlayer}
-                firstRank={firstRanking?.rank ?? null}
-                secondRank={secondRanking?.rank ?? null}
-                firstScore={firstRanking?.score ?? 0}
-                secondScore={secondRanking?.score ?? 0}
-              />
-            );
-          })}
+                return (
+                  <SuggestedDuel
+                    key={`${pair.label}-${pair.firstPlayer.id}-${pair.secondPlayer.id}`}
+                    label={pair.label}
+                    firstPlayer={pair.firstPlayer}
+                    secondPlayer={pair.secondPlayer}
+                    firstRank={firstRanking?.rank ?? null}
+                    secondRank={secondRanking?.rank ?? null}
+                    firstScore={firstRanking?.score ?? 0}
+                    secondScore={secondRanking?.score ?? 0}
+                  />
+                );
+              }
+            )
+          }
         </div>
       </section>
     </main>

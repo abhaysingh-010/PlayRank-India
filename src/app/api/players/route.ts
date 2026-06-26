@@ -12,9 +12,9 @@ export async function GET() {
     (rank) => 
     (
       {...rank,player:
-        players?.find(
-          (p) =>
-            p.id === rank.entity_id
+        players?.find
+        (
+          (p) => p.id === rank.entity_id
         )
 
       }

@@ -32,8 +32,7 @@ export default function AdminPlayersPage()
     const { error } = await supabase.from("players").insert
     (
       {
-        ign: ign.trim(),
-        slug,
+        ign: ign.trim(),slug,
         role: role.trim() || null,
         country: country.trim() || "India",
         active: true,
@@ -98,8 +97,7 @@ export default function AdminPlayersPage()
                 <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4 text-sm text-white/70">
                   {message}
                 </div>
-              ) 
-              : null
+              ) : null
             }
           </div>
         </div>
