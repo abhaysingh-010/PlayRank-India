@@ -1,33 +1,100 @@
-import { supabase } from "@/lib/supabase"
-import { NextResponse } from "next/server"
+import { NextRequest, NextResponse } from "next/server";
+import { supabase } from "@/lib/supabase";
 
-export async function GET() 
-{
+type RankingRow = {
+  id: string;
+  entity_id: string;
+  entity_type: "team";
+  rank: number;
+  score: number;
+  change: number | null;
+  updated_at: string | null;
+};
 
-  const { data: rankings, error } = await supabase.from("rankings").select("*").eq("entity_type", "team").order("rank", {ascending: true})
-  if (error) {return NextResponse.json([])}
-  const ids = rankings?.map
-  (
-    (r) => r.entity_id
-  ) 
-  ?? []
-  const { data: teams } = await supabase.from("teams").select("*").in("id", ids)
-  const finalData = rankings?.map
-  (
-    (rank) => 
-    (
+type TeamRow = {
+  id: string;
+  name: string;
+  short_name: string | null;
+  slug: string;
+  country: string | null;
+  logo_url: string | null;
+  points: number | null;
+  wins: number | null;
+  kills: number | null;
+  matches_played: number | null;
+  source: string | null;
+  verified: boolean | null;
+  active: boolean | null;
+};
+
+function jsonResponse(payload: unknown, status = 200) {
+  return NextResponse.json(payload, { status });
+}
+
+function parseLimit(value: string | null) {
+  const parsed = Number(value);
+
+  if (!Number.isFinite(parsed)) return 50;
+  if (parsed < 1) return 50;
+  if (parsed > 100) return 100;
+
+  return Math.floor(parsed);
+}
+
+export async function GET(request: NextRequest) {
+  const { searchParams } = new URL(request.url);
+  const limit = parseLimit(searchParams.get("limit"));
+
+  const { data: rankingsRaw, error: rankingsError } = await supabase
+    .from("rankings")
+    .select("id, entity_id, entity_type, rank, score, change, updated_at")
+    .eq("entity_type", "team")
+    .order("rank", { ascending: true })
+    .limit(limit);
+
+  if (rankingsError) {
+    return jsonResponse(
       {
-        ...rank,team:teams?.find
-        (
-          (t) => t.id === rank.entity_id
-        )
-      }
-    )
-  ) 
-  ?? []
+        ok: false,
+        error: "Failed to load team rankings",
+        details: rankingsError.message,
+      },
+      500
+    );
+  }
 
-  return NextResponse.json
-  (
-    finalData
-  )
+  const rankings = (rankingsRaw || []) as RankingRow[];
+  const ids = rankings.map((ranking) => ranking.entity_id);
+
+  if (ids.length === 0) {
+    return jsonResponse([]);
+  }
+
+  const { data: teamsRaw, error: teamsError } = await supabase
+    .from("teams")
+    .select(
+      "id, name, short_name, slug, country, logo_url, points, wins, kills, matches_played, source, verified, active"
+    )
+    .in("id", ids);
+
+  if (teamsError) {
+    return jsonResponse(
+      {
+        ok: false,
+        error: "Failed to load team records",
+        details: teamsError.message,
+      },
+      500
+    );
+  }
+
+  const teams = (teamsRaw || []) as TeamRow[];
+  const teamById = new Map(teams.map((team) => [team.id, team]));
+
+  const finalData = rankings.map((ranking) => ({
+    ...ranking,
+    team: teamById.get(ranking.entity_id) || null,
+  }));
+
+  return jsonResponse(finalData);
 }
