@@ -19,6 +19,12 @@ type ReadinessRow = {
   mapped_player_percentage: number | null;
   promotion_status: string | null;
   promotion_allowed: boolean | null;
+  roster_safe_players: number | null;
+  roster_safe_teams: number | null;
+  unmapped_players: number | null;
+  unsafe_roster_players: number | null;
+  ai_participants: number | null;
+  human_participants: number | null;
 };
 
 type ApiImportJob = {
@@ -36,6 +42,15 @@ type ApiImportJob = {
 type SafeCount = {
   count: number;
   error: string | null;
+};
+
+type BlockCopy = {
+  label: string;
+  title: string;
+  description: string;
+  actionLabel: string;
+  actionHref: string;
+  tone: Tone;
 };
 
 const shell =
@@ -94,12 +109,105 @@ function formatStatus(value: string | null) {
 function getReadinessTone(row: ReadinessRow): Tone {
   if (row.promotion_allowed === true) return "healthy";
 
-  const mappedPlayers = n(row.mapped_players);
+  if (
+    row.promotion_status === "not_ready_contains_ai_participants" ||
+    n(row.ai_participants) > 0
+  ) {
+    return "danger";
+  }
+
   const totalParticipants = n(row.total_participants);
+  const mappedPlayers = n(row.mapped_players);
 
   if (totalParticipants > 0 && mappedPlayers === 0) return "danger";
 
   return "warning";
+}
+
+function getBlockCopy(row: ReadinessRow): BlockCopy {
+  const status = row.promotion_status || "unknown";
+
+  if (status === "not_ready_contains_ai_participants") {
+    return {
+      label: "Rejected Public Match",
+      title: "Contains AI Participants",
+      description:
+        "This PUBG import appears to be a public or non-esports match because AI participants were detected. It is not eligible for PlayRank core promotion.",
+      actionLabel: "Import Another Match",
+      actionHref: "/admin/pubg/import",
+      tone: "danger",
+    };
+  }
+
+  if (status === "not_ready_unmapped_players") {
+    return {
+      label: "Identity Mapping Required",
+      title: "Unmapped PUBG Players",
+      description:
+        "PUBG account IDs must be mapped to verified PlayRank player records before this match can move into core data.",
+      actionLabel: "Open Mappings",
+      actionHref: "/admin/pubg/mappings",
+      tone: "warning",
+    };
+  }
+
+  if (status === "not_ready_players_without_team") {
+    return {
+      label: "Team Link Required",
+      title: "Mapped Players Missing Teams",
+      description:
+        "Every mapped player must have a valid PlayRank team before this match can be promoted safely.",
+      actionLabel: "Open Players Admin",
+      actionHref: "/admin/players",
+      tone: "warning",
+    };
+  }
+
+  if (status === "not_ready_roster_health") {
+    return {
+      label: "Roster Health Block",
+      title: "Unsafe Roster State",
+      description:
+        "One or more mapped players failed the active roster safety check. Fix roster health before promotion.",
+      actionLabel: "Roster Health",
+      actionHref: "/admin/rosters/health",
+      tone: "danger",
+    };
+  }
+
+  if (status === "not_ready_not_enough_safe_teams") {
+    return {
+      label: "Team Safety Block",
+      title: "Not Enough Safe Teams",
+      description:
+        "Promotion requires at least two roster-safe teams. Check mappings, teams and active rosters.",
+      actionLabel: "Roster Health",
+      actionHref: "/admin/rosters/health",
+      tone: "warning",
+    };
+  }
+
+  if (status === "ready_for_core_promotion") {
+    return {
+      label: "Ready For Manual Review",
+      title: "Promotion Gate Passed",
+      description:
+        "This match passed the readiness gate. Keep manual review enabled before writing into PlayRank core tables.",
+      actionLabel: "Review PUBG Hub",
+      actionHref: "/admin/pubg",
+      tone: "healthy",
+    };
+  }
+
+  return {
+    label: "Blocked",
+    title: "Promotion Not Available",
+    description:
+      "This match cannot be promoted yet. Review mapping, roster health and readiness signals before moving it into core tables.",
+    actionLabel: "Open PUBG Hub",
+    actionHref: "/admin/pubg",
+    tone: "warning",
+  };
 }
 
 function SectionHeader({
@@ -130,7 +238,7 @@ function SectionHeader({
           href={actionHref}
           className="w-fit text-sm font-black text-white/40 transition hover:text-[#ffd21a]"
         >
-          {actionLabel} →
+          {actionLabel} -&gt;
         </Link>
       ) : null}
     </div>
@@ -171,9 +279,18 @@ function StatBlock({
 
 function ReadinessCard({ row }: { row: ReadinessRow }) {
   const tone = getReadinessTone(row);
+  const blockCopy = getBlockCopy(row);
+
   const totalParticipants = n(row.total_participants);
   const mappedPlayers = n(row.mapped_players);
   const mappedTeams = n(row.mapped_teams);
+  const rosterSafePlayers = n(row.roster_safe_players);
+  const rosterSafeTeams = n(row.roster_safe_teams);
+  const unmappedPlayers = n(row.unmapped_players);
+  const unsafeRosterPlayers = n(row.unsafe_roster_players);
+  const aiParticipants = n(row.ai_participants);
+  const humanParticipants = n(row.human_participants);
+
   const mappedPercent =
     row.mapped_player_percentage === null
       ? totalParticipants > 0
@@ -191,10 +308,16 @@ function ReadinessCard({ row }: { row: ReadinessRow }) {
                 tone
               )}`}
             >
-              {row.promotion_allowed ? "Ready" : "Blocked"}
+              {row.promotion_allowed ? "Ready" : blockCopy.label}
             </span>
 
             <DataSourceBadge label={row.shard || "Shard N/A"} />
+
+            {aiParticipants > 0 ? (
+              <span className="rounded-full border border-red-400/25 bg-red-400/10 px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.12em] text-red-300">
+                AI Detected
+              </span>
+            ) : null}
           </div>
 
           <p className="mt-3 break-all text-sm font-black text-white">
@@ -202,8 +325,9 @@ function ReadinessCard({ row }: { row: ReadinessRow }) {
           </p>
 
           <p className="mt-2 text-sm text-white/45">
-            {row.map_name || "Unknown map"} ·{" "}
-            {row.game_mode || "Unknown mode"} · {formatDate(row.created_at_api)}
+            {row.map_name || "Unknown map"} {" / "}
+            {row.game_mode || "Unknown mode"} {" / "}
+            {formatDate(row.created_at_api)}
           </p>
         </div>
 
@@ -229,61 +353,91 @@ function ReadinessCard({ row }: { row: ReadinessRow }) {
       <div className="mt-5 grid gap-3 md:grid-cols-4">
         <StatBlock label="Participants" value={totalParticipants} />
         <StatBlock
-          label="Mapped"
-          value={mappedPlayers}
-          tone={mappedPlayers > 0 ? "healthy" : "warning"}
+          label="Human"
+          value={humanParticipants}
+          tone={humanParticipants > 0 ? "healthy" : "neutral"}
         />
         <StatBlock
-          label="Teams"
-          value={mappedTeams}
-          tone={mappedTeams > 0 ? "healthy" : "warning"}
+          label="AI"
+          value={aiParticipants}
+          tone={aiParticipants > 0 ? "danger" : "healthy"}
         />
         <StatBlock
           label="Mapped %"
           value={mappedPercent}
-          tone={mappedPercent >= 80 ? "healthy" : mappedPercent > 0 ? "warning" : "danger"}
+          tone={
+            mappedPercent >= 100
+              ? "healthy"
+              : mappedPercent > 0
+                ? "warning"
+                : "danger"
+          }
         />
       </div>
 
-      {!row.promotion_allowed ? (
-        <div className="mt-5 rounded-2xl border border-yellow-400/20 bg-yellow-400/10 p-4">
-          <p className="text-xs font-black uppercase tracking-[0.16em] text-yellow-300">
-            Blocked Reason
-          </p>
+      <div className="mt-3 grid gap-3 md:grid-cols-4">
+        <StatBlock
+          label="Mapped"
+          value={mappedPlayers}
+          tone={mappedPlayers === totalParticipants ? "healthy" : "warning"}
+        />
+        <StatBlock
+          label="Unmapped"
+          value={unmappedPlayers}
+          tone={unmappedPlayers > 0 ? "danger" : "healthy"}
+        />
+        <StatBlock
+          label="Roster Safe"
+          value={rosterSafePlayers}
+          tone={rosterSafePlayers === totalParticipants ? "healthy" : "warning"}
+        />
+        <StatBlock
+          label="Unsafe Roster"
+          value={unsafeRosterPlayers}
+          tone={unsafeRosterPlayers > 0 ? "danger" : "healthy"}
+        />
+      </div>
 
-          <p className="mt-2 text-sm leading-6 text-white/60">
-            This match cannot be promoted yet. Review player mappings and roster
-            health before moving data into PlayRank core tables.
-          </p>
+      <div className="mt-3 grid gap-3 md:grid-cols-2">
+        <StatBlock
+          label="Mapped Teams"
+          value={mappedTeams}
+          tone={mappedTeams >= 2 ? "healthy" : "warning"}
+        />
+        <StatBlock
+          label="Roster Safe Teams"
+          value={rosterSafeTeams}
+          tone={rosterSafeTeams >= 2 ? "healthy" : "warning"}
+        />
+      </div>
 
-          <div className="mt-4 flex flex-wrap gap-3">
-            <Link
-              href="/admin/pubg/mappings"
-              className="text-sm font-black text-yellow-300 transition hover:text-yellow-200"
-            >
-              Open Mappings →
-            </Link>
+      <div
+        className={`mt-5 rounded-2xl border p-4 ${toneStyle(blockCopy.tone)}`}
+      >
+        <p className="text-xs font-black uppercase tracking-[0.16em]">
+          {blockCopy.title}
+        </p>
 
-            <Link
-              href="/admin/rosters/health"
-              className="text-sm font-black text-yellow-300 transition hover:text-yellow-200"
-            >
-              Roster Health →
-            </Link>
-          </div>
+        <p className="mt-2 text-sm leading-6 text-white/65">
+          {blockCopy.description}
+        </p>
+
+        <div className="mt-4 flex flex-wrap gap-3">
+          <Link
+            href={blockCopy.actionHref}
+            className="text-sm font-black transition hover:text-white"
+          >
+            {blockCopy.actionLabel} -&gt;
+          </Link>
+
+          <Link
+            href="/admin/rosters/health"
+            className="text-sm font-black transition hover:text-white"
+          >
+            Roster Health -&gt;
+          </Link>
         </div>
-      ) : (
-        <div className="mt-5 rounded-2xl border border-emerald-400/20 bg-emerald-400/10 p-4">
-          <p className="text-xs font-black uppercase tracking-[0.16em] text-emerald-300">
-            Ready For Promotion
-          </p>
-
-          <p className="mt-2 text-sm leading-6 text-white/60">
-            This match passed the readiness gate. Promotion should still be
-            reviewed before writing into core PlayRank tables.
-          </p>
-        </div>
-      )}
+      </div>
     </article>
   );
 }
@@ -367,7 +521,9 @@ export default async function PubgImportsPage() {
 
     supabaseAdmin
       .from("pubg_match_promotion_readiness")
-      .select("*")
+      .select(
+        "external_match_id, shard, map_name, game_mode, created_at_api, total_participants, mapped_players, mapped_players_with_team, mapped_teams, mapped_player_percentage, promotion_status, promotion_allowed, roster_safe_players, roster_safe_teams, unmapped_players, unsafe_roster_players, ai_participants, human_participants"
+      )
       .order("created_at_api", { ascending: false })
       .limit(50),
 
@@ -392,6 +548,10 @@ export default async function PubgImportsPage() {
     (row) => row.promotion_allowed !== true
   ).length;
 
+  const rejectedPublicMatchCount = readinessRows.filter(
+    (row) => row.promotion_status === "not_ready_contains_ai_participants"
+  ).length;
+
   const totalParticipants = readinessRows.reduce(
     (sum, row) => sum + n(row.total_participants),
     0
@@ -399,6 +559,11 @@ export default async function PubgImportsPage() {
 
   const mappedPlayers = readinessRows.reduce(
     (sum, row) => sum + n(row.mapped_players),
+    0
+  );
+
+  const aiParticipants = readinessRows.reduce(
+    (sum, row) => sum + n(row.ai_participants),
     0
   );
 
@@ -426,6 +591,7 @@ export default async function PubgImportsPage() {
                 <DataSourceBadge label="Admin Console" size="md" />
                 <DataSourceBadge label="PUBG Imports" size="md" />
                 <DataSourceBadge label="Promotion Gate" size="md" />
+                <DataSourceBadge label="AI Rejection" size="md" />
               </div>
 
               <h1 className="mt-7 text-5xl font-black uppercase leading-[0.9] tracking-[-0.07em] text-white md:text-7xl">
@@ -435,9 +601,9 @@ export default async function PubgImportsPage() {
               </h1>
 
               <p className="mt-6 max-w-3xl text-base leading-7 text-white/50">
-                Review imported PUBG API matches, readiness status, mapping
-                coverage, blocked reasons and recent import jobs before any
-                core promotion.
+                Review imported PUBG API matches, readiness status, AI/public
+                match rejection, mapping coverage, blocked reasons and recent
+                import jobs before any core promotion.
               </p>
 
               <div className="mt-8 flex flex-wrap gap-3">
@@ -484,9 +650,9 @@ export default async function PubgImportsPage() {
                 tone={blockedCount > 0 ? "warning" : "healthy"}
               />
               <StatBlock
-                label="Mappings"
-                value={pubgMappings.count}
-                tone={pubgMappings.count > 0 ? "healthy" : "warning"}
+                label="Rejected Public"
+                value={rejectedPublicMatchCount}
+                tone={rejectedPublicMatchCount > 0 ? "danger" : "healthy"}
               />
             </div>
           </div>
@@ -518,6 +684,16 @@ export default async function PubgImportsPage() {
               value={mappedPlayers}
               tone={mappedPlayers > 0 ? "healthy" : "warning"}
             />
+            <StatBlock
+              label="AI Participants"
+              value={aiParticipants}
+              tone={aiParticipants > 0 ? "danger" : "healthy"}
+            />
+            <StatBlock
+              label="Mappings"
+              value={pubgMappings.count}
+              tone={pubgMappings.count > 0 ? "healthy" : "warning"}
+            />
             <StatBlock label="Total Participants" value={totalParticipants} />
           </div>
         </section>
@@ -529,6 +705,17 @@ export default async function PubgImportsPage() {
           />
 
           <div className="grid gap-3">
+            <div className="rounded-2xl border border-red-400/20 bg-red-400/10 p-4">
+              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-red-300">
+                Public Match Rejection
+              </p>
+
+              <p className="mt-3 text-sm leading-6 text-white/60">
+                Any match containing AI participants is treated as a public or
+                non-esports import and is blocked from PlayRank core promotion.
+              </p>
+            </div>
+
             <div className="rounded-2xl border border-white/10 bg-white/[0.025] p-4">
               <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[#ffd21a]">
                 Identity Mapping
