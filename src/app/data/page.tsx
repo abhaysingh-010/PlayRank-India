@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
+import { supabaseAdmin } from "@/lib/supabaseAdmin";
 import DataSourceBadge from "@/components/DataSourceBadge";
 import MethodologySection from "@/components/MethodologySection";
 
@@ -12,6 +13,11 @@ type CountResult = {
   verified?: boolean | null;
 };
 
+type SafeCount = {
+  count: number;
+  error: string | null;
+};
+
 type PubgReadinessRow = {
   external_match_id: string;
   promotion_allowed: boolean | null;
@@ -19,6 +25,12 @@ type PubgReadinessRow = {
   total_participants: number | null;
   mapped_players: number | null;
   mapped_teams: number | null;
+  roster_safe_players: number | null;
+  roster_safe_teams: number | null;
+  unmapped_players: number | null;
+  unsafe_roster_players: number | null;
+  ai_participants: number | null;
+  human_participants: number | null;
 };
 
 type RosterHealthRow = {
@@ -67,14 +79,14 @@ const trustLayers = [
     title: "PUBG API Staging",
     badge: "PUBG API Data",
     description:
-      "PUBG API imports are staged separately first. They are not promoted into public PlayRank tables until identity and roster safety checks pass.",
+      "PUBG API imports are staged separately first. The public Data page only shows aggregate safety signals, never raw payloads or mapping records.",
   },
   {
     label: "Quality Layer",
     title: "Promotion Guards",
     badge: "Promotion Safety",
     description:
-      "Raw imports, staging tables, roster health and promotion readiness checks protect PlayRank from broken or unmapped data.",
+      "Raw imports, staging tables, roster health and promotion readiness checks protect PlayRank from broken, public, AI-filled or unmapped data.",
   },
 ];
 
@@ -143,6 +155,28 @@ const sourcePolicies: TrustPolicy[] = [
 function n(value: unknown, fallback = 0) {
   const numberValue = Number(value);
   return Number.isFinite(numberValue) ? numberValue : fallback;
+}
+
+async function publicCount(table: string, column = "id"): Promise<SafeCount> {
+  const { count, error } = await supabase
+    .from(table)
+    .select(column, { count: "exact", head: true });
+
+  return {
+    count: n(count),
+    error: error?.message || null,
+  };
+}
+
+async function adminCount(table: string, column = "id"): Promise<SafeCount> {
+  const { count, error } = await supabaseAdmin
+    .from(table)
+    .select(column, { count: "exact", head: true });
+
+  return {
+    count: n(count),
+    error: error?.message || null,
+  };
 }
 
 function formatDate(value: string | null | undefined) {
@@ -245,49 +279,41 @@ export default async function DataPage() {
     rankingsResult,
     rankingHistoryResult,
     kraftonRankingsResult,
+    dataSourcesResult,
     aliasesResult,
     rawImportsResult,
     pubgMatchesResult,
     pubgParticipantsResult,
-    dataSourcesResult,
     importBatchesResult,
     pubgReadinessResult,
     rosterHealthResult,
     latestSnapshotResult,
   ] = await Promise.all([
-    supabase.from("teams").select("*", { count: "exact", head: true }),
-    supabase.from("players").select("*", { count: "exact", head: true }),
-    supabase.from("matches").select("*", { count: "exact", head: true }),
-    supabase.from("tournaments").select("*", { count: "exact", head: true }),
-    supabase.from("rankings").select("*", { count: "exact", head: true }),
-    supabase
-      .from("ranking_history")
-      .select("*", { count: "exact", head: true }),
-    supabase
-      .from("krafton_team_rankings")
-      .select("*", { count: "exact", head: true }),
-    supabase.from("team_aliases").select("*", { count: "exact", head: true }),
-    supabase
-      .from("raw_esports_imports")
-      .select("*", { count: "exact", head: true }),
-    supabase
-      .from("pubg_api_matches")
-      .select("*", { count: "exact", head: true }),
-    supabase
-      .from("pubg_api_participants")
-      .select("*", { count: "exact", head: true }),
-    supabase.from("data_sources").select("*", { count: "exact", head: true }),
-    supabase
-      .from("import_batches")
-      .select("*", { count: "exact", head: true }),
-    supabase
+    publicCount("teams"),
+    publicCount("players"),
+    publicCount("matches"),
+    publicCount("tournaments"),
+    publicCount("rankings"),
+    publicCount("ranking_history"),
+    publicCount("krafton_team_rankings"),
+    publicCount("data_sources"),
+
+    adminCount("team_aliases"),
+    adminCount("raw_esports_imports"),
+    adminCount("pubg_api_matches", "external_match_id"),
+    adminCount("pubg_api_participants", "external_participant_id"),
+    adminCount("import_batches"),
+
+    supabaseAdmin
       .from("pubg_match_promotion_readiness")
       .select(
-        "external_match_id, promotion_allowed, promotion_status, total_participants, mapped_players, mapped_teams"
+        "external_match_id, promotion_allowed, promotion_status, total_participants, mapped_players, mapped_teams, roster_safe_players, roster_safe_teams, unmapped_players, unsafe_roster_players, ai_participants, human_participants"
       ),
-    supabase
+
+    supabaseAdmin
       .from("player_roster_health")
-      .select("health_status, promotion_safe"),
+      .select("health_status, promotion_safe, player_id"),
+
     supabase
       .from("ranking_history")
       .select("snapshot_date, created_at")
@@ -298,6 +324,7 @@ export default async function DataPage() {
 
   const pubgReadinessRows = (pubgReadinessResult.data ||
     []) as PubgReadinessRow[];
+
   const rosterHealthRows = (rosterHealthResult.data || []) as RosterHealthRow[];
 
   const pubgReadyForPromotion = pubgReadinessRows.filter(
@@ -308,6 +335,10 @@ export default async function DataPage() {
     (row) => row.promotion_allowed !== true
   ).length;
 
+  const rejectedPublicImports = pubgReadinessRows.filter(
+    (row) => row.promotion_status === "not_ready_contains_ai_participants"
+  ).length;
+
   const pubgTotalMappedPlayers = pubgReadinessRows.reduce(
     (sum, row) => sum + n(row.mapped_players),
     0
@@ -315,6 +346,16 @@ export default async function DataPage() {
 
   const pubgTotalParticipants = pubgReadinessRows.reduce(
     (sum, row) => sum + n(row.total_participants),
+    0
+  );
+
+  const pubgAiParticipants = pubgReadinessRows.reduce(
+    (sum, row) => sum + n(row.ai_participants),
+    0
+  );
+
+  const pubgUnsafeRosterPlayers = pubgReadinessRows.reduce(
+    (sum, row) => sum + n(row.unsafe_roster_players),
     0
   );
 
@@ -334,7 +375,7 @@ export default async function DataPage() {
   const productCounts: CountResult[] = [
     {
       label: "Teams",
-      value: n(teamsResult.count),
+      value: teamsResult.count,
       description:
         "Verified and normalized team records used across rankings, team pages and comparison flows.",
       badgeLabel: "Verified Team Records",
@@ -342,21 +383,21 @@ export default async function DataPage() {
     },
     {
       label: "Players",
-      value: n(playersResult.count),
+      value: playersResult.count,
       description:
         "Player records connected to teams, roles, match stats and public profile pages.",
       badgeLabel: "Player Records",
     },
     {
       label: "Matches",
-      value: n(matchesResult.count),
+      value: matchesResult.count,
       description:
         "Structured match records powering match center, team results and player performance context.",
       badgeLabel: "Analytics Input",
     },
     {
       label: "Tournaments",
-      value: n(tournamentsResult.count),
+      value: tournamentsResult.count,
       description:
         "Tournament records used for event pages, standings and historical context.",
       badgeLabel: "Event Records",
@@ -366,21 +407,21 @@ export default async function DataPage() {
   const rankingCounts: CountResult[] = [
     {
       label: "Active Rankings",
-      value: n(rankingsResult.count),
+      value: rankingsResult.count,
       description:
         "Current team and player ranking rows used in public ranking views.",
       badgeLabel: "Ranking Snapshot",
     },
     {
       label: "Ranking History",
-      value: n(rankingHistoryResult.count),
+      value: rankingHistoryResult.count,
       description:
         "Historical snapshots used for rank movement, trend and form analysis.",
       badgeLabel: "Snapshot History",
     },
     {
       label: "Krafton Rankings",
-      value: n(kraftonRankingsResult.count),
+      value: kraftonRankingsResult.count,
       description:
         "Official Krafton India ranking rows stored as source-controlled input.",
       badgeLabel: "Official Krafton Source",
@@ -389,43 +430,43 @@ export default async function DataPage() {
     },
     {
       label: "Team Aliases",
-      value: n(aliasesResult.count),
+      value: aliasesResult.count,
       description:
-        "Alias records used to match team names across sources, spelling variants and formats.",
-      badgeLabel: "Identity Mapping",
+        "Alias aggregate count used to show identity normalization coverage. Alias records themselves remain internal.",
+      badgeLabel: "Aggregate Only",
     },
   ];
 
   const importCounts: CountResult[] = [
     {
       label: "Raw Imports",
-      value: n(rawImportsResult.count),
+      value: rawImportsResult.count,
       description:
-        "Raw imported payloads retained for traceability, auditing and source verification.",
-      badgeLabel: "Raw Import",
+        "Aggregate count of raw import records retained for traceability. Raw payloads are not exposed publicly.",
+      badgeLabel: "Aggregate Only",
     },
     {
       label: "PUBG Matches",
-      value: n(pubgMatchesResult.count),
+      value: pubgMatchesResult.count,
       description:
-        "PUBG API match records stored in staging before product-level promotion.",
-      badgeLabel: "PUBG API Data",
+        "Aggregate count of PUBG API match records stored in staging before product-level promotion.",
+      badgeLabel: "Staged Aggregate",
       source: "pubg_api",
     },
     {
       label: "PUBG Participants",
-      value: n(pubgParticipantsResult.count),
+      value: pubgParticipantsResult.count,
       description:
-        "PUBG API participant rows used for identity matching and staged performance normalization.",
-      badgeLabel: "PUBG API Data",
+        "Aggregate count of PUBG API participant rows used for identity matching and staged performance normalization.",
+      badgeLabel: "Staged Aggregate",
       source: "pubg_api",
     },
     {
       label: "Import Batches",
-      value: n(importBatchesResult.count),
+      value: importBatchesResult.count,
       description:
-        "Import batch records for tracking ingestion runs and source-control workflows.",
-      badgeLabel: "Import Control",
+        "Aggregate count of ingestion batches. Detailed import jobs and payloads remain admin-only.",
+      badgeLabel: "Admin Controlled",
     },
   ];
 
@@ -434,22 +475,22 @@ export default async function DataPage() {
       label: "PUBG Ready",
       value: pubgReadyForPromotion,
       description:
-        "Imported PUBG matches that passed mapping and roster gates and are eligible for core promotion.",
+        "Imported PUBG matches that passed mapping and roster gates and are eligible for manual core promotion review.",
       badgeLabel: "Promotion Safe",
     },
     {
-      label: "PUBG Staged",
+      label: "PUBG Blocked",
       value: pubgBlockedInStaging,
       description:
-        "Imported PUBG matches intentionally held in staging because player/team identity mapping is incomplete.",
+        "Imported PUBG matches intentionally held in staging because safety or identity checks have not passed.",
       badgeLabel: "Staged Not Public",
     },
     {
-      label: "Roster Safe Players",
-      value: rosterPromotionSafe,
+      label: "Rejected Public",
+      value: rejectedPublicImports,
       description:
-        "Players whose team and active roster data are aligned for safe analytics and import promotion.",
-      badgeLabel: "Roster Guard",
+        "PUBG imports rejected as public or non-esports matches because AI participants were detected.",
+      badgeLabel: "AI Rejection",
     },
     {
       label: "Roster Issues",
@@ -463,7 +504,7 @@ export default async function DataPage() {
   const governanceCounts: CountResult[] = [
     {
       label: "Data Sources",
-      value: n(dataSourcesResult.count),
+      value: dataSourcesResult.count,
       description:
         "Registered source records used to explain where PlayRank data came from and how it should be trusted.",
       badgeLabel: "Source Registry",
@@ -480,15 +521,15 @@ export default async function DataPage() {
       label: "Mapped Participants",
       value: pubgTotalMappedPlayers,
       description:
-        "PUBG participants currently mapped across staged imported match readiness checks.",
+        "Aggregate count of staged PUBG participants currently mapped across promotion readiness checks.",
       badgeLabel: "Identity Mapping",
     },
     {
-      label: "Total Participants",
-      value: pubgTotalParticipants,
+      label: "AI Participants Blocked",
+      value: pubgAiParticipants,
       description:
-        "Total PUBG participants found in staged readiness checks before public promotion.",
-      badgeLabel: "Staging Input",
+        "Aggregate count of AI participants detected in staged PUBG imports and blocked from public core promotion.",
+      badgeLabel: "Public Match Guard",
     },
   ];
 
@@ -517,8 +558,8 @@ export default async function DataPage() {
               size="md"
             />
             <DataSourceBadge label="Ranking Snapshot" size="md" />
-            <DataSourceBadge source="pubg_api" label="PUBG API Data" size="md" />
-            <DataSourceBadge label="Promotion Guard" size="md" />
+            <DataSourceBadge source="pubg_api" label="PUBG API Aggregate" size="md" />
+            <DataSourceBadge label="RLS Protected" size="md" />
           </div>
 
           <p className="mt-8 max-w-5xl text-base font-black uppercase leading-6 tracking-[-0.03em] text-white md:text-xl">
@@ -555,7 +596,7 @@ export default async function DataPage() {
               />
             </div>
             <p className="mt-2 text-5xl font-black text-white">
-              {n(kraftonRankingsResult.count).toLocaleString("en-IN")}
+              {kraftonRankingsResult.count.toLocaleString("en-IN")}
             </p>
           </div>
 
@@ -565,18 +606,18 @@ export default async function DataPage() {
               <DataSourceBadge label="Snapshot" />
             </div>
             <p className="mt-2 text-5xl font-black text-white">
-              {n(rankingHistoryResult.count).toLocaleString("en-IN")}
+              {rankingHistoryResult.count.toLocaleString("en-IN")}
             </p>
           </div>
 
           <div>
             <div className="flex flex-wrap items-center gap-2">
               <p className="data-label">PUBG Staging Rows</p>
-              <DataSourceBadge source="pubg_api" label="Staged" />
+              <DataSourceBadge source="pubg_api" label="Aggregate" />
             </div>
             <p className="mt-2 text-5xl font-black text-white">
               {(
-                n(pubgMatchesResult.count) + n(pubgParticipantsResult.count)
+                pubgMatchesResult.count + pubgParticipantsResult.count
               ).toLocaleString("en-IN")}
             </p>
           </div>
@@ -639,7 +680,7 @@ export default async function DataPage() {
         <div className="mb-8 border-b border-white/10 pb-5">
           <div className="flex flex-wrap items-center gap-3">
             <p className="krafton-label">Import Pipeline</p>
-            <DataSourceBadge label="Raw Import Control" />
+            <DataSourceBadge label="Aggregate Only" />
             <DataSourceBadge source="pubg_api" label="PUBG API Data" />
           </div>
           <h2 className="mt-3 text-4xl font-black uppercase tracking-[-0.04em] text-white md:text-5xl">
@@ -652,6 +693,17 @@ export default async function DataPage() {
             <DataMetric key={item.label} item={item} />
           ))}
         </div>
+
+        <div className="mt-8 border border-white/10 bg-white/[0.035] p-6">
+          <p className="text-xs font-black uppercase tracking-[0.18em] text-white/40">
+            RLS Protection Rule
+          </p>
+          <p className="mt-3 max-w-4xl text-sm leading-6 text-white/55">
+            This public page displays only aggregate staging signals. Raw
+            payloads, import jobs, mappings, roster internals and promotion
+            records remain protected behind server-side admin access.
+          </p>
+        </div>
       </section>
 
       <section className="border-y border-white/10 bg-[#050505] px-7 py-24 md:px-14">
@@ -661,6 +713,7 @@ export default async function DataPage() {
               <p className="krafton-label">Safety Gates</p>
               <DataSourceBadge label="Promotion Guard" />
               <DataSourceBadge label="Roster Guard" />
+              <DataSourceBadge label="AI Rejection" />
             </div>
             <h2 className="mt-3 text-4xl font-black uppercase tracking-[-0.04em] text-white md:text-5xl">
               Staging And Promotion Safety
@@ -680,11 +733,14 @@ export default async function DataPage() {
             <p className="mt-3 max-w-4xl text-sm leading-6 text-white/60">
               PUBG API data is not automatically treated as PlayRank product
               data. Imported matches stay in staging until player identities are
-              mapped, roster links are healthy and promotion guards pass.
+              mapped, roster links are healthy, AI/public match checks pass and
+              promotion guards approve the match.
             </p>
             <p className="mt-3 text-sm font-black uppercase tracking-[0.14em] text-white/45">
               Current PUBG mapping: {pubgTotalMappedPlayers}/
-              {pubgTotalParticipants} participants mapped.
+              {pubgTotalParticipants} participants mapped. AI participants
+              blocked: {pubgAiParticipants}. Unsafe roster players:{" "}
+              {pubgUnsafeRosterPlayers}.
             </p>
           </div>
         </div>
@@ -833,7 +889,7 @@ export default async function DataPage() {
                 label: "Missing Timestamp",
                 title: "Say not available",
                 description:
-                  "When a reliable timestamp is not available, PlayRank should show 'Not available' instead of inventing freshness.",
+                  "When a reliable timestamp is not available, PlayRank should show Not available instead of inventing freshness.",
                 tone: "warning",
               }}
             />
