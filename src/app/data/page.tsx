@@ -4,6 +4,8 @@ import { supabaseAdmin } from "@/lib/supabaseAdmin";
 import DataSourceBadge from "@/components/DataSourceBadge";
 import MethodologySection from "@/components/MethodologySection";
 
+export const dynamic = "force-dynamic";
+
 type CountResult = {
   label: string;
   value: number;
