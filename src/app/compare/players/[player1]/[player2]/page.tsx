@@ -332,7 +332,8 @@ function PlayerCard
   }
 ) 
 {
-  function shortNumber(score: number): string | number {
+  function shortNumber(score: number): string | number 
+  {
     throw new Error("Function not implemented.");
   }
 

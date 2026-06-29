@@ -46,18 +46,6 @@ type PlayerRow = {
   active?: boolean | null;
 };
 
-function getLatestDate(values: Array<string | null | undefined>) 
-{
-  const timestamps = values
-    .filter(Boolean)
-    .map((value) => new Date(value as string).getTime())
-    .filter((value) => Number.isFinite(value));
-
-  if (timestamps.length === 0) return null;
-
-  return new Date(Math.max(...timestamps)).toISOString();
-}
-
 type TrustCard = {
   label: string;
   title: string;
@@ -121,7 +109,7 @@ function TeamLogo({
       className={`${sizeClass} flex shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-white/10 bg-white/[0.04] shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]`}
     >
       {logoUrl ? (
-        // eslint-disable-next-line @next/next/no-img-element
+         
         <Image src={logoUrl} alt={`${name} logo`} width={64} height={64} sizes={size === "lg" ? "64px" : size === "sm" ? "40px" : "48px"} className="h-full w-full object-contain p-2"/>
       ) : (
         <span className="text-sm font-black text-white/70">
