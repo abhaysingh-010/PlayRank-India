@@ -127,11 +127,26 @@ export default async function PlayerRankingsPage() {
     "id, ign, slug, country, role, kd_ratio, avg_damage, win_rate, matches_played, total_kills, mvp_count, recent_form, source, verified, active"
   )
   .in("id", playerIds) : { data: [], error: null };
+  if (rankingsResult.error || playersError) 
+    {
+      return (
+        <main className="page-shell py-10 text-white">
+          <section className="rounded-[2rem] border border-red-500/20 bg-red-500/5 p-8">
+            <h1 className="text-2xl font-black">Player Rankings</h1>
+            <p className="mt-3 text-red-300">
+              Failed to load player rankings. Check Supabase permissions and table
+              columns.
+            </p>
+          </section>
+        </main>
+      );
+    }
   const players = (playersRaw || []) as PlayerRow[];
   const playerById = new Map(players.map((player) => [player.id, player]));
   const rankedPlayers = rankings
   .map
-  ((ranking) => 
+  (
+    (ranking) => 
     (
       {
         ranking,
@@ -139,10 +154,7 @@ export default async function PlayerRankingsPage() {
       }
     )
   )
-  .filter
-  ((item): item is { ranking: RankingRow; player: PlayerRow } =>
-    Boolean(item.player)
-  );
+  .filter((item): item is { ranking: RankingRow; player: PlayerRow } => Boolean(item.player));
 
   const latestSnapshot = latestSnapshotResult.data?.snapshot_date || latestSnapshotResult.data?.created_at || null;
   const latestRankingUpdate = getLatestDate(rankings.map((row) => row.updated_at)) || latestSnapshot;

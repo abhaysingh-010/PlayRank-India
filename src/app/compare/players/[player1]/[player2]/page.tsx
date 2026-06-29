@@ -332,10 +332,6 @@ function PlayerCard
   }
 ) 
 {
-  function shortNumber(score: number): string | number 
-  {
-    throw new Error("Function not implemented.");
-  }
 
   return (
     <Link href={`/players/${player.slug}`}className="group relative block overflow-hidden rounded-[1.65rem] border border-white/[0.12] bg-gradient-to-br from-white/[0.075] via-white/[0.035] to-transparent p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] transition hover:-translate-y-0.5 hover:border-[#ffd21a]/30 hover:bg-white/[0.07]">
@@ -361,7 +357,7 @@ function PlayerCard
         </div>
       </div>
       <div className="relative z-10 mt-5 grid grid-cols-4 gap-2">
-        <Mini label="Score" value={shortNumber(score)} highlight />
+        <Mini label="Score" value={Math.round(score)} highlight />
         <Mini label="Kills" value={kills} />
         <Mini label="Damage" value={Math.round(damage)} />
         <Mini label="MVP" value={mvp} />

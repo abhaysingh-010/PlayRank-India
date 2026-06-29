@@ -131,17 +131,30 @@ export default async function TeamRankingsPage() {
     ]);
 
   const rankings = (rankingsResult.data || []) as RankingRow[];
+  
   const teamIds = rankings.map((row) => row.entity_id);
 
-  const { data: teamsRaw, error: teamsError } =
-    teamIds.length > 0
-      ? await supabase
-          .from("teams")
-          .select(
-            "id, name, short_name, slug, country, logo_url, points, wins, kills, matches_played, source, verified, active"
-          )
-          .in("id", teamIds)
-      : { data: [], error: null };
+  const { data: teamsRaw, error: teamsError } = teamIds.length > 0? await supabase
+  .from("teams")
+  .select
+  (
+    "id, name, short_name, slug, country, logo_url, points, wins, kills, matches_played, source, verified, active"
+  )
+  .in("id", teamIds) : { data: [], error: null };
+  if (rankingsResult.error || teamsError) 
+  {
+    return (
+      <main className="page-shell py-10 text-white">
+        <section className="rounded-[2rem] border border-red-500/20 bg-red-500/5 p-8">
+          <h1 className="text-2xl font-black">Team Rankings</h1>
+          <p className="mt-3 text-red-300">
+            Failed to load team rankings. Check Supabase permissions and table
+            columns.
+          </p>
+        </section>
+      </main>
+    );
+  }
 
   const teams = (teamsRaw || []) as TeamRow[];
   const teamById = new Map(teams.map((team) => [team.id, team]));
