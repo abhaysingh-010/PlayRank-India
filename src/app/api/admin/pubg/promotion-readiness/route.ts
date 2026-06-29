@@ -27,6 +27,12 @@ type PromotionReadinessRow = {
 };
 
 const MAX_LIMIT = 100;
+const SUPPORTED_STATUS_FILTERS: ReadinessStatus[] = [
+  "all",
+  "ready",
+  "blocked",
+  "rejected_public",
+];
 
 function n(value: unknown, fallback = 0) {
   const numberValue = Number(value);
@@ -42,12 +48,29 @@ function parseLimit(value: string | null) {
   return parsed;
 }
 
-function parseStatus(value: string | null): ReadinessStatus {
-  if (value === "ready") return "ready";
-  if (value === "blocked") return "blocked";
-  if (value === "rejected_public") return "rejected_public";
+function parseStatus(value: string | null) {
+  if (!value) {
+    return {
+      ok: true as const,
+      status: "all" as ReadinessStatus,
+    };
+  }
 
-  return "all";
+  if (SUPPORTED_STATUS_FILTERS.includes(value as ReadinessStatus)) {
+    return {
+      ok: true as const,
+      status: value as ReadinessStatus,
+    };
+  }
+
+  return {
+    ok: false as const,
+    payload: {
+      ok: false,
+      error: "Invalid status filter",
+      supported_status_filters: SUPPORTED_STATUS_FILTERS,
+    },
+  };
 }
 
 function jsonResponse(payload: unknown, status = 200) {
@@ -57,6 +80,17 @@ function jsonResponse(payload: unknown, status = 200) {
       "Cache-Control": "no-store",
     },
   });
+}
+
+function methodNotAllowed() {
+  return jsonResponse(
+    {
+      ok: false,
+      error: "Method not allowed",
+      allowed_methods: ["GET"],
+    },
+    405
+  );
 }
 
 function getStatusBreakdown(rows: PromotionReadinessRow[]) {
@@ -70,7 +104,13 @@ function getStatusBreakdown(rows: PromotionReadinessRow[]) {
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
 
-  const status = parseStatus(searchParams.get("status"));
+  const parsedStatus = parseStatus(searchParams.get("status"));
+
+  if (!parsedStatus.ok) {
+    return jsonResponse(parsedStatus.payload, 400);
+  }
+
+  const status = parsedStatus.status;
   const limit = parseLimit(searchParams.get("limit"));
 
   let query = supabaseAdmin
@@ -103,7 +143,6 @@ export async function GET(request: NextRequest) {
       {
         ok: false,
         error: "Failed to fetch PUBG promotion readiness",
-        details: error.message,
       },
       500
     );
@@ -206,9 +245,13 @@ export async function GET(request: NextRequest) {
     filters: {
       status,
       limit,
-      supported_status_filters: ["all", "ready", "blocked", "rejected_public"],
+      supported_status_filters: SUPPORTED_STATUS_FILTERS,
     },
     summary,
     matches: rows,
   });
+}
+
+export async function POST() {
+  return methodNotAllowed();
 }

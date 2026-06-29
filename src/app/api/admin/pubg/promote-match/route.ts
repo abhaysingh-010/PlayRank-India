@@ -18,18 +18,31 @@ type PromotionReadinessRow = {
   mapped_players_with_team?: number | null;
   mapped_teams?: number | null;
   mapped_player_percentage?: number | null;
+  roster_safe_players?: number | null;
+  roster_safe_teams?: number | null;
+  unmapped_players?: number | null;
+  unsafe_roster_players?: number | null;
+  ai_participants?: number | null;
+  human_participants?: number | null;
 };
 
-function jsonResponse(payload: unknown, status = 200) 
-{
-  return NextResponse.json(payload, 
+function jsonResponse(payload: unknown, status = 200) {
+  return NextResponse.json(payload, {
+    status,
+    headers: {
+      "Cache-Control": "no-store",
+    },
+  });
+}
+
+function methodNotAllowed() {
+  return jsonResponse(
     {
-      status,
-      headers: 
-      {
-        "Cache-Control": "no-store",
-      },
-    }
+      ok: false,
+      error: "Method not allowed",
+      allowed_methods: ["POST"],
+    },
+    405
   );
 }
 
@@ -55,9 +68,6 @@ function validateExternalMatchId(externalMatchId: string | null) {
       payload: {
         ok: false,
         error: "Missing external_match_id",
-        example: {
-          external_match_id: "f89445ae-489c-4992-add6-9999f644d55e",
-        },
       },
     };
   }
@@ -87,6 +97,29 @@ async function readBody(request: NextRequest) {
   }
 }
 
+function getReadinessSummary(row: PromotionReadinessRow) {
+  return {
+    external_match_id: row.external_match_id,
+    promotion_allowed: row.promotion_allowed,
+    promotion_status: row.promotion_status,
+    total_participants: row.total_participants ?? null,
+    mapped_players: row.mapped_players ?? null,
+    mapped_players_with_team: row.mapped_players_with_team ?? null,
+    mapped_teams: row.mapped_teams ?? null,
+    mapped_player_percentage: row.mapped_player_percentage ?? null,
+    roster_safe_players: row.roster_safe_players ?? null,
+    roster_safe_teams: row.roster_safe_teams ?? null,
+    unmapped_players: row.unmapped_players ?? null,
+    unsafe_roster_players: row.unsafe_roster_players ?? null,
+    ai_participants: row.ai_participants ?? null,
+    human_participants: row.human_participants ?? null,
+  };
+}
+
+export async function GET() {
+  return methodNotAllowed();
+}
+
 export async function POST(request: NextRequest) {
   try {
     const body = await readBody(request);
@@ -96,9 +129,6 @@ export async function POST(request: NextRequest) {
         {
           ok: false,
           error: "Invalid JSON body",
-          example: {
-            external_match_id: "f89445ae-489c-4992-add6-9999f644d55e",
-          },
         },
         400
       );
@@ -113,7 +143,9 @@ export async function POST(request: NextRequest) {
 
     const { data: readiness, error: readinessError } = await supabaseAdmin
       .from("pubg_match_promotion_readiness")
-      .select("*")
+      .select(
+        "external_match_id, promotion_allowed, promotion_status, total_participants, mapped_players, mapped_players_with_team, mapped_teams, mapped_player_percentage, roster_safe_players, roster_safe_teams, unmapped_players, unsafe_roster_players, ai_participants, human_participants"
+      )
       .eq("external_match_id", validated.externalMatchId)
       .maybeSingle();
 
@@ -122,7 +154,6 @@ export async function POST(request: NextRequest) {
         {
           ok: false,
           error: "Failed to read PUBG match readiness",
-          details: readinessError.message,
           external_match_id: validated.externalMatchId,
         },
         500
@@ -141,6 +172,7 @@ export async function POST(request: NextRequest) {
     }
 
     const readinessRow = readiness as PromotionReadinessRow;
+    const readinessSummary = getReadinessSummary(readinessRow);
 
     if (readinessRow.promotion_allowed !== true) {
       return jsonResponse(
@@ -150,7 +182,7 @@ export async function POST(request: NextRequest) {
           blocked: true,
           error: "PUBG match is not ready for PlayRank core promotion",
           reason: readinessRow.promotion_status || "unknown",
-          readiness: readinessRow,
+          readiness: readinessSummary,
         },
         409
       );
@@ -165,19 +197,16 @@ export async function POST(request: NextRequest) {
         error:
           "Promotion gate passed, but core promotion is intentionally disabled.",
         next_step:
-          "Audit and install promote_pubg_api_match_to_playrank_core() before enabling actual promotion.",
-        readiness: readinessRow,
+          "Complete SQL safety audit before enabling PlayRank core promotion.",
+        readiness: readinessSummary,
       },
       423
     );
-  } catch (error) {
-    const message =
-      error instanceof Error ? error.message : "Unknown promotion error";
-
+  } catch {
     return jsonResponse(
       {
         ok: false,
-        error: message,
+        error: "Unexpected promotion safety check failure",
       },
       500
     );

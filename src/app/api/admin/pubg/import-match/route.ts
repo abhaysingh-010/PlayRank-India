@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
 
+export const dynamic = "force-dynamic";
+
 const ALLOWED_SHARDS = new Set(["steam", "kakao", "xbox", "psn"]);
 const MATCH_ID_PATTERN = /^[a-zA-Z0-9-]{16,80}$/;
 
@@ -21,7 +23,23 @@ type PubgApiPayload = {
 };
 
 function jsonResponse(payload: unknown, status = 200) {
-  return NextResponse.json(payload, { status });
+  return NextResponse.json(payload, {
+    status,
+    headers: {
+      "Cache-Control": "no-store",
+    },
+  });
+}
+
+function methodNotAllowed() {
+  return jsonResponse(
+    {
+      ok: false,
+      error: "Method not allowed",
+      allowed_methods: ["POST"],
+    },
+    405
+  );
 }
 
 function getPayloadMeta(payload: unknown) {
@@ -77,8 +95,6 @@ function validateInput(input: ImportInput) {
       payload: {
         ok: false,
         error: "Missing matchId",
-        example:
-          "/api/admin/pubg/import-match?shard=steam&matchId=f89445ae-489c-4992-add6-9999f644d55e",
       },
     };
   }
@@ -148,7 +164,7 @@ async function importPubgMatch(input: ImportInput) {
     return jsonResponse(
       {
         ok: false,
-        error: "Missing PUBG_API_KEY",
+        error: "PUBG API is not configured",
       },
       500
     );
@@ -179,7 +195,6 @@ async function importPubgMatch(input: ImportInput) {
       {
         ok: false,
         error: "Failed to create API import job",
-        details: jobError?.message,
       },
       500
     );
@@ -215,13 +230,10 @@ async function importPubgMatch(input: ImportInput) {
         {
           ok: false,
           job_id: job.id,
+          error: "PUBG API request failed",
           http_status: response.status,
-          endpoint,
-          shard,
-          matchId,
-          response: payload,
         },
-        response.status
+        502
       );
     }
 
@@ -263,8 +275,7 @@ async function importPubgMatch(input: ImportInput) {
         {
           ok: false,
           job_id: job.id,
-          error: "Failed to insert raw import",
-          details: rawImportError?.message,
+          error: "Failed to store raw import",
         },
         500
       );
@@ -288,7 +299,6 @@ async function importPubgMatch(input: ImportInput) {
           normalized: false,
           http_status: response.status,
           raw_import_id: rawImport.id,
-          normalization_error: normalizeError.message,
         },
       });
 
@@ -298,7 +308,6 @@ async function importPubgMatch(input: ImportInput) {
           job_id: job.id,
           raw_import_id: rawImport.id,
           error: "Raw import succeeded, but normalization failed",
-          details: normalizeError.message,
         },
         500
       );
@@ -321,7 +330,6 @@ async function importPubgMatch(input: ImportInput) {
           normalized: true,
           http_status: response.status,
           raw_import_id: rawImport.id,
-          overview_error: overviewError.message,
         },
       });
 
@@ -332,7 +340,6 @@ async function importPubgMatch(input: ImportInput) {
           job_id: job.id,
           raw_import_id: rawImport.id,
           error: "Normalization succeeded, but overview fetch failed",
-          details: overviewError.message,
         },
         500
       );
@@ -369,7 +376,6 @@ async function importPubgMatch(input: ImportInput) {
       job_id: job.id,
       raw_import_id: rawImport.id,
       http_status: response.status,
-      endpoint,
       shard,
       matchId,
       matchType,
@@ -379,7 +385,8 @@ async function importPubgMatch(input: ImportInput) {
       overview,
     });
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Unknown error";
+    const message =
+      error instanceof Error ? error.message : "Unknown import failure";
 
     await markJobFailed({
       jobId: job.id,
@@ -393,20 +400,15 @@ async function importPubgMatch(input: ImportInput) {
       {
         ok: false,
         job_id: job.id,
-        error: message,
+        error: "Unexpected PUBG import failure",
       },
       500
     );
   }
 }
 
-export async function GET(request: NextRequest) {
-  const { searchParams } = new URL(request.url);
-
-  return importPubgMatch({
-    shard: searchParams.get("shard") || "steam",
-    matchId: searchParams.get("matchId") || "",
-  });
+export async function GET() {
+  return methodNotAllowed();
 }
 
 export async function POST(request: NextRequest) {

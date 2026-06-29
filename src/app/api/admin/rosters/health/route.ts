@@ -30,8 +30,37 @@ type RosterHealthRow = {
 
 const MAX_LIMIT = 200;
 
+const SUPPORTED_STATUS_FILTERS: RosterHealthStatus[] = [
+  "all",
+  "healthy",
+  "issues",
+  "safe",
+  "blocked",
+  "no_team_no_active_roster",
+  "player_has_team_but_no_active_roster",
+  "active_roster_but_player_team_missing",
+  "player_team_roster_mismatch",
+  "multiple_active_rosters",
+];
+
 function jsonResponse(payload: unknown, status = 200) {
-  return NextResponse.json(payload, { status });
+  return NextResponse.json(payload, {
+    status,
+    headers: {
+      "Cache-Control": "no-store",
+    },
+  });
+}
+
+function methodNotAllowed() {
+  return jsonResponse(
+    {
+      ok: false,
+      error: "Method not allowed",
+      allowed_methods: ["GET"],
+    },
+    405
+  );
 }
 
 function n(value: unknown, fallback = 0) {
@@ -40,7 +69,7 @@ function n(value: unknown, fallback = 0) {
 }
 
 function parseLimit(value: string | null) {
-  const parsed = n(value, 100);
+  const parsed = Math.floor(n(value, 100));
 
   if (parsed < 1) return 100;
   if (parsed > MAX_LIMIT) return MAX_LIMIT;
@@ -48,25 +77,29 @@ function parseLimit(value: string | null) {
   return parsed;
 }
 
-function parseStatus(value: string | null): RosterHealthStatus {
-  const allowedStatuses: RosterHealthStatus[] = [
-    "all",
-    "healthy",
-    "issues",
-    "safe",
-    "blocked",
-    "no_team_no_active_roster",
-    "player_has_team_but_no_active_roster",
-    "active_roster_but_player_team_missing",
-    "player_team_roster_mismatch",
-    "multiple_active_rosters",
-  ];
-
-  if (allowedStatuses.includes(value as RosterHealthStatus)) {
-    return value as RosterHealthStatus;
+function parseStatus(value: string | null) {
+  if (!value) {
+    return {
+      ok: true as const,
+      status: "all" as RosterHealthStatus,
+    };
   }
 
-  return "all";
+  if (SUPPORTED_STATUS_FILTERS.includes(value as RosterHealthStatus)) {
+    return {
+      ok: true as const,
+      status: value as RosterHealthStatus,
+    };
+  }
+
+  return {
+    ok: false as const,
+    payload: {
+      ok: false,
+      error: "Invalid status filter",
+      supported_status_filters: SUPPORTED_STATUS_FILTERS,
+    },
+  };
 }
 
 function buildSummary(rows: RosterHealthRow[]) {
@@ -103,12 +136,20 @@ function buildSummary(rows: RosterHealthRow[]) {
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
 
-  const status = parseStatus(searchParams.get("status"));
+  const parsedStatus = parseStatus(searchParams.get("status"));
+
+  if (!parsedStatus.ok) {
+    return jsonResponse(parsedStatus.payload, 400);
+  }
+
+  const status = parsedStatus.status;
   const limit = parseLimit(searchParams.get("limit"));
 
   let query = supabaseAdmin
     .from("player_roster_health")
-    .select("*")
+    .select(
+      "player_id, ign, slug, player_team_id, player_team_name, active_roster_count, active_roster_team_id, active_roster_team_name, health_status, promotion_safe"
+    )
     .order("promotion_safe", { ascending: true })
     .order("health_status", { ascending: true })
     .order("ign", { ascending: true })
@@ -119,7 +160,7 @@ export async function GET(request: NextRequest) {
   }
 
   if (status === "issues") {
-    query = query.neq("health_status", "healthy");
+    query = query.or("health_status.neq.healthy,health_status.is.null");
   }
 
   if (status === "safe") {
@@ -127,7 +168,7 @@ export async function GET(request: NextRequest) {
   }
 
   if (status === "blocked") {
-    query = query.neq("promotion_safe", true);
+    query = query.or("promotion_safe.is.false,promotion_safe.is.null");
   }
 
   if (
@@ -147,7 +188,6 @@ export async function GET(request: NextRequest) {
       {
         ok: false,
         error: "Failed to fetch roster health",
-        details: error.message,
       },
       500
     );
@@ -160,8 +200,13 @@ export async function GET(request: NextRequest) {
     filters: {
       status,
       limit,
+      supported_status_filters: SUPPORTED_STATUS_FILTERS,
     },
     summary: buildSummary(rows),
     rows,
   });
+}
+
+export async function POST() {
+  return methodNotAllowed();
 }

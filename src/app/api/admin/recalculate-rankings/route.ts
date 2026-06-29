@@ -22,6 +22,21 @@ function getErrorMessage(error: unknown) {
   return "Unknown server error";
 }
 
+async function markJobFailed(jobId: string, message: string) {
+  await supabaseAdmin
+    .from("api_import_jobs")
+    .update({
+      status: "failed",
+      completed_at: new Date().toISOString(),
+      response_summary: {
+        ok: false,
+        action: ACTION,
+      },
+      error_message: message,
+    })
+    .eq("id", jobId);
+}
+
 export async function POST() {
   const startedAt = new Date().toISOString();
   const runningSinceCutoff = new Date(
@@ -44,7 +59,6 @@ export async function POST() {
       {
         ok: false,
         error: "Failed to check active ranking recalculation jobs",
-        details: runningJobError.message,
       },
       500
     );
@@ -82,7 +96,6 @@ export async function POST() {
       {
         ok: false,
         error: "Failed to create ranking recalculation job",
-        details: jobError?.message,
       },
       500
     );
@@ -92,25 +105,13 @@ export async function POST() {
     const { error: scoreError } = await supabaseAdmin.rpc(ACTION);
 
     if (scoreError) {
-      await supabaseAdmin
-        .from("api_import_jobs")
-        .update({
-          status: "failed",
-          completed_at: new Date().toISOString(),
-          response_summary: {
-            ok: false,
-            action: ACTION,
-          },
-          error_message: scoreError.message,
-        })
-        .eq("id", job.id);
+      await markJobFailed(job.id, scoreError.message);
 
       return jsonResponse(
         {
           ok: false,
           job_id: job.id,
           error: "Failed to recalculate player scores",
-          details: scoreError.message,
         },
         500
       );
@@ -138,25 +139,13 @@ export async function POST() {
   } catch (error) {
     const message = getErrorMessage(error);
 
-    await supabaseAdmin
-      .from("api_import_jobs")
-      .update({
-        status: "failed",
-        completed_at: new Date().toISOString(),
-        response_summary: {
-          ok: false,
-          action: ACTION,
-        },
-        error_message: message,
-      })
-      .eq("id", job.id);
+    await markJobFailed(job.id, message);
 
     return jsonResponse(
       {
         ok: false,
         job_id: job.id,
         error: "Unexpected ranking recalculation failure",
-        details: message,
       },
       500
     );
