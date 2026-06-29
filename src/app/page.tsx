@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { supabase } from "@/lib/supabase";
@@ -145,12 +146,7 @@ function Logo({
   return (
     <div className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-white/10 bg-white/[0.04]">
       {logoUrl ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          src={logoUrl}
-          alt={`${name} logo`}
-          className="h-full w-full object-contain p-2"
-        />
+        <Image src="/brand/playrank-logo.png" alt="PlayRank" width={180} height={40} priority className="h-auto w-auto object-contain"/>
       ) : (
         <span className="text-xs font-black text-white/70">
           {getInitials(name)}
