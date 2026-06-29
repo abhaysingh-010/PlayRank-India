@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+﻿import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
 
 type SearchType = "player" | "team" | "tournament";
@@ -85,7 +85,6 @@ export async function GET(request: NextRequest) {
     supabase
       .from("tournaments")
       .select("id, name, slug, status")
-      .eq("active", true)
       .ilike("name", searchPattern)
       .limit(limit),
   ]);
