@@ -1,9 +1,34 @@
-import { NextRequest, NextResponse } from "next/server";
+﻿import { NextRequest, NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
 
 export const dynamic = "force-dynamic";
 
-type ReadinessStatus = "all" | "ready" | "blocked" | "rejected_public";
+const PROMOTION_STATUS_FILTERS = [
+  "already_promoted",
+  "not_ready_contains_ai_participants",
+  "not_ready_inactive_mapped_players",
+  "not_ready_inactive_mapped_teams",
+  "not_ready_invalid_winner_roster_count",
+  "not_ready_multi_roster_participants",
+  "not_ready_raw_import_unprocessed",
+  "not_ready_too_few_human_participants",
+  "not_ready_unlinked_participants",
+  "not_ready_unmapped_players",
+  "not_ready_unmapped_teams",
+  "not_ready_unverified_player_mappings",
+  "not_ready_unsafe_roster_players",
+] as const;
+
+const SUPPORTED_STATUS_FILTERS = [
+  "all",
+  "ready",
+  "blocked",
+  "rejected_public",
+  ...PROMOTION_STATUS_FILTERS,
+] as const;
+
+type ReadinessStatus = (typeof SUPPORTED_STATUS_FILTERS)[number];
+type PromotionStatusFilter = (typeof PROMOTION_STATUS_FILTERS)[number];
 
 type PromotionReadinessRow = {
   external_match_id: string;
@@ -27,12 +52,6 @@ type PromotionReadinessRow = {
 };
 
 const MAX_LIMIT = 100;
-const SUPPORTED_STATUS_FILTERS: ReadinessStatus[] = [
-  "all",
-  "ready",
-  "blocked",
-  "rejected_public",
-];
 
 function n(value: unknown, fallback = 0) {
   const numberValue = Number(value);
@@ -48,6 +67,16 @@ function parseLimit(value: string | null) {
   return parsed;
 }
 
+function isSupportedStatus(value: string): value is ReadinessStatus {
+  return (SUPPORTED_STATUS_FILTERS as readonly string[]).includes(value);
+}
+
+function isPromotionStatusFilter(
+  value: ReadinessStatus
+): value is PromotionStatusFilter {
+  return (PROMOTION_STATUS_FILTERS as readonly string[]).includes(value);
+}
+
 function parseStatus(value: string | null) {
   if (!value) {
     return {
@@ -56,10 +85,10 @@ function parseStatus(value: string | null) {
     };
   }
 
-  if (SUPPORTED_STATUS_FILTERS.includes(value as ReadinessStatus)) {
+  if (isSupportedStatus(value)) {
     return {
       ok: true as const,
-      status: value as ReadinessStatus,
+      status: value,
     };
   }
 
@@ -130,10 +159,11 @@ export async function GET(request: NextRequest) {
   }
 
   if (status === "rejected_public") {
-    query = query.eq(
-      "promotion_status",
-      "not_ready_contains_ai_participants"
-    );
+    query = query.eq("promotion_status", "not_ready_contains_ai_participants");
+  }
+
+  if (isPromotionStatusFilter(status)) {
+    query = query.eq("promotion_status", status);
   }
 
   const { data, error } = await query;
