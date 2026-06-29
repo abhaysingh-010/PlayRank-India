@@ -228,24 +228,10 @@ export default async function PubgBlockedPromotionsPage() {
         </div>
 
         <div className="mt-7 flex flex-wrap gap-3">
-          <Link
-            href="/admin/data-health"
-            className="btn-secondary px-5 py-3 text-sm"
-          >
-            Back to Data Health
-          </Link>
-          <Link href="/admin/pubg/mappings" className="btn-primary px-5 py-3 text-sm">
-            Fix Player Mappings
-          </Link>
-          <Link href="/admin/pubg/imports" className="btn-secondary px-5 py-3 text-sm">
-            PUBG Imports
-          </Link>
-          <Link
-            href="/admin/pubg"
-            className="btn-secondary px-5 py-3 text-sm"
-          >
-            PUBG Admin
-          </Link>
+          <Link href="/admin/data-health" className="btn-secondary px-5 py-3 text-sm">Back to Data Health</Link>
+          <Link href="/admin/pubg/mappings" className="btn-primary px-5 py-3 text-sm">Fix Player Mappings</Link>
+          <Link href="/admin/pubg/imports" className="btn-secondary px-5 py-3 text-sm">PUBG Imports</Link>
+          <Link href="/admin/pubg" className="btn-secondary px-5 py-3 text-sm">PUBG Admin</Link>
         </div>
       </section>
 
@@ -293,7 +279,6 @@ export default async function PubgBlockedPromotionsPage() {
                 <th className="px-6 py-4 text-right">Action</th>
               </tr>
             </thead>
-
             <tbody>
               {rows.length > 0 ? (
                 rows.map((row) => {
@@ -355,14 +340,25 @@ export default async function PubgBlockedPromotionsPage() {
                       </td>
 
                       <td className="px-6 py-5 text-right">
-                        <Link
-                          href={`/admin/pubg/mappings?match=${encodeURIComponent(
-                            row.external_match_id
-                          )}`}
-                          className="rounded-full border border-white/10 bg-white/[0.04] px-4 py-2 text-sm text-white/60 transition hover:border-[#ffd21a]/30 hover:text-[#ffd21a]"
-                        >
-                          Review
-                        </Link>
+                        <div className="flex flex-col items-end gap-2">
+                          <Link
+                            href={`/admin/pubg/imports/${encodeURIComponent(
+                              row.external_match_id
+                            )}`}
+                            className="rounded-full border border-red-400/30 bg-red-400/10 px-4 py-2 text-sm text-red-300 transition hover:border-red-300 hover:text-red-200"
+                          >
+                            Review import
+                          </Link>
+
+                          <Link
+                            href={`/admin/pubg/mappings?match=${encodeURIComponent(
+                              row.external_match_id
+                            )}`}
+                            className="rounded-full border border-white/10 bg-white/[0.04] px-4 py-2 text-sm text-white/60 transition hover:border-[#ffd21a]/30 hover:text-[#ffd21a]"
+                          >
+                            Fix mappings
+                          </Link>
+                        </div>
                       </td>
                     </tr>
                   );

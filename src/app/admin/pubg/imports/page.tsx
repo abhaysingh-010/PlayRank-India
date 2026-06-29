@@ -411,31 +411,13 @@ function ReadinessCard({ row }: { row: ReadinessRow }) {
         />
       </div>
 
-      <div
-        className={`mt-5 rounded-2xl border p-4 ${toneStyle(blockCopy.tone)}`}
-      >
-        <p className="text-xs font-black uppercase tracking-[0.16em]">
-          {blockCopy.title}
-        </p>
-
-        <p className="mt-2 text-sm leading-6 text-white/65">
-          {blockCopy.description}
-        </p>
-
+      <div className={`mt-5 rounded-2xl border p-4 ${toneStyle(blockCopy.tone)}`}>
+        <p className="text-xs font-black uppercase tracking-[0.16em]">{blockCopy.title}</p>
+        <p className="mt-2 text-sm leading-6 text-white/65">{blockCopy.description}</p>
         <div className="mt-4 flex flex-wrap gap-3">
-          <Link
-            href={blockCopy.actionHref}
-            className="text-sm font-black transition hover:text-white"
-          >
-            {blockCopy.actionLabel} -&gt;
-          </Link>
-
-          <Link
-            href="/admin/rosters/health"
-            className="text-sm font-black transition hover:text-white"
-          >
-            Roster Health -&gt;
-          </Link>
+          <Link href={blockCopy.actionHref} className="text-sm font-black transition hover:text-white">{blockCopy.actionLabel} -&gt;</Link>
+          <Link href={`/admin/pubg/imports/${encodeURIComponent(row.external_match_id)}`} className="btn-secondary px-4 py-2 text-xs">View Import Detail</Link>
+          <Link href="/admin/rosters/health" className="text-sm font-black transition hover:text-white">Roster Health -&gt;</Link>
         </div>
       </div>
     </article>
