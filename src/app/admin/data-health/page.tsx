@@ -469,29 +469,25 @@ export default async function DataHealthPage() {
       label: "Teams",
       value: teams.count,
       status: teams.count > 0 ? "healthy" : "danger",
-      description:
-        "Primary team records used across rankings, profiles and comparison pages.",
+      description:"Primary team records used across rankings, profiles and comparison pages.",
     },
     {
       label: "Players",
       value: players.count,
       status: players.count > 0 ? "healthy" : "warning",
-      description:
-        "Player records used for profile pages, rankings and player comparison.",
+      description:"Player records used for profile pages, rankings and player comparison.",
     },
     {
       label: "Matches",
       value: matches.count,
       status: matches.count > 0 ? "healthy" : "warning",
-      description:
-        "Match records powering match center and match intelligence pages.",
+      description:"Match records powering match center and match intelligence pages.",
     },
     {
       label: "Tournaments",
       value: tournaments.count,
       status: tournaments.count > 0 ? "healthy" : "warning",
-      description:
-        "Tournament records powering event, standings and context pages.",
+      description:"Tournament records powering event, standings and context pages.",
     },
     {
       label: "Active Rankings",
@@ -509,22 +505,19 @@ export default async function DataHealthPage() {
       label: "Krafton Rankings",
       value: kraftonRankings.count,
       status: kraftonRankings.count > 0 ? "healthy" : "warning",
-      description:
-        "Official Krafton India ranking source rows stored in PlayRank.",
+      description:"Official Krafton India ranking source rows stored in PlayRank.",
     },
     {
       label: "Team Aliases",
       value: teamAliases.count,
       status: teamAliases.count > 0 ? "healthy" : "warning",
-      description:
-        "Alias coverage used for name matching and source normalization.",
+      description:"Alias coverage used for name matching and source normalization.",
     },
     {
       label: "Raw Imports",
       value: rawImports.count,
       status: rawImports.count > 0 ? "healthy" : "neutral",
-      description:
-        "Raw import payloads retained for traceability and debugging.",
+      description:"Raw import payloads retained for traceability and debugging.",
     },
     {
       label: "Data Sources",
@@ -542,15 +535,13 @@ export default async function DataHealthPage() {
       label: "PUBG API Matches",
       value: pubgMatches.count,
       status: pubgMatches.count > 0 ? "healthy" : "neutral",
-      description:
-        "PUBG API match records stored before product-level normalization.",
+      description:"PUBG API match records stored before product-level normalization.",
     },
     {
       label: "PUBG API Participants",
       value: pubgParticipants.count,
       status: pubgParticipants.count > 0 ? "healthy" : "neutral",
-      description:
-        "PUBG API participant rows stored in staging before PlayRank promotion.",
+      description:"PUBG API participant rows stored in staging before PlayRank promotion.",
     },
   ];
 
@@ -559,60 +550,49 @@ export default async function DataHealthPage() {
       label: "Roster Health Issues",
       value: rosterHealthIssues,
       status: rosterHealthIssues === 0 ? "healthy" : "danger",
-      description:
-        "Player/team roster mismatches that can block PUBG promotion safety.",
-      href: "/admin/rosters/health",
+      description:"Player/team roster mismatches that can block PUBG promotion safety.",
+      href: "/admin/data-health/roster-issues",
     },
     {
       label: "Missing Team Logos",
       value: missingLogoCount,
       status: missingLogoCount === 0 ? "healthy" : "warning",
-      description:
-        "Teams without logo_url. These will fall back to initials in UI.",
-      href: "/teams",
+      description:"Teams without logo_url. These will fall back to initials in UI.",
+      href: "/admin/data-health/missing-logos",
     },
     {
       label: "Teams Without Slug",
       value: missingTeamSlugCount,
       status: missingTeamSlugCount === 0 ? "healthy" : "danger",
-      description: "Teams without slugs break team profile URLs.",
-      href: "/teams",
+      description:"Teams without slugs break team profile URLs.",
+      href: "/teams/admin/data-health/missing-slugs",
     },
     {
       label: "Players Without Team",
       value: playersWithoutTeamCount,
       status: playersWithoutTeamCount === 0 ? "healthy" : "warning",
-      description:
-        "Players not linked to a team. This weakens profile and comparison context.",
-      href: "/players",
+      description:"Players not linked to a team. This weakens profile and comparison context.",
+      href: "/admin/data-health/players-without-team",
     },
     {
       label: "Orphan Rankings",
       value: orphanRankings.length,
       status: orphanRankings.length === 0 ? "healthy" : "danger",
-      description:
-        "Ranking rows whose entity_id does not match a team or player record.",
-      href: "/rankings",
+      description:"Ranking rows whose entity_id does not match a team or player record.",
+      href: "/admin/data-health/orphan-rankings",
     },
     {
       label: "PUBG Promotion Blocked",
       value: pubgBlockedPromotionCount,
       status: pubgBlockedPromotionCount === 0 ? "healthy" : "warning",
-      description:
-        "PUBG API matches blocked from core promotion because players or teams are not mapped yet.",
-      href: "/admin/pubg/imports",
+      description:"PUBG API matches blocked from core promotion because players or teams are not mapped yet.",
+      href: "/admin/data-health/pubg-blocked-promotions",
     },
   ];
 
-  const openIssueCount =
-    missingLogoCount +
-    missingTeamSlugCount +
-    playersWithoutTeamCount +
-    orphanRankings.length +
-    pubgBlockedPromotionCount +
-    rosterHealthIssues;
-
-  const tableErrorEntries: Array<[string, string | null | undefined]> = [
+  const openIssueCount = missingLogoCount + missingTeamSlugCount + playersWithoutTeamCount + orphanRankings.length + pubgBlockedPromotionCount + rosterHealthIssues;
+  const tableErrorEntries: Array<[string, string | null | undefined]> = 
+  [
     ["teams", teams.error],
     ["players", players.error],
     ["matches", matches.error],
@@ -630,7 +610,9 @@ export default async function DataHealthPage() {
     ["player_roster_health", rosterHealthResult.error?.message],
   ];
 
-  const tableErrors = tableErrorEntries.filter(
+  const tableErrors = tableErrorEntries
+  .filter
+  (
     (entry): entry is [string, string] => Boolean(entry[1])
   );
 
@@ -651,107 +633,47 @@ export default async function DataHealthPage() {
                 <br />
                 Control
               </h1>
-
               <p className="mt-6 max-w-3xl text-base leading-7 text-white/50">
                 Internal quality console for PlayRank teams, players, rankings,
                 match data, source imports, roster sync and PUBG API staging.
               </p>
-
               <div className="mt-8 flex flex-wrap gap-3">
-                <Link
-                  href="/admin"
-                  className="rounded-full border border-white/10 bg-white/[0.04] px-5 py-2.5 text-sm font-black text-white/65 transition hover:border-white/25 hover:text-white"
-                >
+                <Link href="/admin" className="rounded-full border border-white/10 bg-white/[0.04] px-5 py-2.5 text-sm font-black text-white/65 transition hover:border-white/25 hover:text-white">
                   Admin Home
                 </Link>
-
-                <Link
-                  href="/admin/pubg"
-                  className="rounded-full border border-[#ffd21a]/30 bg-[#ffd21a]/10 px-5 py-2.5 text-sm font-black text-[#ffd21a] transition hover:bg-[#ffd21a]/15"
-                >
+                <Link href="/admin/pubg" className="rounded-full border border-[#ffd21a]/30 bg-[#ffd21a]/10 px-5 py-2.5 text-sm font-black text-[#ffd21a] transition hover:bg-[#ffd21a]/15">
                   PUBG Hub
                 </Link>
-
-                <Link
-                  href="/admin/rosters/health"
-                  className="rounded-full border border-white/10 bg-white/[0.04] px-5 py-2.5 text-sm font-black text-white/65 transition hover:border-white/25 hover:text-white"
-                >
+                <Link href="/admin/rosters/health" className="rounded-full border border-white/10 bg-white/[0.04] px-5 py-2.5 text-sm font-black text-white/65 transition hover:border-white/25 hover:text-white">
                   Roster Health
+                </Link>
+                <Link href="/admin/data-health/missing-logos" className="rounded-full border border-white/10 bg-white/[0.04] px-5 py-2.5 text-sm font-black text-white/65 transition hover:border-white/25 hover:text-white">
+                  Missing Logos
                 </Link>
               </div>
             </div>
-
             <div className="grid grid-cols-2 gap-3">
-              <StatBlock
-                label="Product Records"
-                value={
-                  teams.count + players.count + matches.count + tournaments.count
-                }
-                status="neutral"
-              />
-              <StatBlock
-                label="Ranking Rows"
-                value={rankings.count + rankingHistory.count}
-                status={rankings.count > 0 ? "healthy" : "danger"}
-              />
-              <StatBlock
-                label="Import Rows"
-                value={rawImports.count + pubgMatches.count + pubgParticipants.count}
-                status={pubgMatches.count > 0 ? "healthy" : "neutral"}
-              />
-              <StatBlock
-                label="Open Issues"
-                value={openIssueCount}
-                status={openIssueCount === 0 ? "healthy" : "warning"}
-              />
+              <StatBlock label="Product Records" value={teams.count + players.count + matches.count + tournaments.count} status="neutral"/>
+              <StatBlock label="Ranking Rows" value={rankings.count + rankingHistory.count} status={rankings.count > 0 ? "healthy" : "danger"}/>
+              <StatBlock label="Import Rows" value={rawImports.count + pubgMatches.count + pubgParticipants.count} status={pubgMatches.count > 0 ? "healthy" : "neutral"}/>
+              <StatBlock label="Open Issues" value={openIssueCount} status={openIssueCount === 0 ? "healthy" : "warning"}/>
             </div>
           </div>
         </div>
       </section>
-
       <section className="mx-auto grid max-w-7xl gap-5 px-5 py-10 lg:grid-cols-[1.05fr_0.95fr]">
-        <PubgReadinessPanel
-          totalImportedMatches={pubgReadinessRows.length}
-          readyForPromotion={pubgReadyForPromotionCount}
-          blocked={pubgBlockedPromotionCount}
-          latest={latestPubgReadiness}
-        />
-
+        <PubgReadinessPanel totalImportedMatches={pubgReadinessRows.length} readyForPromotion={pubgReadyForPromotionCount} blocked={pubgBlockedPromotionCount} latest={latestPubgReadiness} />
         <section className={shell + " p-5 md:p-6"}>
-          <SectionHeader
-            eyebrow="Roster Guard"
-            title="Roster Promotion Safety"
-            actionHref="/admin/rosters/health"
-            actionLabel="Open Roster Health"
-          />
-
+          <SectionHeader eyebrow="Roster Guard" title="Roster Promotion Safety" actionHref="/admin/rosters/health" actionLabel="Open Roster Health"/>
           <div className="grid gap-3">
-            <StatBlock
-              label="Healthy Players"
-              value={rosterHealthy}
-              status={rosterHealthIssues === 0 ? "healthy" : "warning"}
-            />
-            <StatBlock
-              label="Promotion Safe"
-              value={rosterPromotionSafe}
-              status={rosterPromotionSafe > 0 ? "healthy" : "warning"}
-            />
-            <StatBlock
-              label="Roster Issues"
-              value={rosterHealthIssues}
-              status={rosterHealthIssues === 0 ? "healthy" : "danger"}
-            />
+            <StatBlock label="Healthy Players" value={rosterHealthy} status={rosterHealthIssues === 0 ? "healthy" : "warning"}/>
+            <StatBlock label="Promotion Safe" value={rosterPromotionSafe} status={rosterPromotionSafe > 0 ? "healthy" : "warning"}/>
+            <StatBlock label="Roster Issues"value={rosterHealthIssues} status={rosterHealthIssues === 0 ? "healthy" : "danger"}/>
           </div>
-
           {rosterHealthResult.error ? (
             <div className="mt-4 rounded-2xl border border-red-400/20 bg-red-400/10 p-4">
-              <p className="font-black uppercase text-red-300">
-                Roster health view error
-              </p>
-
-              <p className="mt-2 text-sm text-white/60">
-                {rosterHealthResult.error.message}
-              </p>
+              <p className="font-black uppercase text-red-300"> Roster health view error</p>
+              <p className="mt-2 text-sm text-white/60">{rosterHealthResult.error.message}</p>
             </div>
           ) : null}
         </section>
