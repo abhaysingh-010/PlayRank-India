@@ -117,16 +117,34 @@ function clamp(value: number, min = 0, max = 100)
   return Math.max(min, Math.min(max, value));
 }
 
-function formatDate(value: string | null) 
+function formatDate(value: string | null | undefined) 
 {
-  if (!value) return "TBD";
+  if (!value) return "Not available";
 
-  return new Date(value).toLocaleDateString("en-IN", 
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return "Not available";
+  }
+
+  return date.toLocaleDateString("en-IN", 
   {
     day: "2-digit",
     month: "short",
     year: "numeric",
   });
+}
+
+function getLatestDate(values: Array<string | null | undefined>) 
+{
+  const timestamps = values
+    .filter(Boolean)
+    .map((value) => new Date(value as string).getTime())
+    .filter((value) => Number.isFinite(value));
+
+  if (timestamps.length === 0) return null;
+
+  return new Date(Math.max(...timestamps)).toISOString();
 }
 
 function formatMinutes(seconds: unknown) 
@@ -162,6 +180,48 @@ function getMatchSourceLabel(source: string | null, verified: boolean | null)
   if (source === "krafton_india_esports") return "Official Krafton Source";
   if (verified) return "Verified Match";
   return "Match Record";
+}
+
+function getMatchConfidence
+(
+  {
+    verified,
+    playerStatsCount,
+    teamStatsCount,
+  }
+  : 
+  {
+    verified: boolean | null;
+    playerStatsCount: number;
+    teamStatsCount: number;
+  }
+) 
+{
+  const sampleSize = playerStatsCount + teamStatsCount;
+
+  if (verified && sampleSize >= 20) 
+  {
+    return {
+      label: "High Confidence",
+      description:
+        "This match has verified source status and a strong stat sample.",
+    };
+  }
+
+  if (sampleSize >= 8) 
+  {
+    return {
+      label: "Medium Confidence",
+      description:
+        "This match has usable stat coverage, but some analytics should still be read directionally.",
+    };
+  }
+
+  return {
+    label: "Low Confidence",
+    description:
+      "This match has limited stat coverage. Treat analytics as early directional signals.",
+  };
 }
 
 function Metric
@@ -422,6 +482,16 @@ export default async function MatchDetailPage
   const scoreTension = scoreTotal > 0 ? clamp(100 - scoreDiff * 10) : 0;
   const isHeadToHead = Boolean(match.team1 || match.team2);
   const matchFormat = isHeadToHead ? "Head-to-Head" : "Battle Royale";
+  const latestMatchUpdate = getLatestDate([
+  match.created_at,
+  match.date,
+]);
+
+const matchConfidence = getMatchConfidence({
+  verified: match.verified,
+  playerStatsCount: playerStats.length,
+  teamStatsCount: teamStats.length,
+});
 
   return (
     <main className="page-shell space-y-6 py-8 text-white">
@@ -434,11 +504,9 @@ export default async function MatchDetailPage
             <DataSourceBadge label={matchFormat} size="md" />
             <DataSourceBadge label="Match Intelligence" size="md" />
             <DataSourceBadge label="Analytics Generated" size="md" />
-            {tournament ? 
-              (
-                <DataSourceBadge label="Tournament Record" size="md" />
-              ) : null
-            }
+            <DataSourceBadge label={matchConfidence.label} size="md" />
+            <DataSourceBadge label={`Last Updated: ${formatDate(latestMatchUpdate)}`} size="md" />
+            {tournament ? <DataSourceBadge label="Tournament Record" size="md" /> : null}
           </div>
 
           <div className="grid gap-8 xl:grid-cols-[1fr_240px_1fr] xl:items-center">
@@ -645,8 +713,10 @@ export default async function MatchDetailPage
 
             <p className="mt-2 text-sm leading-6 text-white/45">
               Match detail uses normalized match, team result and player stat
-              tables. PUBG API records only appear here after controlled
-              promotion into PlayRank core tables.
+              tables. PUBG API records only appear here after controlled promotion
+              into PlayRank core tables. {matchConfidence.description} PlayRank
+              match analytics are independent intelligence signals, not official
+              predictions or outcome guarantees.
             </p>
           </div>
         </section>

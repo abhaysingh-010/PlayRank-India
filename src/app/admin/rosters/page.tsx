@@ -229,7 +229,7 @@ export default async function AdminRostersPage()
           <h2 className="mt-4 text-4xl font-black uppercase tracking-[-0.05em]">Assign Player</h2>
           <p className="mt-4 leading-7 text-white/50">
             Assigning a player to a team updates both `team_rosters` and the
-            player's direct `team_id`. Existing active roster links for that
+            player&apos;s direct `team_id`. Existing active roster links for that
             player are closed automatically.
           </p>
         </div>

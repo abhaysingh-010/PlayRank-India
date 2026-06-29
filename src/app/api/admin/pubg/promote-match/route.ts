@@ -20,8 +20,17 @@ type PromotionReadinessRow = {
   mapped_player_percentage?: number | null;
 };
 
-function jsonResponse(payload: unknown, status = 200) {
-  return NextResponse.json(payload, { status });
+function jsonResponse(payload: unknown, status = 200) 
+{
+  return NextResponse.json(payload, 
+    {
+      status,
+      headers: 
+      {
+        "Cache-Control": "no-store",
+      },
+    }
+  );
 }
 
 function normalizeExternalMatchId(value: unknown) {
@@ -159,7 +168,7 @@ export async function POST(request: NextRequest) {
           "Audit and install promote_pubg_api_match_to_playrank_core() before enabling actual promotion.",
         readiness: readinessRow,
       },
-      501
+      423
     );
   } catch (error) {
     const message =

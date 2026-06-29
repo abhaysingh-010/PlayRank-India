@@ -464,10 +464,6 @@ export default async function StandingsPage() {
     0
   );
 
-  const totalWins = leaderboard.reduce(
-    (sum, team) => sum + n(team.totalWins),
-    0
-  );
 
   const verifiedTeams = leaderboard.filter((team) => team.verified === true).length;
 

@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import RankHistoryChart from "@/components/RankHistoryChart";
@@ -98,18 +99,34 @@ function formatValue(value: unknown, decimals = 0)
   const safe = n(value);
   return decimals > 0 ? safe.toFixed(decimals) : Math.round(safe).toString();
 }
-function formatDate(value: string | null | undefined) 
-{
+
+function formatDate(value: string | null | undefined) {
   if (!value) return "Not available";
-  return new Date(value).toLocaleDateString
-  ("en-IN", 
-    {
-      day: "2-digit",
-      month: "short",
-      year: "numeric",
-    }
-  );
+
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return "Not available";
+  }
+
+  return date.toLocaleDateString("en-IN", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  });
 }
+
+function getLatestDate(values: Array<string | null | undefined>) {
+  const timestamps = values
+    .filter(Boolean)
+    .map((value) => new Date(value as string).getTime())
+    .filter((value) => Number.isFinite(value));
+
+  if (timestamps.length === 0) return null;
+
+  return new Date(Math.max(...timestamps)).toISOString();
+}
+
 function formatChange(value: number | null | undefined) 
 {
   if (!value) return "—";
@@ -139,6 +156,27 @@ function getSourceLabel(source: string | null)
   if (source === "admin_manual") return "Admin Verified";
   return source || "PlayRank";
 }
+
+function getTeamConfidence(matchesPlayed: number, verified?: boolean | null) {
+  if (verified && matchesPlayed >= 20) {
+    return {
+      label: "High Confidence",
+      description: "This team has verified source signals and enough match volume for stronger directional analysis.",
+    };
+  }
+
+  if (matchesPlayed >= 8) {
+    return {
+      label: "Medium Confidence",
+      description: "This team has usable match data, but the sample size is still developing.",
+    };
+  }
+
+  return {
+    label: "Low Confidence",
+    description: "This team has limited match data. Treat analytics as early directional signals.",
+  };
+}
 function TeamLogo
 (
   {
@@ -156,7 +194,7 @@ function TeamLogo
     <div className="flex h-24 w-24 shrink-0 items-center justify-center overflow-hidden rounded-[1.6rem] border border-white/10 bg-white/[0.04] shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]">
       {logoUrl ? 
         (
-          <img src={logoUrl}alt={`${name} logo`}className="h-full w-full object-contain p-3"/>
+          <Image src={logoUrl} alt={`${name} logo`} width={96} height={96} sizes="96px" className="h-full w-full object-contain p-3"/>
         ) 
         : 
         (
@@ -274,7 +312,7 @@ function getVerdict
 {
   if (powerScore >= 90) 
   {
-    return `${teamName} profiles as a ${archetype}. The team has elite title-contender strength, backed by ${killRate} kills per match and a ${winRate}% win rate.`;
+    return `${teamName} profiles as a ${archetype}. The team currently shows title-contender indicators, backed by ${killRate} kills per match and a ${winRate}% win rate.`;
   }
   if (powerScore >= 75) 
   {
@@ -393,6 +431,17 @@ export default async function TeamPage
   const recentFormScore = Math.round(recentWins * 18 + recentMatches.length * 4 + wins * 0.5);
   const sourceLabel = getSourceLabel(team.source);
   const sourceBadgeLabel = team.source === "krafton_india_esports"? "Official Krafton Team": team.verified? "Verified Team": "Team Record";
+  const latestTeamUpdate = getLatestDate
+  (
+    [
+      currentRanking?.updated_at,
+      ...rankHistory.map((row) => row.snapshot_date),
+      ...rankHistory.map((row) => row.created_at),
+      team.created_at,
+    ]
+  );
+
+  const confidence = getTeamConfidence(matchesPlayed, team.verified);
 
   return (
     <main className="page-shell space-y-6 py-8 text-white">
@@ -409,8 +458,10 @@ export default async function TeamPage
               <h1 className="mt-2 text-5xl font-black uppercase leading-[0.9] tracking-[-0.06em] text-white md:text-7xl">{team.name}</h1>
               <p className="mt-3 text-white/45">{team.short_name || "TEAM"} · {team.country || "India"} ·{" "}{sourceLabel}</p>
               <div className="mt-4 flex flex-wrap gap-2">
-                <DataSourceBadge source={team.source}verified={team.verified}label={sourceBadgeLabel}/>
+                <DataSourceBadge source={team.source} verified={team.verified} label={sourceBadgeLabel}/>
                 <DataSourceBadge label="Ranking Snapshot" />
+                <DataSourceBadge label={confidence.label} />
+                <DataSourceBadge label={`Last Updated: ${formatDate(latestTeamUpdate)}`} />
                 {team.active === false ? 
                   (
                     <span className="inline-flex items-center gap-1.5 rounded-full border border-red-400/30 bg-red-400/10 px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.14em] text-red-300">
@@ -583,7 +634,9 @@ export default async function TeamPage
             <p className="mt-2 text-sm leading-6 text-white/45">
               This profile uses normalized PlayRank team, ranking, roster and
               match records. API-imported data is only included after promotion
-              safety checks.
+              safety checks. {confidence.description} PlayRank analytics are
+              independent intelligence signals, not official predictions or outcome
+              guarantees.
             </p>
           </div>
         </section>

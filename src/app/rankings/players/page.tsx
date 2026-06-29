@@ -55,6 +55,17 @@ function formatDate(value: string | null) {
   });
 }
 
+function getLatestDate(values: Array<string | null | undefined>) 
+{
+  const timestamps = values
+  .filter(Boolean)
+  .map((value) => new Date(value as string).getTime())
+  .filter((value) => Number.isFinite(value));
+  if (timestamps.length === 0) return null;
+
+  return new Date(Math.max(...timestamps)).toISOString();
+}
+
 function formatChange(value: number | null) {
   if (!value) return "—";
   if (value > 0) return `+${value}`;
@@ -109,48 +120,32 @@ export default async function PlayerRankingsPage() {
 
   const rankings = (rankingsResult.data || []) as RankingRow[];
   const playerIds = rankings.map((row) => row.entity_id);
-
-  const { data: playersRaw, error: playersError } =
-    playerIds.length > 0
-      ? await supabase
-          .from("players")
-          .select(
-            "id, ign, slug, country, role, kd_ratio, avg_damage, win_rate, matches_played, total_kills, mvp_count, recent_form, source, verified, active"
-          )
-          .in("id", playerIds)
-      : { data: [], error: null };
-
+  const { data: playersRaw, error: playersError } = playerIds.length > 0 ? await supabase
+  .from("players")
+  .select
+  (
+    "id, ign, slug, country, role, kd_ratio, avg_damage, win_rate, matches_played, total_kills, mvp_count, recent_form, source, verified, active"
+  )
+  .in("id", playerIds) : { data: [], error: null };
   const players = (playersRaw || []) as PlayerRow[];
   const playerById = new Map(players.map((player) => [player.id, player]));
-
   const rankedPlayers = rankings
-    .map((ranking) => ({
-      ranking,
-      player: playerById.get(ranking.entity_id),
-    }))
-    .filter((item): item is { ranking: RankingRow; player: PlayerRow } =>
-      Boolean(item.player)
-    );
+  .map
+  ((ranking) => 
+    (
+      {
+        ranking,
+        player: playerById.get(ranking.entity_id),
+      }
+    )
+  )
+  .filter
+  ((item): item is { ranking: RankingRow; player: PlayerRow } =>
+    Boolean(item.player)
+  );
 
-  const latestRankingUpdate =
-    rankings[0]?.updated_at ||
-    latestSnapshotResult.data?.snapshot_date ||
-    latestSnapshotResult.data?.created_at ||
-    null;
-
-  if (rankingsResult.error || playersError) {
-    return (
-      <main className="page-shell py-10 text-white">
-        <section className="rounded-[2rem] border border-red-500/20 bg-red-500/5 p-8">
-          <h1 className="text-2xl font-black">Player Rankings</h1>
-          <p className="mt-3 text-red-300">
-            Failed to load player rankings. Check Supabase permissions and table
-            columns.
-          </p>
-        </section>
-      </main>
-    );
-  }
+  const latestSnapshot = latestSnapshotResult.data?.snapshot_date || latestSnapshotResult.data?.created_at || null;
+  const latestRankingUpdate = getLatestDate(rankings.map((row) => row.updated_at)) || latestSnapshot;
 
   return (
     <main className="page-shell space-y-8 py-8 text-white">

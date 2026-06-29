@@ -5,8 +5,32 @@ function unauthorized() {
     status: 401,
     headers: {
       "WWW-Authenticate": 'Basic realm="PlayRank Admin"',
+      "Cache-Control": "no-store",
     },
   });
+}
+
+function safeDecodeBasicAuth(authHeader: string) {
+  try {
+    if (!authHeader.startsWith("Basic ")) {
+      return null;
+    }
+
+    const base64Credentials = authHeader.replace("Basic ", "");
+    const credentials = atob(base64Credentials);
+    const separatorIndex = credentials.indexOf(":");
+
+    if (separatorIndex === -1) {
+      return null;
+    }
+
+    return {
+      username: credentials.slice(0, separatorIndex),
+      password: credentials.slice(separatorIndex + 1),
+    };
+  } catch {
+    return null;
+  }
 }
 
 export default function proxy(req: NextRequest) {
@@ -25,28 +49,25 @@ export default function proxy(req: NextRequest) {
   if (!username || !password) {
     return new NextResponse("Admin protection is not configured", {
       status: 500,
+      headers: {
+        "Cache-Control": "no-store",
+      },
     });
   }
 
   const authHeader = req.headers.get("authorization");
 
-  if (!authHeader || !authHeader.startsWith("Basic ")) {
+  if (!authHeader) {
     return unauthorized();
   }
 
-  const base64Credentials = authHeader.replace("Basic ", "");
-  const credentials = atob(base64Credentials);
+  const decoded = safeDecodeBasicAuth(authHeader);
 
-  const separatorIndex = credentials.indexOf(":");
-
-  if (separatorIndex === -1) {
+  if (!decoded) {
     return unauthorized();
   }
 
-  const inputUsername = credentials.slice(0, separatorIndex);
-  const inputPassword = credentials.slice(separatorIndex + 1);
-
-  if (inputUsername !== username || inputPassword !== password) {
+  if (decoded.username !== username || decoded.password !== password) {
     return unauthorized();
   }
 

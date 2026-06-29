@@ -51,7 +51,12 @@ function parseStatus(value: string | null): ReadinessStatus {
 }
 
 function jsonResponse(payload: unknown, status = 200) {
-  return NextResponse.json(payload, { status });
+  return NextResponse.json(payload, {
+    status,
+    headers: {
+      "Cache-Control": "no-store",
+    },
+  });
 }
 
 function getStatusBreakdown(rows: PromotionReadinessRow[]) {
@@ -81,7 +86,7 @@ export async function GET(request: NextRequest) {
   }
 
   if (status === "blocked") {
-    query = query.neq("promotion_allowed", true);
+    query = query.or("promotion_allowed.is.false,promotion_allowed.is.null");
   }
 
   if (status === "rejected_public") {

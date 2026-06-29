@@ -1,3 +1,5 @@
+
+import Image from "next/image";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import DataSourceBadge from "@/components/DataSourceBadge";
@@ -145,7 +147,7 @@ function TeamLogo
       className={`flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-2xl border ${won? "border-[#ffd21a]/30 bg-[#ffd21a]/10 text-[#ffd21a]" : "border-white/10 bg-white/[0.04] text-white/65"}`}>
       {team?.logo_url ? 
         (  
-          <img src={team.logo_url}alt={`${teamName} logo`}className="h-full w-full object-contain p-2"/>
+          <Image src={team.logo_url} alt={`${teamName} logo`} width={48} height={48} sizes="48px"className="h-full w-full object-contain p-2"/>
         ) 
         : 
         (
@@ -228,7 +230,7 @@ function MatchResultPreview
                 <div className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-white/10 bg-white/[0.04]">
                   {row.team?.logo_url ? 
                     (
-                      <img src={row.team.logo_url} alt={`${row.team.name} logo`} className="h-full w-full object-contain p-1.5"/>
+                      <Image src={row.team.logo_url}alt={`${row.team.name} logo`}width={36}height={36}sizes="36px"className="h-full w-full object-contain p-1.5"/>
                     ) 
                     : 
                     (

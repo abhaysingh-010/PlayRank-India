@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { supabase } from "@/lib/supabase";
@@ -27,6 +28,7 @@ type RankingRow =
   rank: number | null;
   score: number | null;
   change: number | null;
+  updated_at: string | null;
 };
 
 type MatchRow = 
@@ -85,11 +87,17 @@ function shortNumber(value: number)
   return Math.round(value).toString();
 }
 
-function formatDate(value: string | null) 
+function formatDate(value: string | null | undefined) 
 {
-  if (!value) return "TBD";
+  if (!value) return "Not available";
 
-  return new Date(value).toLocaleDateString
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return "Not available";
+  }
+
+  return date.toLocaleDateString
   ("en-IN", 
     {
       day: "2-digit",
@@ -97,6 +105,18 @@ function formatDate(value: string | null)
       year: "numeric",
     }
   );
+}
+
+function getLatestDate(values: Array<string | null | undefined>) 
+{
+  const timestamps = values
+    .filter(Boolean)
+    .map((value) => new Date(value as string).getTime())
+    .filter((value) => Number.isFinite(value));
+
+  if (timestamps.length === 0) return null;
+
+  return new Date(Math.max(...timestamps)).toISOString();
 }
 
 function getInitials(name: string) 
@@ -200,6 +220,41 @@ function getMomentum(results: TeamMatchResultRow[] = []): Momentum
   return {matches, avgPoints, avgKills, avgPlacement, score, label,};
 }
 
+function getTeamCompareConfidence
+(
+  {
+    sampleSize,
+    bothVerified,
+  }
+  : 
+  {
+    sampleSize: number;
+    bothVerified: boolean;
+  }
+) 
+{
+  if (bothVerified && sampleSize >= 20) 
+  {
+    return {
+      label: "High Confidence",
+      note: "Both teams have verified source signals and enough comparison data for stronger directional analysis.",
+    };
+  }
+
+  if (sampleSize >= 8) 
+  {
+    return {
+      label: "Medium Confidence",
+      note: "This comparison has usable ranking, match and form data, but the sample size is still developing.",
+    };
+  }
+
+  return {
+    label: "Low Confidence",
+    note: "This comparison has limited match or form data. Treat the edge as an early directional signal.",
+  };
+}
+
 function TeamLogo
 (
   {
@@ -221,7 +276,7 @@ function TeamLogo
     <div className={`${sizeClass} flex shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-white/[0.12] bg-black/25 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]`}>
       {logoUrl ? 
         (
-          <img src={logoUrl} alt={`${name} logo`} className="h-full w-full object-contain p-2"/>
+          <Image src={logoUrl} alt={`${name} logo`} width={96} height={96} sizes="96px" className="h-full w-full object-contain p-2"/>
         ) 
         : 
         (
@@ -625,7 +680,7 @@ export default async function TeamCompareDynamicPage
 
         supabase
         .from("rankings")
-        .select("entity_id, rank, score, change")
+        .select("entity_id, rank, score, change, updated_at")
         .eq("entity_type", "team")
         .in("entity_id", [firstTeam.id, secondTeam.id]),
 
@@ -685,6 +740,18 @@ export default async function TeamCompareDynamicPage
     const winSplitGap = Math.abs(team1Wins - team2Wins);
     const rivalryScore = Math.round(totalMeetings * 18 + closeMatches * 22 + Math.max(0, 30 - avgScoreGap) + Math.max(0, 10 - winSplitGap) * 4);
     const rivalryLabel = rivalryScore >= 100? "Elite Rivalry" : rivalryScore >= 70? "Strong Rivalry" : rivalryScore >= 40? "Developing Rivalry" : "Limited History";
+    const comparisonSampleSize = totalMeetings + firstRecentResults.length + secondRecentResults.length + firstMatches + secondMatches;
+    const comparisonConfidence = getTeamCompareConfidence({ sampleSize: comparisonSampleSize, bothVerified: firstTeam.verified === true && secondTeam.verified === true,});
+    const latestCompareUpdate = getLatestDate
+    (
+      [
+        rank1?.updated_at,
+        rank2?.updated_at,
+        ...h2hMatches.map((match) => match.date),
+        ...firstRecentResults.map((row) => row.created_at),
+        ...secondRecentResults.map((row) => row.created_at),
+      ]
+    );
     const scoreDiff = firstScore - secondScore;
     const killDiff = firstKills - secondKills;
     const winDiff = firstWins - secondWins;
@@ -736,6 +803,8 @@ export default async function TeamCompareDynamicPage
               <DataSourceBadge label="Ranking Snapshot" size="md" />
               <DataSourceBadge label="Rivalry Intelligence" size="md" />
               <DataSourceBadge label="Analytics Generated" size="md" />
+              <DataSourceBadge label={comparisonConfidence.label} size="md" />
+              <DataSourceBadge label={`Last Updated: ${formatDate(latestCompareUpdate)}`} size="md" />
             </div>
 
             <p className="text-xs font-black uppercase tracking-[0.28em] text-[#ffd21a]">Comparative Edge</p>
@@ -744,7 +813,9 @@ export default async function TeamCompareDynamicPage
             </h1>
             <p className="mt-3 max-w-3xl text-sm leading-6 text-white/45">
               Team comparison uses rankings, team records, analytics output,
-              recent match results and head-to-head history.
+              recent match results and head-to-head history. {comparisonConfidence.note}
+              PlayRank comparisons are independent intelligence signals, not official
+              predictions or outcome guarantees.
             </p>
           </div>
           <div className="flex flex-wrap gap-3">

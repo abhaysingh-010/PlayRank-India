@@ -21,7 +21,6 @@ type SafeCount = {
 };
 
 type PubgReadinessRow = {
-  external_match_id: string;
   promotion_allowed: boolean | null;
   promotion_status: string | null;
   total_participants: number | null;
@@ -307,14 +306,14 @@ export default async function DataPage() {
     adminCount("import_batches"),
 
     supabaseAdmin
-      .from("pubg_match_promotion_readiness")
-      .select(
-        "external_match_id, promotion_allowed, promotion_status, total_participants, mapped_players, mapped_teams, roster_safe_players, roster_safe_teams, unmapped_players, unsafe_roster_players, ai_participants, human_participants"
-      ),
+    .from("pubg_match_promotion_readiness")
+    .select(
+      "promotion_allowed, promotion_status, total_participants, mapped_players, mapped_teams, roster_safe_players, roster_safe_teams, unmapped_players, unsafe_roster_players, ai_participants, human_participants"
+    ),
 
     supabaseAdmin
-      .from("player_roster_health")
-      .select("health_status, promotion_safe, player_id"),
+    .from("player_roster_health")
+    .select("health_status"),
 
     supabase
       .from("ranking_history")
@@ -360,10 +359,6 @@ export default async function DataPage() {
     (sum, row) => sum + n(row.unsafe_roster_players),
     0
   );
-
-  const rosterPromotionSafe = rosterHealthRows.filter(
-    (row) => row.promotion_safe === true
-  ).length;
 
   const rosterIssues = rosterHealthRows.filter(
     (row) => row.health_status !== "healthy"

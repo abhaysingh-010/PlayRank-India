@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
@@ -135,22 +136,35 @@ function clamp(value: number, min = 0, max = 100)
 {
   return Math.max(min, Math.min(max, value));
 }
-function formatValue(value: unknown, decimals = 0) 
-{
-  const safe = n(value);
-  return decimals > 0 ? safe.toFixed(decimals) : Math.round(safe).toString();
-}
+
 function formatDate(value: string | null | undefined) 
 {
-  if (!value) return "TBD";
-  return new Date(value).toLocaleDateString
-  ("en-IN", 
-    {
-      day: "2-digit",
-      month: "short",
-      year: "numeric",
-    }
-  );
+  if (!value) return "Not available";
+
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return "Not available";
+  }
+
+  return date.toLocaleDateString("en-IN", 
+  {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  });
+}
+
+function getLatestDate(values: Array<string | null | undefined>) 
+{
+  const timestamps = values
+    .filter(Boolean)
+    .map((value) => new Date(value as string).getTime())
+    .filter((value) => Number.isFinite(value));
+
+  if (timestamps.length === 0) return null;
+
+  return new Date(Math.max(...timestamps)).toISOString();
 }
 
 function formatDateRange(start: string | null, end: string | null) 
@@ -205,6 +219,47 @@ function getTournamentBadgeLabel(tournament: TournamentRow)
   if (tournament.verified) return "Verified Event";
   return "Tournament Record";
 }
+
+function getTournamentConfidence
+(
+  {
+    verified,
+    standingsCount,
+    matchCount,
+  }
+  : 
+  {
+    verified: boolean | null;
+    standingsCount: number;
+    matchCount: number;
+  }
+) 
+{
+  if (verified && standingsCount >= 12 && matchCount >= 10) 
+  {
+    return {
+      label: "High Confidence",
+      description:
+        "This tournament has verified source status, standings coverage and meaningful match volume.",
+    };
+  }
+
+  if (standingsCount >= 6 || matchCount >= 5) 
+  {
+    return {
+      label: "Medium Confidence",
+      description:
+        "This tournament has usable standings or match data, but some analytics should still be read directionally.",
+    };
+  }
+
+  return {
+    label: "Low Confidence",
+    description:
+      "This tournament has limited standings or match data. Treat analytics as early directional signals.",
+  };
+}
+
 function getTeamBadgeLabel(team?: TeamMini | null) 
 {
   if (!team) return "Team Record";
@@ -255,26 +310,7 @@ function Metric
     </div>
   );
 }
-function MiniStat
-(
-  {
-    label,
-    value,
-  }
-  : 
-  {
-    label: string;
-    value: string | number;
-  }
-) 
-{
-  return (
-    <div>
-      <p className="text-[10px] font-black uppercase tracking-[0.18em] text-white/30">{label}</p>
-      <p className="mt-1 text-sm font-black text-white/75">{value}</p>
-    </div>
-  );
-}
+
 function Bar
 (
   { 
@@ -323,7 +359,7 @@ function TournamentLogo
       {
         logoUrl ? 
         (
-          <img src={logoUrl}alt={`${name} logo`}className="h-full w-full object-contain p-3"/>
+          <Image src={logoUrl} alt={`${name} logo`} width={96} height={96} sizes={size === "lg" ? "96px" : "48px"} className="h-full w-full object-contain p-3"/>
         ) 
         : 
         (
@@ -350,7 +386,7 @@ function TeamLogo
     <div className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-white/10 bg-white/[0.04]">
       {logoUrl ? 
         (
-          <img src={logoUrl}alt={`${name} logo`}className="h-full w-full object-contain p-2"/>
+          <Image src={logoUrl} alt={`${name} logo`} width={44} height={44} sizes="44px" className="h-full w-full object-contain p-2"/>
         ) 
         : 
         (
@@ -656,6 +692,18 @@ export default async function TournamentPage
   const winDensity = clamp(Math.round(totalWins * 9));
   const matchVolume = clamp(Math.round(totalMatches * 8));
   const difficultyScore = clamp(Math.round(difficultyIndex / 3));
+  const tournamentConfidence = getTournamentConfidence({
+  verified: tournament.verified,
+  standingsCount: standings.length,
+  matchCount: matches.length,
+});
+
+const latestTournamentUpdate = getLatestDate([
+  tournament.created_at,
+  tournament.end_date,
+  tournament.start_date,
+  ...matches.map((match) => match.date),
+]);
 
   return (
     <main className="page-shell space-y-6 py-8 text-white">
@@ -667,9 +715,12 @@ export default async function TournamentPage
             <TournamentLogo name={tournament.name}logoUrl={tournament.logo_url}/>
             <div>
               <div className="mb-4 flex flex-wrap gap-2">
-                <DataSourceBadge source={tournament.source}verified={tournament.verified}label={getTournamentBadgeLabel(tournament)}size="md"/>
+                <DataSourceBadge source={tournament.source} verified={tournament.verified} label={getTournamentBadgeLabel(tournament)} size="md"/>
                 <DataSourceBadge label="Standings Data" size="md" />
                 <DataSourceBadge label="Match Data" size="md" />
+                <DataSourceBadge label="Tournament Intelligence" size="md" />
+                <DataSourceBadge label={tournamentConfidence.label} size="md" />
+                <DataSourceBadge label={`Last Updated: ${formatDate(latestTournamentUpdate)}`} size="md" />
               </div>
               <p className="text-xs font-black uppercase tracking-[0.28em] text-[#ffd21a]">Tournament Profile</p>
               <h1 className="mt-2 max-w-4xl text-5xl font-black uppercase leading-[0.9] tracking-[-0.06em] text-white md:text-7xl">{tournament.name}</h1>
@@ -677,6 +728,12 @@ export default async function TournamentPage
                 {tournament.organizer || "Organizer N/A"} ·{" "}
                 {tournament.location || "Location N/A"} ·{" "}
                 {formatDateRange(tournament.start_date, tournament.end_date)}
+              </p>
+              <p className="mt-3 max-w-4xl text-sm leading-6 text-white/45">
+                {tournamentConfidence.description} PlayRank tournament analytics are
+                independent intelligence signals generated from available tournament,
+                standings, match and player-stat records. They are not official predictions,
+                betting tips or outcome guarantees.
               </p>
             </div>
           </div>

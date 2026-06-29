@@ -3,22 +3,75 @@ import { supabaseAdmin } from "@/lib/supabaseAdmin";
 
 export const dynamic = "force-dynamic";
 
+const JOB_TYPE = "recalculate_rankings";
+const PROVIDER = "playrank_internal";
+const ACTION = "calculate_player_scores";
+const RUNNING_JOB_WINDOW_MINUTES = 30;
+
 function jsonResponse(payload: unknown, status = 200) {
-  return NextResponse.json(payload, { status });
+  return NextResponse.json(payload, {
+    status,
+    headers: {
+      "Cache-Control": "no-store",
+    },
+  });
+}
+
+function getErrorMessage(error: unknown) {
+  if (error instanceof Error) return error.message;
+  return "Unknown server error";
 }
 
 export async function POST() {
   const startedAt = new Date().toISOString();
+  const runningSinceCutoff = new Date(
+    Date.now() - RUNNING_JOB_WINDOW_MINUTES * 60 * 1000
+  ).toISOString();
+
+  const { data: runningJob, error: runningJobError } = await supabaseAdmin
+    .from("api_import_jobs")
+    .select("id, started_at, status")
+    .eq("provider", PROVIDER)
+    .eq("job_type", JOB_TYPE)
+    .eq("status", "running")
+    .gte("started_at", runningSinceCutoff)
+    .order("started_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (runningJobError) {
+    return jsonResponse(
+      {
+        ok: false,
+        error: "Failed to check active ranking recalculation jobs",
+        details: runningJobError.message,
+      },
+      500
+    );
+  }
+
+  if (runningJob) {
+    return jsonResponse(
+      {
+        ok: false,
+        blocked: true,
+        reason: "A ranking recalculation job is already running",
+        running_job_id: runningJob.id,
+        started_at: runningJob.started_at,
+      },
+      409
+    );
+  }
 
   const { data: job, error: jobError } = await supabaseAdmin
     .from("api_import_jobs")
     .insert({
-      provider: "playrank_internal",
-      job_type: "recalculate_rankings",
+      provider: PROVIDER,
+      job_type: JOB_TYPE,
       status: "running",
       started_at: startedAt,
       request_params: {
-        action: "calculate_player_scores",
+        action: ACTION,
       },
     })
     .select("id")
@@ -35,11 +88,56 @@ export async function POST() {
     );
   }
 
-  const { error: scoreError } = await supabaseAdmin.rpc(
-    "calculate_player_scores"
-  );
+  try {
+    const { error: scoreError } = await supabaseAdmin.rpc(ACTION);
 
-  if (scoreError) {
+    if (scoreError) {
+      await supabaseAdmin
+        .from("api_import_jobs")
+        .update({
+          status: "failed",
+          completed_at: new Date().toISOString(),
+          response_summary: {
+            ok: false,
+            action: ACTION,
+          },
+          error_message: scoreError.message,
+        })
+        .eq("id", job.id);
+
+      return jsonResponse(
+        {
+          ok: false,
+          job_id: job.id,
+          error: "Failed to recalculate player scores",
+          details: scoreError.message,
+        },
+        500
+      );
+    }
+
+    await supabaseAdmin
+      .from("api_import_jobs")
+      .update({
+        status: "completed",
+        completed_at: new Date().toISOString(),
+        response_summary: {
+          ok: true,
+          action: ACTION,
+        },
+        error_message: null,
+      })
+      .eq("id", job.id);
+
+    return jsonResponse({
+      ok: true,
+      job_id: job.id,
+      recalculated: true,
+      action: ACTION,
+    });
+  } catch (error) {
+    const message = getErrorMessage(error);
+
     await supabaseAdmin
       .from("api_import_jobs")
       .update({
@@ -47,9 +145,9 @@ export async function POST() {
         completed_at: new Date().toISOString(),
         response_summary: {
           ok: false,
-          action: "calculate_player_scores",
+          action: ACTION,
         },
-        error_message: scoreError.message,
+        error_message: message,
       })
       .eq("id", job.id);
 
@@ -57,30 +155,10 @@ export async function POST() {
       {
         ok: false,
         job_id: job.id,
-        error: "Failed to recalculate player scores",
-        details: scoreError.message,
+        error: "Unexpected ranking recalculation failure",
+        details: message,
       },
       500
     );
   }
-
-  await supabaseAdmin
-    .from("api_import_jobs")
-    .update({
-      status: "completed",
-      completed_at: new Date().toISOString(),
-      response_summary: {
-        ok: true,
-        action: "calculate_player_scores",
-      },
-      error_message: null,
-    })
-    .eq("id", job.id);
-
-  return jsonResponse({
-    ok: true,
-    job_id: job.id,
-    recalculated: true,
-    action: "calculate_player_scores",
-  });
 }

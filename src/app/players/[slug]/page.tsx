@@ -111,6 +111,32 @@ function formatValue(value: unknown, decimals = 0)
   return decimals > 0 ? safe.toFixed(decimals) : Math.round(safe).toString();
 }
 
+function formatDate(value: string | null | undefined) 
+{
+  if (!value) return "Not available";
+
+  return new Date(value).toLocaleDateString
+  ("en-IN", 
+    {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    }
+  );
+}
+
+function getLatestDate(values: Array<string | null | undefined>) 
+{
+  const timestamps = values
+  .filter(Boolean)
+  .map((value) => new Date(value as string).getTime())
+  .filter((value) => Number.isFinite(value));
+
+  if (timestamps.length === 0) return null;
+
+  return new Date(Math.max(...timestamps)).toISOString();
+}
+
 function formatChange(value: number | null | undefined) 
 {
   if (!value) return "—";
@@ -131,6 +157,29 @@ function getSourceLabel(source: string | null | undefined)
   if (source === "pubg_api") return "PUBG API";
   if (source === "admin_manual") return "Admin Verified";
   return source || "PlayRank";
+}
+
+function getPlayerConfidence(totalMatches: number) {
+  if (totalMatches >= 20) 
+  {
+    return {
+      label: "High Confidence",
+      description: "This profile has enough match data for stronger directional analysis.",
+    };
+  }
+
+  if (totalMatches >= 5) 
+  {
+    return {
+      label: "Medium Confidence",
+      description: "This profile has usable match data, but the sample size is still developing.",
+    };
+  }
+
+  return {
+    label: "Low Confidence",
+    description: "This profile has limited match data. Treat analytics as early directional signals.",
+  };
 }
 
 function PlayerAvatar({ ign, role }: { ign: string; role?: string | null }) 
@@ -341,6 +390,9 @@ export default async function PlayerPage
   const teamSourceLabel = player.team?.source === "krafton_india_esports"? "Official Krafton Team" : player.team?.verified? "Verified Team" : "Team Record";
   const playerSource = getSourceLabel(player.source);
   const teamName = player.team?.name || "Free Agent";
+  const latestRankingUpdate = currentRanking?.updated_at || getLatestDate(rankHistory.map((row) => row.snapshot_date)) || getLatestDate(rankHistory.map((row) => row.created_at)) || null;
+  const confidence = getPlayerConfidence(totalMatches);
+
   return (
     <main className="page-shell space-y-6 py-8 text-white">
       <section className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-[#07080c] p-7 shadow-2xl md:p-9">
@@ -361,6 +413,8 @@ export default async function PlayerPage
                  ) : null
                 }
                 <DataSourceBadge label="Ranking Snapshot" />
+                <DataSourceBadge label={confidence.label} />
+                <DataSourceBadge label={`Last Updated: ${formatDate(latestRankingUpdate)}`} />
                 <ActiveBadge active={player.active} />
               </div>
             </div>
@@ -496,8 +550,10 @@ export default async function PlayerPage
             <p className="text-xs font-black uppercase tracking-[0.18em] text-white/35">Data Context</p>
             <p className="mt-2 text-sm leading-6 text-white/45">
               This profile uses normalized PlayRank player, ranking, roster and
-              match records. API-imported stats are only included after
-              promotion safety checks.
+              match records. API-imported stats are only included after promotion
+              safety checks. {confidence.description} PlayRank analytics are
+              independent intelligence signals, not official predictions or outcome
+              guarantees.
             </p>
           </div>
         </section>

@@ -51,6 +51,7 @@ type RankingRow =
   rank: number | null;
   score: number | null;
   change: number | null;
+  updated_at: string | null;
 };
 
 type PlayerMatchStat = 
@@ -66,6 +67,7 @@ type PlayerMatchStat =
   survival_time?: number | null;
   mvp?: boolean | null;
   is_mvp?: boolean | null;
+  created_at?: string | null;
 };
 
 const surface = "relative overflow-hidden rounded-[2rem] border border-white/[0.12] bg-[#080a0f]/95 shadow-[0_24px_80px_rgba(0,0,0,0.45),inset_0_1px_0_rgba(255,255,255,0.06)] backdrop-blur-xl";
@@ -89,10 +91,33 @@ function clamp(value: number, min = 0, max = 100)
   return Math.max(min, Math.min(max, value));
 }
 
-function shortNumber(value: number) 
+function formatDate(value: string | null | undefined) 
 {
-  if (value >= 1000) return `${(value / 1000).toFixed(1)}k`;
-  return Math.round(value).toString();
+  if (!value) return "Not available";
+
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return "Not available";
+  }
+
+  return date.toLocaleDateString("en-IN", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  });
+}
+
+function getLatestDate(values: Array<string | null | undefined>) 
+{
+  const timestamps = values
+    .filter(Boolean)
+    .map((value) => new Date(value as string).getTime())
+    .filter((value) => Number.isFinite(value));
+
+  if (timestamps.length === 0) return null;
+
+  return new Date(Math.max(...timestamps)).toISOString();
 }
 
 function getInitials(name: string) 
@@ -307,6 +332,10 @@ function PlayerCard
   }
 ) 
 {
+  function shortNumber(score: number): string | number {
+    throw new Error("Function not implemented.");
+  }
+
   return (
     <Link href={`/players/${player.slug}`}className="group relative block overflow-hidden rounded-[1.65rem] border border-white/[0.12] bg-gradient-to-br from-white/[0.075] via-white/[0.035] to-transparent p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] transition hover:-translate-y-0.5 hover:border-[#ffd21a]/30 hover:bg-white/[0.07]">
       <div className={`pointer-events-none absolute ${align === "right" ? "-left-16" : "-right-16"} -top-16 h-40 w-40 rounded-full bg-[#ffd21a]/10 blur-3xl opacity-0 transition group-hover:opacity-100`}/>
@@ -612,7 +641,7 @@ export default async function PlayerCompareDynamicPage
     [
       supabase
       .from("rankings")
-      .select("entity_id, rank, score, change")
+      .select("entity_id, rank, score, change, updated_at")
       .eq("entity_type", "player")
       .in("entity_id", [firstPlayer.id, secondPlayer.id]),
 
@@ -664,6 +693,15 @@ export default async function PlayerCompareDynamicPage
   const edgeMagnitude = Math.abs(Math.round(edgeScore));
   const sampleSize = firstRecentStats.length + secondRecentStats.length + firstMatches + secondMatches;
   const confidence = getConfidence(sampleSize);
+  const latestCompareUpdate = getLatestDate
+  (
+    [
+      rank1?.updated_at,
+      rank2?.updated_at,
+      ...firstRecentStats.map((row) => row.created_at),
+      ...secondRecentStats.map((row) => row.created_at),
+    ]
+  );
   const maxScore = Math.max(firstScore, secondScore, 1);
   const maxKills = Math.max(firstKills, secondKills, 1);
   const maxDamage = Math.max(firstDamage, secondDamage, 1);
@@ -706,6 +744,8 @@ export default async function PlayerCompareDynamicPage
               <DataSourceBadge label="Ranking Snapshot" size="md" />
               <DataSourceBadge label="Duel Intelligence" size="md" />
               <DataSourceBadge label="Analytics Generated" size="md" />
+              <DataSourceBadge label={confidence.label} size="md" />
+              <DataSourceBadge label={`Last Updated: ${formatDate(latestCompareUpdate)}`} size="md" />
             </div>
             <p className="text-xs font-black uppercase tracking-[0.28em] text-[#ffd21a]">Player Duel Analyzer</p>
             <h1 className="mt-2 text-4xl font-black uppercase leading-[0.95] tracking-[-0.06em] text-white md:text-6xl">
@@ -715,7 +755,9 @@ export default async function PlayerCompareDynamicPage
             </h1>
             <p className="mt-3 max-w-3xl text-sm leading-6 text-white/45">
               Player comparison uses player records, ranking snapshots, team
-              context, match-stat samples and PlayRank analytics.
+              context, match-stat samples and PlayRank analytics. {confidence.note}
+              PlayRank duel reads are independent intelligence signals, not official
+              predictions or outcome guarantees.
             </p>
           </div>
           <div className="flex flex-wrap gap-3">

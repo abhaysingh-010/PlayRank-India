@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import GlobalSearch from "@/components/GlobalSearch";
@@ -11,7 +12,7 @@ const links = [
   { label: "Tournaments", href: "/tournaments" },
   { label: "Rankings", href: "/rankings" },
   { label: "Compare", href: "/compare" },
-  {label: "About", href: "/about",},
+  { label: "About", href: "/about" },
   { label: "Data", href: "/data" },
 ];
 
@@ -23,9 +24,12 @@ export default function Navbar() {
     <header className="sticky top-0 z-[9999] border-b border-white/10 bg-black/90 backdrop-blur-xl">
       <div className="mx-auto flex h-[82px] max-w-[1600px] items-center justify-between px-7 md:px-14">
         <Link href="/" className="flex shrink-0 items-center">
-          <img
+          <Image
             src="/brand/playrank-logo.png"
             alt="PlayRank"
+            width={180}
+            height={40}
+            priority
             className="h-9 w-auto object-contain"
           />
         </Link>

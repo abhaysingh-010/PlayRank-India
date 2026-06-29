@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import DataSourceBadge from "@/components/DataSourceBadge";
@@ -44,6 +45,18 @@ type PlayerRow = {
   verified?: boolean | null;
   active?: boolean | null;
 };
+
+function getLatestDate(values: Array<string | null | undefined>) 
+{
+  const timestamps = values
+    .filter(Boolean)
+    .map((value) => new Date(value as string).getTime())
+    .filter((value) => Number.isFinite(value));
+
+  if (timestamps.length === 0) return null;
+
+  return new Date(Math.max(...timestamps)).toISOString();
+}
 
 type TrustCard = {
   label: string;
@@ -109,11 +122,7 @@ function TeamLogo({
     >
       {logoUrl ? (
         // eslint-disable-next-line @next/next/no-img-element
-        <img
-          src={logoUrl}
-          alt={`${name} logo`}
-          className="h-full w-full object-contain p-2"
-        />
+        <Image src={logoUrl} alt={`${name} logo`} width={64} height={64} sizes={size === "lg" ? "64px" : size === "sm" ? "40px" : "48px"} className="h-full w-full object-contain p-2"/>
       ) : (
         <span className="text-sm font-black text-white/70">
           {getInitials(name)}
@@ -287,11 +296,7 @@ export default async function RankingsPage() {
 
   const topThreeTeams = rankedTeams.slice(0, 3);
 
-  const latestTeamUpdate =
-    teamRankings[0]?.updated_at ||
-    latestSnapshotResult.data?.snapshot_date ||
-    latestSnapshotResult.data?.created_at ||
-    null;
+  const latestTeamUpdate = teamRankings[0]?.updated_at || latestSnapshotResult.data?.snapshot_date || latestSnapshotResult.data?.created_at || null;
 
   const latestPlayerUpdate =
     playerRankings[0]?.updated_at ||
@@ -480,11 +485,7 @@ export default async function RankingsPage() {
             </h2>
 
             <div className="mt-3">
-              <DataSourceBadge
-                source="krafton_india_esports"
-                label="Official Krafton Ranking"
-                verified
-              />
+              <DataSourceBadge label="Official + PlayRank Verified Layer" />
             </div>
           </div>
 
@@ -575,11 +576,7 @@ export default async function RankingsPage() {
         <div className="flex flex-col gap-4 border-b border-white/10 p-6 md:flex-row md:items-end md:justify-between">
           <div>
             <div className="flex flex-wrap gap-2">
-              <DataSourceBadge
-                source="krafton_india_esports"
-                label="Official Krafton Ranking"
-                verified
-              />
+              <DataSourceBadge label="Official + PlayRank Verified Layer" />
               <DataSourceBadge label="Ranking Snapshot" />
               <DataSourceBadge label={`Last Updated: ${formatDate(latestTeamUpdate)}`} />
             </div>

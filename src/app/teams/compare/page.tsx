@@ -21,16 +21,10 @@ type TeamOption = {
   active: boolean | null;
 };
 
-const surface =
-  "relative overflow-hidden rounded-[2rem] border border-white/[0.12] bg-[#080a0f]/95 shadow-[0_24px_80px_rgba(0,0,0,0.45),inset_0_1px_0_rgba(255,255,255,0.06)] backdrop-blur-xl";
+const surface = "relative overflow-hidden rounded-[2rem] border border-white/[0.12] bg-[#080a0f]/95 shadow-[0_24px_80px_rgba(0,0,0,0.45),inset_0_1px_0_rgba(255,255,255,0.06)] backdrop-blur-xl";
 
-const panel =
-  "rounded-[1.35rem] border border-white/[0.10] bg-white/[0.035] shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]";
+const panel = "rounded-[1.35rem] border border-white/[0.10] bg-white/[0.035] shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]";
 
-function n(value: unknown, fallback = 0) {
-  const numberValue = Number(value);
-  return Number.isFinite(numberValue) ? numberValue : fallback;
-}
 
 function getInitials(name: string) {
   return name
@@ -60,12 +54,6 @@ function rankTone(rank: number | null | undefined) {
   if (rank <= 10) return "border-emerald-400/25 bg-emerald-400/10 text-emerald-300";
 
   return "border-white/10 bg-white/[0.04] text-white/70";
-}
-
-function getTeamBadgeLabel(team: TeamOption) {
-  if (team.source === "krafton_india_esports") return "Official Krafton Team";
-  if (team.verified) return "Verified Team";
-  return "Team Record";
 }
 
 function TeamLogo({
