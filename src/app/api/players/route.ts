@@ -31,7 +31,12 @@ type PlayerRow = {
 };
 
 function jsonResponse(payload: unknown, status = 200) {
-  return NextResponse.json(payload, { status });
+  return NextResponse.json(payload, {
+    status,
+    headers: {
+      "Cache-Control": "no-store",
+    },
+  });
 }
 
 function parseLimit(value: string | null) {
@@ -60,7 +65,6 @@ export async function GET(request: NextRequest) {
       {
         ok: false,
         error: "Failed to load player rankings",
-        details: rankingsError.message,
       },
       500
     );
@@ -78,14 +82,14 @@ export async function GET(request: NextRequest) {
     .select(
       "id, ign, slug, country, role, team_id, kd_ratio, avg_damage, win_rate, matches_played, total_kills, mvp_count, recent_form, source, verified, active"
     )
-    .in("id", ids);
+    .in("id", ids)
+    .eq("active", true);
 
   if (playersError) {
     return jsonResponse(
       {
         ok: false,
         error: "Failed to load player records",
-        details: playersError.message,
       },
       500
     );
@@ -94,10 +98,20 @@ export async function GET(request: NextRequest) {
   const players = (playersRaw || []) as PlayerRow[];
   const playerById = new Map(players.map((player) => [player.id, player]));
 
-  const finalData = rankings.map((ranking) => ({
-    ...ranking,
-    player: playerById.get(ranking.entity_id) || null,
-  }));
+  const finalData = rankings
+    .map((ranking) => {
+      const player = playerById.get(ranking.entity_id);
+
+      if (!player) {
+        return null;
+      }
+
+      return {
+        ...ranking,
+        player,
+      };
+    })
+    .filter(Boolean);
 
   return jsonResponse(finalData);
 }

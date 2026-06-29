@@ -30,11 +30,20 @@ type SearchResult =
   | (TournamentSearchRow & { type: SearchType });
 
 function jsonResponse(payload: unknown, status = 200) {
-  return NextResponse.json(payload, { status });
+  return NextResponse.json(payload, {
+    status,
+    headers: {
+      "Cache-Control": "no-store",
+    },
+  });
 }
 
 function cleanQuery(value: string | null) {
-  return (value || "").trim().replace(/\s+/g, " ").slice(0, 60);
+  return (value || "")
+    .trim()
+    .replace(/\s+/g, " ")
+    .replace(/[%_]/g, "")
+    .slice(0, 60);
 }
 
 function parseLimit(value: string | null) {
@@ -56,38 +65,39 @@ export async function GET(request: NextRequest) {
     return jsonResponse([]);
   }
 
+  const searchPattern = `%${q}%`;
+
   const [playersResult, teamsResult, tournamentsResult] = await Promise.all([
     supabase
       .from("players")
       .select("id, ign, slug, country")
-      .ilike("ign", `%${q}%`)
+      .eq("active", true)
+      .ilike("ign", searchPattern)
       .limit(limit),
 
     supabase
       .from("teams")
       .select("id, name, slug, country")
-      .ilike("name", `%${q}%`)
+      .eq("active", true)
+      .ilike("name", searchPattern)
       .limit(limit),
 
     supabase
       .from("tournaments")
       .select("id, name, slug, status")
-      .ilike("name", `%${q}%`)
+      .eq("active", true)
+      .ilike("name", searchPattern)
       .limit(limit),
   ]);
 
-  const errors = [
-    playersResult.error?.message,
-    teamsResult.error?.message,
-    tournamentsResult.error?.message,
-  ].filter(Boolean);
+  const hasError =
+    playersResult.error || teamsResult.error || tournamentsResult.error;
 
-  if (errors.length > 0) {
+  if (hasError) {
     return jsonResponse(
       {
         ok: false,
         error: "Failed to run search",
-        details: errors,
       },
       500
     );
