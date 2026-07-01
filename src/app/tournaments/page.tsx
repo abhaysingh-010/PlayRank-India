@@ -1,6 +1,7 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import DataSourceBadge from "@/components/DataSourceBadge";
+import PublicTrustNotice from "@/components/PublicTrustNotice";
 
 type TournamentRow = {
   id: string;
@@ -39,10 +40,10 @@ function formatPrizePool(value: unknown) {
   const amount = n(value);
 
   if (!amount) return "TBD";
-  if (amount >= 10000000) return `₹${(amount / 10000000).toFixed(1)}Cr`;
-  if (amount >= 100000) return `₹${(amount / 100000).toFixed(1)}L`;
+  if (amount >= 10000000) return `â‚¹${(amount / 10000000).toFixed(1)}Cr`;
+  if (amount >= 100000) return `â‚¹${(amount / 100000).toFixed(1)}L`;
 
-  return `₹${amount.toLocaleString("en-IN")}`;
+  return `â‚¹${amount.toLocaleString("en-IN")}`;
 }
 
 function formatDate(value: string | null | undefined) {
@@ -231,7 +232,7 @@ function TournamentCard({
 
         <div className="mt-5 grid grid-cols-4 gap-4 border-y border-white/10 py-4">
           <MiniStat label="Prize" value={formatPrizePool(tournament.prize_pool)} />
-          <MiniStat label="Teams" value={tournament.participating_teams || "—"} />
+          <MiniStat label="Teams" value={tournament.participating_teams || "â€”"} />
           <MiniStat label="Matches" value={matchCount} />
           <MiniStat label="Rows" value={standingCount} />
         </div>
@@ -367,6 +368,8 @@ export default async function TournamentsPage() {
         </div>
       </section>
 
+      <PublicTrustNotice variant="tournaments" />
+
       <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
         <Metric label="Events" value={tournaments.length} />
         <Metric label="Live" value={liveTournaments} />
@@ -422,3 +425,4 @@ export default async function TournamentsPage() {
     </main>
   );
 }
+

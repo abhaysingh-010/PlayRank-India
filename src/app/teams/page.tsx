@@ -1,6 +1,7 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import DataSourceBadge from "@/components/DataSourceBadge";
+import PublicTrustNotice from "@/components/PublicTrustNotice";
 
 type RankingRow = {
   entity_id: string;
@@ -61,7 +62,7 @@ function formatDate(value: string | null | undefined) {
 }
 
 function formatChange(value: number | null) {
-  if (!value) return "—";
+  if (!value) return "â€”";
   if (value > 0) return `+${value}`;
   return String(value);
 }
@@ -348,6 +349,8 @@ export default async function TeamsPage({
           </div>
         </div>
       </section>
+
+      <PublicTrustNotice variant="teams" />
 
       <section className="space-y-5">
         <div className="flex items-end justify-between gap-4">
@@ -658,3 +661,4 @@ export default async function TeamsPage({
     </main>
   );
 }
+

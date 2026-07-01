@@ -1,8 +1,9 @@
-
+﻿
 import Image from "next/image";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import DataSourceBadge from "@/components/DataSourceBadge";
+import PublicTrustNotice from "@/components/PublicTrustNotice";
 
 type TeamMini = 
 {
@@ -225,7 +226,7 @@ function MatchResultPreview
         ((row) => 
           (
             <div key={`${row.match_id}-${row.team_id}`}className="grid grid-cols-[auto_minmax(0,1fr)_auto_auto] items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.035] px-4 py-3">
-              <span className="rounded-full border border-[#ffd21a]/25 bg-[#ffd21a]/10 px-2.5 py-1 text-xs font-black text-[#ffd21a]">#{row.placement ?? "—"}</span>
+              <span className="rounded-full border border-[#ffd21a]/25 bg-[#ffd21a]/10 px-2.5 py-1 text-xs font-black text-[#ffd21a]">#{row.placement ?? "â€”"}</span>
               <div className="flex min-w-0 items-center gap-3">
                 <div className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-white/10 bg-white/[0.04]">
                   {row.team?.logo_url ? 
@@ -331,7 +332,7 @@ function MatchCard
             <p className="text-xs uppercase tracking-[0.2em] text-white/30">Winner</p>
               <p className="mt-1 font-black text-[#ffd21a]">{match.winner?.name || resultRows.find((row) => row.placement === 1)?.team?.name || "Pending"}</p>
             </div>
-            <Link href={`/match/${match.id}`}className="text-sm font-black text-white/45 transition hover:text-[#ffd21a]">View match →</Link>
+            <Link href={`/match/${match.id}`}className="text-sm font-black text-white/45 transition hover:text-[#ffd21a]">View match â†’</Link>
           </div>
         </div>
       </article>
@@ -513,13 +514,15 @@ function MatchCard
             </div>
           </div>
         </section>
+      <PublicTrustNotice variant="matches" />
+
         <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-6">
           <Metric label="Matches" value={matches.length} />
           <Metric label="Completed" value={completedMatches} />
           <Metric label="Verified" value={verifiedMatches} />
           <Metric label="PUBG API" value={pubgApiMatches} />
-          <Metric label="Maps" value={totalMaps || "—"} muted />
-          <Metric label="Stages" value={totalStages || "—"} muted />
+          <Metric label="Maps" value={totalMaps || "â€”"} muted />
+          <Metric label="Stages" value={totalStages || "â€”"} muted />
         </section>
         <section className={card + " p-6"}>
           <div className="mb-5 flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
@@ -560,3 +563,4 @@ function MatchCard
       </main>
     );
   }
+
