@@ -1,7 +1,8 @@
-import Image from "next/image";
+﻿import Image from "next/image";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import DataSourceBadge from "@/components/DataSourceBadge";
+import RankingExplanationPanel from "@/components/RankingExplanationPanel";
 
 type RankingRow = {
   id: string;
@@ -67,7 +68,7 @@ function getLatestDate(values: Array<string | null | undefined>)
 }
 
 function formatChange(value: number | null) {
-  if (!value) return "—";
+  if (!value) return "â€”";
   if (value > 0) return `+${value}`;
 
   return String(value);
@@ -214,6 +215,8 @@ export default async function TeamRankingsPage() {
           </div>
         </div>
       </section>
+      <RankingExplanationPanel variant="team" lastUpdatedLabel={formatDate(latestRankingUpdate)} />
+
       <section className="rounded-[2rem] border border-red-400/20 bg-red-400/[0.06] p-6">
         <div className="flex flex-wrap gap-2">
           <DataSourceBadge label="Independent Platform" />

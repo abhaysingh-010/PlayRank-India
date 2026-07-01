@@ -1,7 +1,8 @@
-import Image from "next/image";
+﻿import Image from "next/image";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import DataSourceBadge from "@/components/DataSourceBadge";
+import RankingExplanationPanel from "@/components/RankingExplanationPanel";
 
 type RankingRow = {
   entity_id: string;
@@ -79,7 +80,7 @@ function formatDate(value: string | null) {
 }
 
 function formatChange(value: number | null) {
-  if (!value) return "—";
+  if (!value) return "â€”";
   if (value > 0) return `+${value}`;
 
   return String(value);
@@ -433,6 +434,8 @@ export default async function RankingsPage() {
           </div>
         </div>
       </section>
+
+      <RankingExplanationPanel variant="overview" lastUpdatedLabel={formatDate(latestGlobalSnapshot)} />
 
       <section className="rounded-[2rem] border border-red-400/20 bg-red-400/[0.06] p-6">
         <div className="flex flex-wrap gap-2">
@@ -790,7 +793,7 @@ export default async function RankingsPage() {
                     </td>
 
                     <td className="px-6 py-5 text-white/60">
-                      {player.role || "—"}
+                      {player.role || "â€”"}
                     </td>
 
                     <td className="px-6 py-5 text-right font-black text-white">
