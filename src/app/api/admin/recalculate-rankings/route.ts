@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+﻿import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
 
 export const dynamic = "force-dynamic";
@@ -37,6 +37,20 @@ async function markJobFailed(jobId: string, message: string) {
     .eq("id", jobId);
 }
 
+function methodNotAllowed() {
+  return jsonResponse(
+    {
+      ok: false,
+      error: "Method not allowed",
+      allowed_methods: ["POST"],
+    },
+    405
+  );
+}
+
+export async function GET() {
+  return methodNotAllowed();
+}
 export async function POST() {
   const startedAt = new Date().toISOString();
   const runningSinceCutoff = new Date(
@@ -151,3 +165,4 @@ export async function POST() {
     );
   }
 }
+

@@ -38,8 +38,10 @@ function getAdminCredentials() {
   const env = parseEnvFile(path.resolve(process.cwd(), '.env'));
 
   return {
-    username: process.env.ADMIN_USERNAME ?? envLocal.ADMIN_USERNAME ?? env.ADMIN_USERNAME,
-    password: process.env.ADMIN_PASSWORD ?? envLocal.ADMIN_PASSWORD ?? env.ADMIN_PASSWORD,
+    username:
+      process.env.ADMIN_USERNAME ?? envLocal.ADMIN_USERNAME ?? env.ADMIN_USERNAME,
+    password:
+      process.env.ADMIN_PASSWORD ?? envLocal.ADMIN_PASSWORD ?? env.ADMIN_PASSWORD,
   };
 }
 
@@ -75,6 +77,15 @@ test.describe('admin API safety regression tests', () => {
     });
 
     expect(response.status()).toBe(405);
+    expect(response.headers()['cache-control']).toContain('no-store');
+
+    const data = await response.json();
+
+    expect(data).toEqual({
+      ok: false,
+      error: 'Method not allowed',
+      allowed_methods: ['POST'],
+    });
   });
 
   test('GET /api/admin/pubg/promote-match is method-safe', async ({ request }) => {
@@ -83,6 +94,15 @@ test.describe('admin API safety regression tests', () => {
     });
 
     expect(response.status()).toBe(405);
+    expect(response.headers()['cache-control']).toContain('no-store');
+
+    const data = await response.json();
+
+    expect(data).toEqual({
+      ok: false,
+      error: 'Method not allowed',
+      allowed_methods: ['POST'],
+    });
   });
 
   test('GET /api/admin/recalculate-rankings is method-safe', async ({ request }) => {
@@ -91,6 +111,15 @@ test.describe('admin API safety regression tests', () => {
     });
 
     expect(response.status()).toBe(405);
+    expect(response.headers()['cache-control']).toContain('no-store');
+
+    const data = await response.json();
+
+    expect(data).toEqual({
+      ok: false,
+      error: 'Method not allowed',
+      allowed_methods: ['POST'],
+    });
   });
 
   test('/api/admin/pubg/promotion-readiness supports safe read access', async ({ request }) => {
@@ -99,10 +128,26 @@ test.describe('admin API safety regression tests', () => {
     });
 
     expect(response.status()).toBe(200);
+    expect(response.headers()['cache-control']).toContain('no-store');
 
     const data = await response.json();
 
-    expect(data).toBeTruthy();
+    expect(data.ok).toBe(true);
+    expect(data.filters).toBeTruthy();
+    expect(data.filters.status).toBe('all');
+    expect(data.filters.limit).toBeGreaterThan(0);
+    expect(Array.isArray(data.filters.supported_status_filters)).toBe(true);
+    expect(data.filters.supported_status_filters).toContain('all');
+    expect(data.filters.supported_status_filters).toContain('ready');
+    expect(data.filters.supported_status_filters).toContain('blocked');
+
+    expect(data.summary).toBeTruthy();
+    expect(typeof data.summary.returned_matches).toBe('number');
+    expect(typeof data.summary.ready_for_promotion).toBe('number');
+    expect(typeof data.summary.blocked).toBe('number');
+    expect(typeof data.summary.status_breakdown).toBe('object');
+
+    expect(Array.isArray(data.matches)).toBe(true);
   });
 
   test('/api/admin/pubg/promotion-readiness rejects invalid status filter', async ({ request }) => {
@@ -111,10 +156,13 @@ test.describe('admin API safety regression tests', () => {
     });
 
     expect(response.status()).toBe(400);
+    expect(response.headers()['cache-control']).toContain('no-store');
 
     const data = await response.json();
 
     expect(data.ok).toBe(false);
+    expect(data.error).toBe('Invalid status filter');
+    expect(Array.isArray(data.supported_status_filters)).toBe(true);
   });
 
   test('/api/admin/rosters/health supports safe read access', async ({ request }) => {
@@ -123,10 +171,27 @@ test.describe('admin API safety regression tests', () => {
     });
 
     expect(response.status()).toBe(200);
+    expect(response.headers()['cache-control']).toContain('no-store');
 
     const data = await response.json();
 
-    expect(data).toBeTruthy();
+    expect(data.ok).toBe(true);
+    expect(data.filters).toBeTruthy();
+    expect(data.filters.status).toBe('all');
+    expect(data.filters.limit).toBeGreaterThan(0);
+    expect(Array.isArray(data.filters.supported_status_filters)).toBe(true);
+    expect(data.filters.supported_status_filters).toContain('all');
+    expect(data.filters.supported_status_filters).toContain('healthy');
+    expect(data.filters.supported_status_filters).toContain('blocked');
+
+    expect(data.summary).toBeTruthy();
+    expect(typeof data.summary.returned_players).toBe('number');
+    expect(typeof data.summary.healthy).toBe('number');
+    expect(typeof data.summary.promotion_safe).toBe('number');
+    expect(typeof data.summary.blocked).toBe('number');
+    expect(typeof data.summary.issues).toBe('number');
+
+    expect(Array.isArray(data.rows)).toBe(true);
   });
 
   test('/api/admin/rosters/health rejects invalid status filter', async ({ request }) => {
@@ -135,9 +200,13 @@ test.describe('admin API safety regression tests', () => {
     });
 
     expect(response.status()).toBe(400);
+    expect(response.headers()['cache-control']).toContain('no-store');
 
     const data = await response.json();
 
     expect(data.ok).toBe(false);
+    expect(data.error).toBe('Invalid status filter');
+    expect(Array.isArray(data.supported_status_filters)).toBe(true);
   });
 });
+
