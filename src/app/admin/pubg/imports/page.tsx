@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import DataSourceBadge from "@/components/DataSourceBadge";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
 
@@ -145,8 +145,10 @@ function getBlockCopy(row: ReadinessRow): BlockCopy {
       title: "Unmapped PUBG Players",
       description:
         "PUBG account IDs must be mapped to verified PlayRank player records before this match can move into core data.",
-      actionLabel: "Open Mappings",
-      actionHref: "/admin/pubg/mappings",
+      actionLabel: "Open Match Mappings",
+      actionHref: `/admin/pubg/mappings?match=${encodeURIComponent(
+        row.external_match_id
+      )}`,
       tone: "warning",
     };
   }
@@ -810,3 +812,5 @@ export default async function PubgImportsPage() {
     </main>
   );
 }
+
+

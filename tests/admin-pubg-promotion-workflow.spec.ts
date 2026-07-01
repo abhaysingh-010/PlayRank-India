@@ -36,3 +36,26 @@ test.describe('admin PUBG mappings workflow coverage', () => {
     expect(source).not.toContain('py-3text-sm');
   });
 });
+
+test.describe('admin PUBG import detail workflow coverage', () => {
+  test('/admin/pubg/imports/[external_match_id] exposes direct workflow actions in source', async () => {
+    const source = fs.readFileSync('src/app/admin/pubg/imports/[external_match_id]/page.tsx', 'utf8');
+
+    expect(source).toContain('function getMatchMappingsHref');
+    expect(source).toContain('/admin/pubg/mappings?match=');
+    expect(source).toContain('function getPromotionReadinessHref');
+    expect(source).toContain('/api/admin/pubg/promotion-readiness?status=');
+    expect(source).toContain('Fix Match Mappings');
+    expect(source).toContain('Readiness Status');
+    expect(source).toContain('/admin/data-health/pubg-blocked-promotions');
+  });
+
+  test('/admin/pubg/imports carries match context into mapping actions in source', async () => {
+    const source = fs.readFileSync('src/app/admin/pubg/imports/page.tsx', 'utf8');
+
+    expect(source).toContain('Open Match Mappings');
+    expect(source).toContain('/admin/pubg/mappings?match=');
+    expect(source).toContain('encodeURIComponent(');
+    expect(source).toContain('row.external_match_id');
+  });
+});

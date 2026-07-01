@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import { supabaseAdmin } from "../../../../../lib/supabaseAdmin";
 
 export const dynamic = "force-dynamic";
@@ -12,14 +12,14 @@ type PageProps = {
 type AnyRecord = Record<string, unknown>;
 
 function valueToText(value: unknown) {
-  if (value === null || value === undefined) return "—";
+  if (value === null || value === undefined) return "â€”";
   if (typeof value === "string") return value;
   if (typeof value === "number" || typeof value === "boolean") return String(value);
   return JSON.stringify(value);
 }
 
 function getField(row: AnyRecord | null | undefined, keys: string[]) {
-  if (!row) return "—";
+  if (!row) return "â€”";
 
   for (const key of keys) {
     const value = row[key];
@@ -28,9 +28,23 @@ function getField(row: AnyRecord | null | undefined, keys: string[]) {
     }
   }
 
-  return "—";
+  return "â€”";
 }
 
+function getMatchMappingsHref(externalMatchId: string) {
+  return `/admin/pubg/mappings?match=${encodeURIComponent(externalMatchId)}`;
+}
+
+function getPromotionReadinessHref(readiness: AnyRecord | null) {
+  const status =
+    typeof readiness?.promotion_status === "string"
+      ? readiness.promotion_status
+      : "blocked";
+
+  return `/api/admin/pubg/promotion-readiness?status=${encodeURIComponent(
+    status
+  )}`;
+}
 function StatusBadge({
   status,
 }: {
@@ -154,7 +168,7 @@ export default async function PubgImportDetailPage({ params }: PageProps) {
               href="/admin/pubg/imports"
               className="text-sm font-medium text-red-400 hover:text-red-300"
             >
-              ← Back to PUBG imports
+              â† Back to PUBG imports
             </Link>
 
             <h1 className="mt-4 text-3xl font-black tracking-tight md:text-5xl">
@@ -180,6 +194,29 @@ export default async function PubgImportDetailPage({ params }: PageProps) {
           PUBG core promotion is intentionally disabled until SQL safety is
           audited. This page is read-only and should not write to core
           PlayRank tables.
+        </div>
+
+        <div className="mb-6 flex flex-wrap gap-3 rounded-2xl border border-white/10 bg-zinc-950 p-5">
+          <Link
+            href={getMatchMappingsHref(externalMatchId)}
+            className="rounded-full border border-[#ffd21a]/30 bg-[#ffd21a]/10 px-5 py-2.5 text-sm font-black text-[#ffd21a] transition hover:bg-[#ffd21a]/15"
+          >
+            Fix Match Mappings
+          </Link>
+
+          <Link
+            href={getPromotionReadinessHref(readiness)}
+            className="rounded-full border border-white/10 bg-white/[0.04] px-5 py-2.5 text-sm font-black text-white/65 transition hover:border-white/25 hover:text-white"
+          >
+            Readiness Status
+          </Link>
+
+          <Link
+            href="/admin/data-health/pubg-blocked-promotions"
+            className="rounded-full border border-white/10 bg-white/[0.04] px-5 py-2.5 text-sm font-black text-white/65 transition hover:border-white/25 hover:text-white"
+          >
+            Blocked Promotions
+          </Link>
         </div>
 
         {errors.length > 0 ? (
@@ -298,3 +335,5 @@ export default async function PubgImportDetailPage({ params }: PageProps) {
     </main>
   );
 }
+
+
