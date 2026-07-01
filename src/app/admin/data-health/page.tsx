@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import DataSourceBadge from "@/components/DataSourceBadge";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
 
@@ -161,7 +161,7 @@ function SectionHeader({
           href={actionHref}
           className="w-fit text-sm font-black text-white/40 transition hover:text-[#ffd21a]"
         >
-          {actionLabel} →
+          {actionLabel} â†’
         </Link>
       ) : null}
     </div>
@@ -292,8 +292,8 @@ function PubgReadinessPanel({
               </p>
 
               <p className="mt-2 text-sm text-white/45">
-                {latest.map_name || "Unknown map"} ·{" "}
-                {latest.game_mode || "Unknown mode"} · {latest.shard}
+                {latest.map_name || "Unknown map"} Â·{" "}
+                {latest.game_mode || "Unknown mode"} Â· {latest.shard}
               </p>
             </div>
 
@@ -565,7 +565,7 @@ export default async function DataHealthPage() {
       value: missingTeamSlugCount,
       status: missingTeamSlugCount === 0 ? "healthy" : "danger",
       description:"Teams without slugs break team profile URLs.",
-      href: "/teams/admin/data-health/missing-slugs",
+      href: "/admin/data-health/missing-slugs",
     },
     {
       label: "Players Without Team",
