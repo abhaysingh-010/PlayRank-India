@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
 import DataSourceBadge from "@/components/DataSourceBadge";
 
@@ -55,6 +55,13 @@ function formatStatus(value: string | null) {
     .replace(/\b\w/g, (letter) => letter.toUpperCase());
 }
 
+function getPromotionReadinessHref(status: string | null) {
+  if (!status) {
+    return "/api/admin/pubg/promotion-readiness?status=blocked";
+  }
+
+  return `/api/admin/pubg/promotion-readiness?status=${encodeURIComponent(status)}`;
+}
 function getBlockReason(row: PromotionReadinessRow) {
   if (n(row.ai_participants) > 0) {
     return "Contains AI/public participants";
@@ -303,7 +310,7 @@ export default async function PubgBlockedPromotionsPage() {
                           {row.map_name || "Unknown Map"}
                         </p>
                         <p className="mt-1 text-xs uppercase tracking-[0.16em] text-white/35">
-                          {row.game_mode || "mode"} · {row.shard || "shard"}
+                          {row.game_mode || "mode"} Â· {row.shard || "shard"}
                         </p>
                       </td>
 
@@ -350,13 +357,20 @@ export default async function PubgBlockedPromotionsPage() {
                             Review import
                           </Link>
 
-                          <Link
+                                                    <Link
                             href={`/admin/pubg/mappings?match=${encodeURIComponent(
                               row.external_match_id
                             )}`}
                             className="rounded-full border border-white/10 bg-white/[0.04] px-4 py-2 text-sm text-white/60 transition hover:border-[#ffd21a]/30 hover:text-[#ffd21a]"
                           >
                             Fix mappings
+                          </Link>
+
+                          <Link
+                            href={getPromotionReadinessHref(row.promotion_status)}
+                            className="rounded-full border border-[#ffd21a]/20 bg-[#ffd21a]/10 px-4 py-2 text-sm font-bold text-[#ffd21a] transition hover:bg-[#ffd21a]/15"
+                          >
+                            Readiness filter
                           </Link>
                         </div>
                       </td>
@@ -382,3 +396,4 @@ export default async function PubgBlockedPromotionsPage() {
     </main>
   );
 }
+
