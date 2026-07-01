@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import DataSourceBadge from "@/components/DataSourceBadge";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
 
@@ -130,7 +130,7 @@ function SectionHeader({
           href={actionHref}
           className="w-fit text-sm font-black text-white/40 transition hover:text-[#ffd21a]"
         >
-          {actionLabel} →
+          {actionLabel} â†’
         </Link>
       ) : null}
     </div>
@@ -297,9 +297,18 @@ export default async function AdminRosterHealthPage({
       );
     }
 
+    if (
+      selectedStatus === "no_team_no_active_roster" ||
+      selectedStatus === "player_has_team_but_no_active_roster" ||
+      selectedStatus === "active_roster_but_player_team_missing" ||
+      selectedStatus === "player_team_roster_mismatch" ||
+      selectedStatus === "multiple_active_rosters"
+    ) {
+      return row.health_status === selectedStatus;
+    }
+
     return true;
   });
-
   const filters = [
     { label: "All", value: "all" },
     { label: "Issues", value: "issues" },
@@ -307,6 +316,11 @@ export default async function AdminRosterHealthPage({
     { label: "Promotion Safe", value: "safe" },
     { label: "Blocked", value: "blocked" },
     { label: "Healthy", value: "healthy" },
+    { label: "No Team / No Roster", value: "no_team_no_active_roster" },
+    { label: "Team / No Roster", value: "player_has_team_but_no_active_roster" },
+    { label: "Roster / Team Missing", value: "active_roster_but_player_team_missing" },
+    { label: "Team/Roster Mismatch", value: "player_team_roster_mismatch" },
+    { label: "Multiple Active Rosters", value: "multiple_active_rosters" },
   ];
 
   return (
@@ -495,3 +509,4 @@ export default async function AdminRosterHealthPage({
     </main>
   );
 }
+
