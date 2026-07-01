@@ -1,9 +1,10 @@
 ﻿import Link from "next/link";
+import DataFreshnessBadge from "@/components/DataFreshnessBadge";
 import DataSourceBadge from "@/components/DataSourceBadge";
 
 type RankingExplanationPanelProps = {
   variant: "overview" | "team" | "player";
-  lastUpdatedLabel?: string;
+  lastUpdatedValue?: string | null;
 };
 
 const copy = {
@@ -56,7 +57,7 @@ const copy = {
 
 export default function RankingExplanationPanel({
   variant,
-  lastUpdatedLabel,
+  lastUpdatedValue,
 }: RankingExplanationPanelProps) {
   const item = copy[variant];
 
@@ -66,9 +67,10 @@ export default function RankingExplanationPanel({
         <DataSourceBadge label="Score Explained" />
         <DataSourceBadge label="Freshness Aware" />
         <DataSourceBadge label="Confidence Context" />
-        {lastUpdatedLabel ? (
-          <DataSourceBadge label={`Updated: ${lastUpdatedLabel}`} />
-        ) : null}
+        <DataFreshnessBadge
+          value={lastUpdatedValue}
+          label="Ranking Freshness"
+        />
       </div>
 
       <div className="mt-5 grid gap-6 lg:grid-cols-[1.1fr_1.4fr] lg:items-start">
@@ -98,9 +100,11 @@ export default function RankingExplanationPanel({
             <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/35">
               Score
             </p>
+
             <h3 className="mt-3 text-lg font-black text-white">
               {item.scoreTitle}
             </h3>
+
             <p className="mt-3 text-sm leading-6 text-white/50">
               {item.scoreText}
             </p>
@@ -110,9 +114,11 @@ export default function RankingExplanationPanel({
             <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/35">
               Source
             </p>
+
             <h3 className="mt-3 text-lg font-black text-white">
               {item.sourceTitle}
             </h3>
+
             <p className="mt-3 text-sm leading-6 text-white/50">
               {item.sourceText}
             </p>
@@ -122,9 +128,11 @@ export default function RankingExplanationPanel({
             <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/35">
               Limit
             </p>
+
             <h3 className="mt-3 text-lg font-black text-white">
               {item.limitationTitle}
             </h3>
+
             <p className="mt-3 text-sm leading-6 text-white/50">
               {item.limitationText}
             </p>

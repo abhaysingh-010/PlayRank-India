@@ -436,7 +436,7 @@ export default async function RankingsPage() {
         </div>
       </section>
 
-      <RankingExplanationPanel variant="overview" lastUpdatedLabel={formatDate(latestGlobalSnapshot)} />
+      <RankingExplanationPanel variant="overview" lastUpdatedValue={latestGlobalSnapshot} />
 
       <section className="rounded-[2rem] border border-red-400/20 bg-red-400/[0.06] p-6">
         <div className="flex flex-wrap gap-2">
@@ -850,5 +850,7 @@ export default async function RankingsPage() {
     </main>
   );
 }
+
+
 
 
