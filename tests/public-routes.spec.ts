@@ -2,6 +2,8 @@
 
 const publicRoutes = [
   '/',
+  '/about',
+  '/data',
   '/rankings',
   '/rankings/teams',
   '/rankings/players',
@@ -13,6 +15,7 @@ const publicRoutes = [
   '/compare',
   '/teams/compare',
   '/players/compare',
+  '/methodology',
 ];
 
 test.describe('public route smoke tests', () => {

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import Image from "next/image";
 import Link from "next/link";
@@ -14,6 +14,7 @@ const links = [
   { label: "Compare", href: "/compare" },
   { label: "About", href: "/about" },
   { label: "Data", href: "/data" },
+  { label: "Methodology", href: "/methodology" },
 ];
 
 export default function Navbar() {
@@ -34,7 +35,7 @@ export default function Navbar() {
           />
         </Link>
 
-        <nav className="hidden items-center gap-10 lg:flex">
+        <nav className="hidden items-center gap-8 lg:flex">
           {links.map((link) => {
             const isActive =
               pathname === link.href || pathname.startsWith(`${link.href}/`);
@@ -55,7 +56,7 @@ export default function Navbar() {
           })}
         </nav>
 
-        <div className="hidden w-[360px] justify-end xl:flex">
+        <div className="hidden w-[300px] justify-end xl:flex">
           {!isHome ? <GlobalSearch /> : null}
         </div>
 

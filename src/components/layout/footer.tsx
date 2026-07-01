@@ -1,4 +1,4 @@
-import Image from "next/image";
+﻿import Image from "next/image";
 import Link from "next/link";
 
 const productLinks = [
@@ -12,19 +12,19 @@ const productLinks = [
 
 const dataLinks = [
   { label: "Data Trust Layer", href: "/data" },
+  { label: "Methodology", href: "/methodology" },
   { label: "Official Rankings", href: "/rankings" },
   { label: "Team Database", href: "/teams" },
   { label: "Player Database", href: "/players" },
   { label: "Match Intelligence", href: "/matches" },
-  { label: "Data Health", href: "/admin/data-health" },
-  { label: "Ranking Sync", href: "/admin/rankings-sync" },
+  { label: "Tournament Records", href: "/tournaments" },
 ];
 
 const companyLinks = [
   { label: "About PlayRank", href: "/about" },
-  { label: "Admin Console", href: "/admin" },
   { label: "Esports Intelligence", href: "/compare" },
-  { label: "Methodology", href: "/data" },
+  { label: "Data Transparency", href: "/data" },
+  { label: "Methodology", href: "/methodology" },
 ];
 
 function FooterColumn({
@@ -110,10 +110,10 @@ export default function Footer() {
               </Link>
 
               <Link
-                href="/data"
+                href="/methodology"
                 className="rounded-full border border-white/15 bg-white/[0.04] px-5 py-2.5 text-xs font-black uppercase tracking-[0.14em] text-white transition hover:border-[#ffd21a] hover:text-[#ffd21a]"
               >
-                Data Trust
+                Methodology
               </Link>
             </div>
           </div>
