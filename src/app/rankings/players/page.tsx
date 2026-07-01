@@ -1,6 +1,7 @@
 ﻿import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import DataSourceBadge from "@/components/DataSourceBadge";
+import DataFreshnessBadge from "@/components/DataFreshnessBadge";
 import RankingExplanationPanel from "@/components/RankingExplanationPanel";
 
 type RankingRow = {
@@ -258,7 +259,7 @@ export default async function PlayerRankingsPage() {
         <div className="flex flex-col gap-4 border-b border-white/10 p-6 md:flex-row md:items-end md:justify-between">
           <div>
             <div className="flex flex-wrap gap-2">
-              <DataSourceBadge label={`Last Updated: ${formatDate(latestRankingUpdate)}`} />
+              <DataFreshnessBadge value={latestRankingUpdate} label="Player Freshness" />
               <DataSourceBadge label="Sample Size Aware" />
               <DataSourceBadge label="PlayRank Calculated" />
             </div>
@@ -384,3 +385,5 @@ export default async function PlayerRankingsPage() {
     </main>
   );
 }
+
+
