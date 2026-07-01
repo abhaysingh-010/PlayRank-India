@@ -21,3 +21,17 @@ test.describe('admin roster health workflow coverage', () => {
     expect(response.status()).toBe(401);
   });
 });
+
+test.describe('admin roster issue action coverage', () => {
+  test('/admin/data-health/roster-issues provides direct issue action links in source', async () => {
+    const source = fs.readFileSync('src/app/admin/data-health/roster-issues/page.tsx', 'utf8');
+
+    expect(source).toContain('function getRosterHealthHref');
+    expect(source).toContain('/admin/rosters/health?status=issues');
+    expect(source).toContain('encodeURIComponent(status)');
+    expect(source).toContain('function getPlayerReviewHref');
+    expect(source).toContain('/admin/players?search=');
+    expect(source).toContain('getRosterHealthHref(issue.health.health_status)');
+    expect(source).toContain('getPlayerReviewHref(issue.player)');
+  });
+});

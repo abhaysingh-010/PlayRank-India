@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
 import DataSourceBadge from "@/components/DataSourceBadge";
 
@@ -119,6 +119,21 @@ function getPriority(row: RosterHealthRow, player: PlayerRow | null) {
   };
 }
 
+function getRosterHealthHref(status: string | null) {
+  if (!status) {
+    return "/admin/rosters/health?status=issues";
+  }
+
+  return `/admin/rosters/health?status=${encodeURIComponent(status)}`;
+}
+
+function getPlayerReviewHref(player: PlayerRow | null) {
+  if (!player?.ign) {
+    return "/admin/rosters/health?status=issues";
+  }
+
+  return `/admin/players?search=${encodeURIComponent(player.ign)}`;
+}
 function isRosterIssue(row: RosterHealthRow) {
   const status = row.health_status?.toLowerCase() || "";
 
@@ -437,19 +452,22 @@ export default async function RosterIssuesPage() {
                       {formatDate(issue.player?.created_at || null)}
                     </td>
 
-                    <td className="px-6 py-5 text-right">
-                      <Link
-                        href={
-                          issue.player?.ign
-                            ? `/admin/players?search=${encodeURIComponent(
-                                issue.player.ign
-                              )}`
-                            : "/admin/rosters/health"
-                        }
-                        className="rounded-full border border-white/10 bg-white/[0.04] px-4 py-2 text-sm text-white/60 transition hover:border-[#ffd21a]/30 hover:text-[#ffd21a]"
-                      >
-                        Review
-                      </Link>
+                                        <td className="px-6 py-5 text-right">
+                      <div className="flex justify-end gap-2">
+                        <Link
+                          href={getPlayerReviewHref(issue.player)}
+                          className="rounded-full border border-white/10 bg-white/[0.04] px-4 py-2 text-sm text-white/60 transition hover:border-[#ffd21a]/30 hover:text-[#ffd21a]"
+                        >
+                          Review
+                        </Link>
+
+                        <Link
+                          href={getRosterHealthHref(issue.health.health_status)}
+                          className="rounded-full border border-[#ffd21a]/20 bg-[#ffd21a]/10 px-4 py-2 text-sm font-bold text-[#ffd21a] transition hover:bg-[#ffd21a]/15"
+                        >
+                          Filter
+                        </Link>
+                      </div>
                     </td>
                   </tr>
                 ))
@@ -482,3 +500,4 @@ export default async function RosterIssuesPage() {
     </main>
   );
 }
+
