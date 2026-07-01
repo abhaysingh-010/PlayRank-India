@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import { revalidatePath } from "next/cache";
 import DataSourceBadge from "@/components/DataSourceBadge";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
@@ -30,6 +30,8 @@ type TeamRow = {
   name: string;
   slug: string;
 };
+
+type MatchParticipantRow = Record<string, unknown>;
 
 const shell =
   "rounded-[2rem] border border-white/10 bg-[#080a0f] shadow-[0_24px_80px_rgba(0,0,0,0.28)]";
@@ -81,6 +83,54 @@ function formatDate(value: string | null) {
   });
 }
 
+function textKey(value: unknown) {
+  if (value === null || value === undefined) return "";
+  return String(value).trim().toLowerCase();
+}
+
+function getParticipantMappingKeys(participant: MatchParticipantRow) {
+  return [
+    participant.pubg_player_account_id,
+    participant.player_account_id,
+    participant.account_id,
+    participant.participant_id,
+    participant.id,
+    participant.pubg_player_name,
+    participant.player_name,
+    participant.name,
+    participant.ign,
+  ]
+    .map(textKey)
+    .filter(Boolean);
+}
+
+function mappingMatchesParticipant(
+  mapping: MappingRow,
+  participantKeySet: Set<string>
+) {
+  return (
+    participantKeySet.has(textKey(mapping.pubg_player_account_id)) ||
+    participantKeySet.has(textKey(mapping.pubg_player_name))
+  );
+}
+
+function buildMappingFilterHref(
+  status: string,
+  searchQuery: string,
+  matchQuery: string
+) {
+  const params = new URLSearchParams({ status });
+
+  if (searchQuery) {
+    params.set("q", searchQuery);
+  }
+
+  if (matchQuery) {
+    params.set("match", matchQuery);
+  }
+
+  return `/admin/pubg/mappings?${params.toString()}`;
+}
 function StatBlock({
   label,
   value,
@@ -141,7 +191,7 @@ function SectionHeader({
           href={actionHref}
           className="w-fit text-sm font-black text-white/40 transition hover:text-[#ffd21a]"
         >
-          {actionLabel} →
+          {actionLabel} â†’
         </Link>
       ) : null}
     </div>
@@ -235,7 +285,7 @@ function MappingCard({
           </p>
 
           <p className="mt-2 text-xs text-white/35">
-            Confidence {n(mapping.confidence_score).toFixed(2)} · Updated{" "}
+            Confidence {n(mapping.confidence_score).toFixed(2)} Â· Updated{" "}
             {formatDate(mapping.updated_at)}
           </p>
         </div>
@@ -315,14 +365,25 @@ export default async function PubgMappingsPage({
   searchParams: Promise<{
     status?: string;
     q?: string;
+    match?: string;
   }>;
 }) {
   const params = await searchParams;
   const selectedStatus = params.status || "all";
   const searchQuery = (params.q || "").trim();
+  const matchQuery = (params.match || "").trim();
   const normalizedSearchQuery = searchQuery.toLowerCase();
 
-  const [mappingsResult, playersResult, teamsResult] = await Promise.all([
+  const matchParticipantsQuery =
+    matchQuery.length > 0
+      ? supabaseAdmin
+          .from("pubg_api_participants")
+          .select("*")
+          .eq("external_match_id", matchQuery)
+      : Promise.resolve({ data: [], error: null });
+
+  const [mappingsResult, playersResult, teamsResult, matchParticipantsResult] =
+    await Promise.all([
     supabaseAdmin
       .from("pubg_player_mappings")
       .select(
@@ -342,14 +403,21 @@ export default async function PubgMappingsPage({
       .from("teams")
       .select("id, name, slug")
       .order("name", { ascending: true }),
+
+    matchParticipantsQuery,
   ]);
 
   const mappings = (mappingsResult.data || []) as MappingRow[];
   const players = (playersResult.data || []) as PlayerRow[];
   const teams = (teamsResult.data || []) as TeamRow[];
+  const matchParticipants = (matchParticipantsResult.data ||
+    []) as MatchParticipantRow[];
 
   const playerById = new Map(players.map((player) => [player.id, player]));
   const teamById = new Map(teams.map((team) => [team.id, team]));
+  const matchParticipantKeySet = new Set(
+    matchParticipants.flatMap(getParticipantMappingKeys)
+  );
 
   const statusFilteredMappings = mappings.filter((mapping) => {
     if (selectedStatus === "unmapped") return !mapping.player_id;
@@ -360,9 +428,16 @@ export default async function PubgMappingsPage({
     return true;
   });
 
+  const matchFilteredMappings =
+    matchQuery.length > 0
+      ? statusFilteredMappings.filter((mapping) =>
+          mappingMatchesParticipant(mapping, matchParticipantKeySet)
+        )
+      : statusFilteredMappings;
+
   const visibleMappings =
     normalizedSearchQuery.length > 0
-      ? statusFilteredMappings.filter((mapping) => {
+      ? matchFilteredMappings.filter((mapping) => {
           const mappedPlayer = mapping.player_id
             ? playerById.get(mapping.player_id)
             : null;
@@ -380,7 +455,7 @@ export default async function PubgMappingsPage({
 
           return haystack.includes(normalizedSearchQuery);
         })
-      : statusFilteredMappings;
+      : matchFilteredMappings;
 
   const totalMappings = mappings.length;
   const verifiedMappings = mappings.filter(
@@ -393,6 +468,7 @@ export default async function PubgMappingsPage({
     ["pubg_player_mappings", mappingsResult.error?.message],
     ["players", playersResult.error?.message],
     ["teams", teamsResult.error?.message],
+    ["pubg_api_participants", matchParticipantsResult.error?.message],
   ].filter((entry): entry is [string, string] => Boolean(entry[1]));
 
   const filters = [
@@ -509,6 +585,9 @@ export default async function PubgMappingsPage({
             className="grid gap-3"
           >
             <input type="hidden" name="status" value={selectedStatus} />
+            {matchQuery ? (
+              <input type="hidden" name="match" value={matchQuery} />
+            ) : null}
 
             <input
               name="q"
@@ -527,12 +606,11 @@ export default async function PubgMappingsPage({
 
           <div className="mt-5 flex flex-wrap gap-2">
             {filters.map((filter) => {
-              const href =
-                searchQuery.length > 0
-                  ? `/admin/pubg/mappings?status=${
-                      filter.value
-                    }&q=${encodeURIComponent(searchQuery)}`
-                  : `/admin/pubg/mappings?status=${filter.value}`;
+              const href = buildMappingFilterHref(
+                filter.value,
+                searchQuery,
+                matchQuery
+              );
 
               return (
                 <Link
@@ -574,6 +652,7 @@ export default async function PubgMappingsPage({
           <p className="mb-5 text-sm text-white/45">
             Showing {visibleMappings.length.toLocaleString("en-IN")} of{" "}
             {mappings.length.toLocaleString("en-IN")} mappings
+            {matchQuery ? ` scoped to match ${matchQuery}` : ""}
             {searchQuery ? ` for "${searchQuery}"` : ""}.
           </p>
 
@@ -606,3 +685,7 @@ export default async function PubgMappingsPage({
     </main>
   );
 }
+
+
+
+

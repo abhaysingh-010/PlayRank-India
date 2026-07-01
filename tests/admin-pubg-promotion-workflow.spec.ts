@@ -18,3 +18,21 @@ test.describe('admin PUBG promotion workflow coverage', () => {
     expect(response.status()).toBe(401);
   });
 });
+
+test.describe('admin PUBG mappings workflow coverage', () => {
+  test('/admin/pubg/mappings supports match-scoped mapping review in source', async () => {
+    const source = fs.readFileSync('src/app/admin/pubg/mappings/page.tsx', 'utf8');
+
+    expect(source).toContain('match?: string');
+    expect(source).toContain('const matchQuery = (params.match || "").trim()');
+    expect(source).toContain('pubg_api_participants');
+    expect(source).toContain('.eq("external_match_id", matchQuery)');
+    expect(source).toContain('function getParticipantMappingKeys');
+    expect(source).toContain('function mappingMatchesParticipant');
+    expect(source).toContain('function buildMappingFilterHref');
+    expect(source).toContain('name="match"');
+    expect(source).toContain('scoped to match');
+    expect(source).not.toContain('bg-[#ffd21a]/10px-5');
+    expect(source).not.toContain('py-3text-sm');
+  });
+});
