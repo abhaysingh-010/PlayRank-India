@@ -106,6 +106,13 @@ function formatStatus(value: string | null) {
   return (value || "unknown").replace(/_/g, " ");
 }
 
+function getMatchMappingsHref(externalMatchId: string) {
+  return `/admin/pubg/mappings?match=${encodeURIComponent(externalMatchId)}`;
+}
+
+function getRosterHealthHref(status: string) {
+  return `/admin/rosters/health?status=${encodeURIComponent(status)}`;
+}
 function getReadinessTone(row: ReadinessRow): Tone {
   if (row.promotion_allowed === true) return "healthy";
 
@@ -146,9 +153,7 @@ function getBlockCopy(row: ReadinessRow): BlockCopy {
       description:
         "PUBG account IDs must be mapped to verified PlayRank player records before this match can move into core data.",
       actionLabel: "Open Match Mappings",
-      actionHref: `/admin/pubg/mappings?match=${encodeURIComponent(
-        row.external_match_id
-      )}`,
+      actionHref: getMatchMappingsHref(row.external_match_id),
       tone: "warning",
     };
   }
@@ -172,7 +177,7 @@ function getBlockCopy(row: ReadinessRow): BlockCopy {
       description:
         "One or more mapped players failed the active roster safety check. Fix roster health before promotion.",
       actionLabel: "Roster Health",
-      actionHref: "/admin/rosters/health",
+      actionHref: getRosterHealthHref("issues"),
       tone: "danger",
     };
   }
@@ -184,7 +189,7 @@ function getBlockCopy(row: ReadinessRow): BlockCopy {
       description:
         "Promotion requires at least two roster-safe teams. Check mappings, teams and active rosters.",
       actionLabel: "Roster Health",
-      actionHref: "/admin/rosters/health",
+      actionHref: getRosterHealthHref("issues"),
       tone: "warning",
     };
   }
@@ -649,7 +654,7 @@ export default async function PubgImportsPage() {
             eyebrow="Coverage"
             title="Import Mapping Coverage"
             actionHref="/admin/pubg/mappings"
-            actionLabel="Open Mappings"
+            actionLabel="Open All Mappings"
           />
 
           <div className="grid gap-3">
@@ -812,5 +817,7 @@ export default async function PubgImportsPage() {
     </main>
   );
 }
+
+
 
 

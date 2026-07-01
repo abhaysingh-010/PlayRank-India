@@ -59,3 +59,25 @@ test.describe('admin PUBG import detail workflow coverage', () => {
     expect(source).toContain('row.external_match_id');
   });
 });
+
+test.describe('admin PUBG imports list workflow consistency', () => {
+  test('/admin/pubg/imports keeps mapping and roster actions consistent in source', async () => {
+    const source = fs.readFileSync('src/app/admin/pubg/imports/page.tsx', 'utf8');
+
+    expect(source).toContain('function getMatchMappingsHref');
+    expect(source).toContain('getMatchMappingsHref(row.external_match_id)');
+    expect(source).toContain('function getRosterHealthHref');
+    expect(source).toContain('/admin/rosters/health?status=');
+    expect(source).toContain('getRosterHealthHref("issues")');
+    expect(source).toContain('Open All Mappings');
+    expect(source).not.toContain('text-[#ffd21a]transition');
+  });
+
+  test('/admin/data-health/pubg-blocked-promotions has clean blocked match cell classes in source', async () => {
+    const source = fs.readFileSync('src/app/admin/data-health/pubg-blocked-promotions/page.tsx', 'utf8');
+
+    expect(source).not.toContain('text-xstext-white/60');
+    expect(source).toContain('text-xs text-white/60');
+  });
+});
+
