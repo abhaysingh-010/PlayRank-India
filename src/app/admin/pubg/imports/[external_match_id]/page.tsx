@@ -153,6 +153,9 @@ export default async function PubgImportDetailPage({ params }: PageProps) {
       ? "blocked"
       : "unknown";
 
+  const PROMOTION_WRITE_STATUS =
+    "Core promotion writes disabled. Dry-run checks are allowed, but this admin route does not execute the SQL promotion RPC.";
+
   const errors = [
     matchResult.error ? `Match: ${matchResult.error.message}` : null,
     participantsResult.error ? `Participants: ${participantsResult.error.message}` : null,
@@ -352,6 +355,7 @@ export default async function PubgImportDetailPage({ params }: PageProps) {
     </main>
   );
 }
+
 
 
 

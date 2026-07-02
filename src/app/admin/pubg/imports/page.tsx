@@ -595,6 +595,15 @@ export default async function PubgImportsPage() {
                 import jobs before any core promotion.
               </p>
 
+                            <div className="mt-5 rounded-2xl border border-yellow-400/20 bg-yellow-400/10 p-4">
+                <p className="text-xs font-black uppercase tracking-[0.18em] text-yellow-300">
+                  Core promotion writes are disabled
+                </p>
+
+                <p className="mt-2 text-sm leading-6 text-white/65">
+                  Dry-run checks are allowed for readiness review, but the admin API route does not call the SQL promotion RPC yet. Use the promotion audit page to review historical promotion attempts.
+                </p>
+              </div>
               <div className="mt-8 flex flex-wrap gap-3">
                 <Link
                   href="/admin/pubg/import"
@@ -622,6 +631,12 @@ export default async function PubgImportsPage() {
                   className="rounded-full border border-white/10 bg-white/[0.04] px-5 py-2.5 text-sm font-black text-white/65 transition hover:border-white/25 hover:text-white"
                 >
                   Data Health
+                </Link>
+                <Link
+                  href="/admin/pubg/promotions"
+                  className="rounded-full border border-white/10 bg-white/[0.04] px-5 py-2.5 text-sm font-black text-white/65 transition hover:border-white/25 hover:text-white"
+                >
+                  Promotion Audit
                 </Link>
               </div>
             </div>
@@ -734,7 +749,7 @@ export default async function PubgImportsPage() {
 
               <p className="mt-3 text-sm leading-6 text-white/50">
                 Imported rows stay in staging until promotion_allowed is true in
-                the readiness view.
+                the readiness view. Dry-run only: real PlayRank core writes are disabled until the SQL safety audit is approved.
               </p>
             </div>
           </div>
@@ -817,6 +832,10 @@ export default async function PubgImportsPage() {
     </main>
   );
 }
+
+
+
+
 
 
 
