@@ -162,6 +162,23 @@ export default async function PubgImportDetailPage({ params }: PageProps) {
   return (
     <main className="min-h-screen bg-black px-6 py-8 text-white">
       <div className="mx-auto max-w-7xl">
+        <div className="mb-4 rounded-2xl border border-yellow-500/20 bg-yellow-500/10 p-4">
+          <p className="text-xs font-black uppercase tracking-[0.18em] text-yellow-300">
+            Promotion safety mode
+          </p>
+          <p className="mt-2 text-sm leading-6 text-zinc-300">
+            {PROMOTION_WRITE_STATUS}
+          </p>
+          <div className="mt-3 flex flex-wrap gap-3">
+            <Link href="/admin/pubg/promotions" className="text-sm font-bold text-yellow-300 hover:text-yellow-200">
+              Promotion Audit -&gt;
+            </Link>
+            <Link href="/admin/pubg/imports" className="text-sm font-bold text-zinc-300 hover:text-white">
+              Import Review -&gt;
+            </Link>
+          </div>
+        </div>
+
         <div className="mb-8 flex flex-col gap-4 border-b border-zinc-800 pb-6 md:flex-row md:items-end md:justify-between">
           <div>
             <Link
@@ -335,5 +352,8 @@ export default async function PubgImportDetailPage({ params }: PageProps) {
     </main>
   );
 }
+
+
+
 
 

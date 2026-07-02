@@ -109,3 +109,46 @@ test.describe('admin PUBG promotion audit visibility', () => {
     expect(dataHealth).toContain('Promotion Audit');
   });
 });
+
+test.describe('admin PUBG promotion safety copy', () => {
+  test('imports page explains dry-run only promotion safety mode', async () => {
+    const source = fs.readFileSync('src/app/admin/pubg/imports/page.tsx', 'utf8');
+
+    expect(source).toContain('Core promotion writes are disabled');
+    expect(source).toContain('Dry-run checks are allowed');
+    expect(source).toContain('admin API route does not call the SQL promotion RPC yet');
+    expect(source).toContain('/admin/pubg/promotions');
+    expect(source).toContain('Promotion Audit');
+    expect(source).toContain('Dry-run only: real PlayRank core writes are');
+    expect(source).not.toContain('bg-[#ffd21a]/10px-5');
+    expect(source).not.toContain('transitionhover:text-white');
+    expect(source).not.toContain('bg-emerald-400/10p-5');
+  });
+
+  test('import detail page exposes promotion safety mode and audit link', async () => {
+    const source = fs.readFileSync(
+      'src/app/admin/pubg/imports/[external_match_id]/page.tsx',
+      'utf8',
+    );
+
+    expect(source).toContain('PROMOTION_WRITE_STATUS');
+    expect(source).toContain('Core promotion writes disabled');
+    expect(source).toContain('Dry-run checks are allowed');
+    expect(source).toContain('does not execute the SQL promotion RPC');
+    expect(source).toContain('/admin/pubg/promotions');
+    expect(source).toContain('Promotion Audit');
+  });
+
+  test('promotion audit page states RPC is not called by admin route yet', async () => {
+    const source = fs.readFileSync('src/app/admin/pubg/promotions/page.tsx', 'utf8');
+    const routeSource = fs.readFileSync('src/app/api/admin/pubg/promote-match/route.ts', 'utf8');
+
+    expect(source).toContain('SQL promotion function exists');
+    expect(source).toContain('admin API route does not');
+    expect(source).toContain('Current approved operation is dry-run readiness review');
+    expect(routeSource).toContain('dry_run?: unknown');
+    expect(routeSource).toContain('core_promotion_disabled: true');
+    expect(routeSource).not.toContain('.rpc(');
+    expect(routeSource).not.toContain('promote_pubg_api_match_to_playrank_core(');
+  });
+});

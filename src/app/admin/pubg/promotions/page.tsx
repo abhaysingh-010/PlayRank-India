@@ -232,6 +232,18 @@ export default async function PubgPromotionAuditPage() {
             core write path is enabled in the admin API.
           </p>
 
+          <div className="mt-5 rounded-2xl border border-yellow-400/20 bg-yellow-400/10 p-4">
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-yellow-300">
+              Audit visibility before writes
+            </p>
+
+            <p className="mt-2 text-sm leading-6 text-white/65">
+              SQL promotion function exists, but the admin API route does not
+              call it yet. Current approved operation is dry-run readiness review
+              plus audit inspection only.
+            </p>
+          </div>
+
           <div className="mt-8 flex flex-wrap gap-3">
             <Link
               href="/admin/pubg"
@@ -299,3 +311,6 @@ export default async function PubgPromotionAuditPage() {
     </main>
   );
 }
+
+
+
