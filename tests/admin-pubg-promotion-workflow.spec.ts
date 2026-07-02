@@ -81,3 +81,31 @@ test.describe('admin PUBG imports list workflow consistency', () => {
   });
 });
 
+
+test.describe('admin PUBG promotion audit visibility', () => {
+  test('/admin/pubg/promotions exposes promotion audit table and workflow links in source', async () => {
+    const source = fs.readFileSync('src/app/admin/pubg/promotions/page.tsx', 'utf8');
+
+    expect(source).toContain('pubg_core_promotions');
+    expect(source).toContain('external_match_id, core_match_id, status, result, error_message, created_at, completed_at');
+    expect(source).toContain('PUBG Promotion');
+    expect(source).toContain('Audit Log');
+    expect(source).toContain('/admin/pubg/imports/${encodeURIComponent(');
+    expect(source).toContain('/admin/pubg/mappings?match=${encodeURIComponent(');
+    expect(source).toContain('No PUBG promotion audit rows found.');
+  });
+
+  test('admin PUBG hub and data health link to promotion audit', async () => {
+    const pubgHub = fs.readFileSync('src/app/admin/pubg/page.tsx', 'utf8');
+    const dataHealth = fs.readFileSync('src/app/admin/data-health/page.tsx', 'utf8');
+
+    expect(pubgHub).toContain('/admin/pubg/promotions');
+    expect(pubgHub).toContain('Promotion Audit');
+    expect(pubgHub).not.toContain('p-4transition');
+    expect(pubgHub).not.toContain('bg-[#ffd21a]/10px-5');
+    expect(pubgHub).not.toContain('bg-emerald-400/10p-5');
+
+    expect(dataHealth).toContain('/admin/pubg/promotions');
+    expect(dataHealth).toContain('Promotion Audit');
+  });
+});

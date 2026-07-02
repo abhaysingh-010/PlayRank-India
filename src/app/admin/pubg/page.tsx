@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import DataSourceBadge from "@/components/DataSourceBadge";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
 
@@ -120,7 +120,7 @@ function SectionHeader({
           href={actionHref}
           className="w-fit text-sm font-black text-white/40 transition hover:text-[#ffd21a]"
         >
-          {actionLabel} →
+          {actionLabel} â†’
         </Link>
       ) : null}
     </div>
@@ -417,6 +417,12 @@ export default async function PubgAdminHubPage() {
                 >
                   Player Mappings
                 </Link>
+                <Link
+                  href="/admin/pubg/promotions"
+                  className="rounded-full border border-white/10 bg-white/[0.04] px-5 py-2.5 text-sm font-black text-white/65 transition hover:border-white/25 hover:text-white"
+                >
+                  Promotion Audit
+                </Link>
 
                 <Link
                   href="/admin"
@@ -487,8 +493,8 @@ export default async function PubgAdminHubPage() {
                 </p>
 
                 <p className="mt-2 text-sm text-white/45">
-                  {latestReadiness.map_name || "Unknown map"} ·{" "}
-                  {latestReadiness.game_mode || "Unknown mode"} ·{" "}
+                  {latestReadiness.map_name || "Unknown map"} Â·{" "}
+                  {latestReadiness.game_mode || "Unknown mode"} Â·{" "}
                   {latestReadiness.shard || "Unknown shard"}
                 </p>
 

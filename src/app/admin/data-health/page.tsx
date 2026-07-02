@@ -646,7 +646,10 @@ export default async function DataHealthPage() {
                 </Link>
                 <Link href="/admin/rosters/health" className="rounded-full border border-white/10 bg-white/[0.04] px-5 py-2.5 text-sm font-black text-white/65 transition hover:border-white/25 hover:text-white">
                   Roster Health
+                </Link>                <Link href="/admin/pubg/promotions" className="rounded-full border border-white/10 bg-white/[0.04] px-5 py-2.5 text-sm font-black text-white/65 transition hover:border-white/25 hover:text-white">
+                  Promotion Audit
                 </Link>
+
                 <Link href="/admin/data-health/missing-logos" className="rounded-full border border-white/10 bg-white/[0.04] px-5 py-2.5 text-sm font-black text-white/65 transition hover:border-white/25 hover:text-white">
                   Missing Logos
                 </Link>
@@ -742,3 +745,4 @@ export default async function DataHealthPage() {
     </main>
   );
 }
+
