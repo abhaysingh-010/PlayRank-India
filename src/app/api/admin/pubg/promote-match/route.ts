@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+﻿import { NextRequest, NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
 
 export const dynamic = "force-dynamic";
@@ -7,6 +7,7 @@ const MATCH_ID_PATTERN = /^[a-zA-Z0-9-]{16,80}$/;
 
 type PromoteBody = {
   external_match_id?: unknown;
+  dry_run?: unknown;
 };
 
 type PromotionReadinessRow = {
@@ -58,6 +59,10 @@ function normalizeExternalMatchId(value: unknown) {
   }
 
   return cleaned;
+}
+
+function normalizeDryRun(value: unknown) {
+  return value === true;
 }
 
 function validateExternalMatchId(externalMatchId: string | null) {
@@ -141,6 +146,8 @@ export async function POST(request: NextRequest) {
       return jsonResponse(validated.payload, validated.status);
     }
 
+    const dryRun = normalizeDryRun(body.dry_run);
+
     const { data: readiness, error: readinessError } = await supabaseAdmin
       .from("pubg_match_promotion_readiness")
       .select(
@@ -188,12 +195,34 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    if (dryRun) {
+      return jsonResponse(
+        {
+          ok: true,
+          promoted: false,
+          blocked: false,
+          dry_run: true,
+          promotion_ready: true,
+          would_promote: true,
+          core_promotion_disabled: true,
+          message:
+            "Dry run passed. Promotion gate is ready, but no core write was executed.",
+          next_step:
+            "Review SQL safety audit before enabling PlayRank core promotion.",
+          readiness: readinessSummary,
+        },
+        200
+      );
+    }
+
     return jsonResponse(
       {
         ok: false,
         promoted: false,
         blocked: false,
+        dry_run: false,
         promotion_ready: true,
+        core_promotion_disabled: true,
         error:
           "Promotion gate passed, but core promotion is intentionally disabled.",
         next_step:
