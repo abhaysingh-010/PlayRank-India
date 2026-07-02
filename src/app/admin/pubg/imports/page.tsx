@@ -200,8 +200,8 @@ function getBlockCopy(row: ReadinessRow): BlockCopy {
       title: "Promotion Gate Passed",
       description:
         "This match passed the readiness gate. Keep manual review enabled before writing into PlayRank core tables.",
-      actionLabel: "Review PUBG Hub",
-      actionHref: "/admin/pubg",
+      actionLabel: "Open Confirmation Workflow",
+          actionHref: `/admin/pubg/imports/${encodeURIComponent(row.external_match_id)}`,
       tone: "healthy",
     };
   }
@@ -604,6 +604,27 @@ export default async function PubgImportsPage() {
                   Dry-run checks are allowed for readiness review, but the admin API route does not call the SQL promotion RPC yet. Use the promotion audit page to review historical promotion attempts.
                 </p>
               </div>
+
+              <div className="mt-4 rounded-2xl border border-white/10 bg-white/[0.035] p-4">
+                <p className="text-xs font-black uppercase tracking-[0.18em] text-[#ffd21a]">
+                  Two-step promotion workflow
+                </p>
+
+                <div className="mt-3 grid gap-3 text-sm leading-6 text-white/60 md:grid-cols-2">
+                  <p>
+                    1. Run dry-run readiness check from the match detail page before any promotion intent.
+                  </p>
+                  <p>
+                    2. Review Promotion Audit and readiness blockers before using the confirmation workflow.
+                  </p>
+                  <p>
+                    3. Confirmed promotion requires confirm_promotion plus the exact text PROMOTE_TO_PLAYRANK_CORE.
+                  </p>
+                  <p>
+                    4. Server flag PLAYRANK_ENABLE_PUBG_CORE_PROMOTION must remain disabled until Phase 4A approval.
+                  </p>
+                </div>
+              </div>
               <div className="mt-8 flex flex-wrap gap-3">
                 <Link
                   href="/admin/pubg/import"
@@ -832,6 +853,10 @@ export default async function PubgImportsPage() {
     </main>
   );
 }
+
+
+
+
 
 
 

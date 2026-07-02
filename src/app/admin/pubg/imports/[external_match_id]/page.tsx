@@ -156,6 +156,28 @@ export default async function PubgImportDetailPage({ params }: PageProps) {
   const PROMOTION_WRITE_STATUS =
     "Core promotion writes disabled. Dry-run checks are allowed, but this admin route does not execute the SQL promotion RPC.";
 
+  const PROMOTION_CONFIRMATION_TEXT = "PROMOTE_TO_PLAYRANK_CORE";
+
+  const dryRunRequestBody = JSON.stringify(
+    {
+      external_match_id: externalMatchId,
+      dry_run: true,
+    },
+    null,
+    2
+  );
+
+  const confirmedPromotionRequestBody = JSON.stringify(
+    {
+      external_match_id: externalMatchId,
+      dry_run: false,
+      confirm_promotion: true,
+      confirmation_text: PROMOTION_CONFIRMATION_TEXT,
+    },
+    null,
+    2
+  );
+
   const errors = [
     matchResult.error ? `Match: ${matchResult.error.message}` : null,
     participantsResult.error ? `Participants: ${participantsResult.error.message}` : null,
@@ -180,6 +202,42 @@ export default async function PubgImportDetailPage({ params }: PageProps) {
               Import Review -&gt;
             </Link>
           </div>
+        </div>
+
+        <div className="mb-4 rounded-2xl border border-yellow-500/20 bg-yellow-500/10 p-4">
+          <p className="text-xs font-black uppercase tracking-[0.18em] text-yellow-300">
+            Dry-run vs confirmed promotion workflow
+          </p>
+
+          <div className="mt-4 grid gap-4 lg:grid-cols-2">
+            <div className="rounded-2xl border border-emerald-500/20 bg-emerald-500/10 p-4">
+              <p className="text-sm font-black text-emerald-300">
+                Step 1: Run dry-run readiness check
+              </p>
+              <p className="mt-2 text-sm leading-6 text-zinc-300">
+                Dry-run validates readiness and returns would_promote without writing to PlayRank core tables.
+              </p>
+              <pre className="mt-3 overflow-auto rounded-xl border border-black/30 bg-black/30 p-3 text-xs leading-5 text-zinc-300">
+                {dryRunRequestBody}
+              </pre>
+            </div>
+
+            <div className="rounded-2xl border border-red-500/20 bg-red-500/10 p-4">
+              <p className="text-sm font-black text-red-300">
+                Step 2: Confirm promotion intent
+              </p>
+              <p className="mt-2 text-sm leading-6 text-zinc-300">
+                Confirmed promotion requires confirm_promotion, the exact confirmation_text, and the server flag PLAYRANK_ENABLE_PUBG_CORE_PROMOTION. Real writes are still disabled until Phase 4A.
+              </p>
+              <pre className="mt-3 overflow-auto rounded-xl border border-black/30 bg-black/30 p-3 text-xs leading-5 text-zinc-300">
+                {confirmedPromotionRequestBody}
+              </pre>
+            </div>
+          </div>
+
+          <p className="mt-4 text-sm leading-6 text-zinc-300">
+            Required confirmation text: <span className="font-black text-yellow-300">PROMOTE_TO_PLAYRANK_CORE</span>
+          </p>
         </div>
 
         <div className="mb-8 flex flex-col gap-4 border-b border-zinc-800 pb-6 md:flex-row md:items-end md:justify-between">
@@ -355,6 +413,7 @@ export default async function PubgImportDetailPage({ params }: PageProps) {
     </main>
   );
 }
+
 
 
 

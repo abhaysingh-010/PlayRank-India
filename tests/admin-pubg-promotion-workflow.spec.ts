@@ -152,3 +152,43 @@ test.describe('admin PUBG promotion safety copy', () => {
     expect(routeSource).not.toContain('promote_pubg_api_match_to_playrank_core(');
   });
 });
+
+test.describe('admin PUBG promotion confirmation workflow UI', () => {
+  test('imports page explains the two-step promotion workflow before writes are enabled', async () => {
+    const source = fs.readFileSync('src/app/admin/pubg/imports/page.tsx', 'utf8');
+
+    expect(source).toContain('Two-step promotion workflow');
+    expect(source).toContain('Run dry-run readiness check');
+    expect(source).toContain('Promotion Audit');
+    expect(source).toContain('confirm_promotion');
+    expect(source).toContain('PROMOTE_TO_PLAYRANK_CORE');
+    expect(source).toContain('PLAYRANK_ENABLE_PUBG_CORE_PROMOTION');
+    expect(source).toContain('Open Confirmation Workflow');
+  });
+
+  test('import detail page shows dry-run and confirmed promotion request bodies', async () => {
+    const source = fs.readFileSync(
+      'src/app/admin/pubg/imports/[external_match_id]/page.tsx',
+      'utf8',
+    );
+
+    expect(source).toContain('Dry-run vs confirmed promotion workflow');
+    expect(source).toContain('Step 1: Run dry-run readiness check');
+    expect(source).toContain('Step 2: Confirm promotion intent');
+    expect(source).toContain('dryRunRequestBody');
+    expect(source).toContain('confirmedPromotionRequestBody');
+    expect(source).toContain('confirm_promotion');
+    expect(source).toContain('confirmation_text');
+    expect(source).toContain('PROMOTE_TO_PLAYRANK_CORE');
+    expect(source).toContain('PLAYRANK_ENABLE_PUBG_CORE_PROMOTION');
+    expect(source).toContain('Real writes are still disabled until Phase 4A');
+  });
+
+  test('confirmation workflow UI does not enable SQL RPC execution yet', async () => {
+    const routeSource = fs.readFileSync('src/app/api/admin/pubg/promote-match/route.ts', 'utf8');
+
+    expect(routeSource).toContain('SQL RPC call is still disabled in this phase');
+    expect(routeSource).not.toContain('.rpc(');
+    expect(routeSource).not.toContain('promote_pubg_api_match_to_playrank_core(');
+  });
+});
