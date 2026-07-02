@@ -56,6 +56,51 @@ function formatStatus(value: string | null) {
   return (value || "unknown").replace(/_/g, " ");
 }
 
+function getOperatorActionCopy(status: string | null) {
+  if (status === "failed") {
+    return {
+      title: "Promotion failed: operator action required",
+      description:
+        "Inspect error_message and result payload before retrying. Keep the match in staging, repair mappings, roster health, or SQL data issues, then run dry-run again before any confirmed attempt.",
+      tone: "danger" as Tone,
+    };
+  }
+
+  if (status === "blocked") {
+    return {
+      title: "Promotion blocked by readiness guard",
+      description:
+        "Blocked means the promotion function rejected the attempt before core writes completed. Review readiness blockers, mapping coverage, roster safety, and AI participant signals before retrying.",
+      tone: "warning" as Tone,
+    };
+  }
+
+  if (status === "started") {
+    return {
+      title: "Started without completion",
+      description:
+        "A started audit row without completed_at may indicate an in-flight or interrupted attempt. Do not retry a real promotion until an operator confirms the database state and audit owner.",
+      tone: "warning" as Tone,
+    };
+  }
+
+  if (status === "promoted") {
+    return {
+      title: "Promotion completed",
+      description:
+        "Verify the core_match_id, inserted player stats, inserted team results, and downstream ranking effects before marking the promotion operationally closed.",
+      tone: "healthy" as Tone,
+    };
+  }
+
+  return {
+    title: "Unknown audit state",
+    description:
+      "Treat unknown audit states as unsafe. Review the raw audit payload and keep the match in staging until the state is understood.",
+    tone: "neutral" as Tone,
+  };
+}
+
 function SectionHeader({
   eyebrow,
   title,
@@ -129,6 +174,8 @@ function AuditRow({ row }: { row: PromotionAuditRow }) {
       ? JSON.stringify(row.result, null, 2)
       : String(row.result || "No result payload");
 
+  const operatorAction = getOperatorActionCopy(row.status);
+
   return (
     <div className="rounded-2xl border border-white/10 bg-white/[0.025] p-4">
       <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
@@ -188,6 +235,16 @@ function AuditRow({ row }: { row: PromotionAuditRow }) {
         </p>
       ) : null}
 
+      <div className={`mt-4 rounded-2xl border p-3 ${toneStyle(operatorAction.tone)}`}>
+        <p className="text-xs font-black uppercase tracking-[0.16em]">
+          {operatorAction.title}
+        </p>
+
+        <p className="mt-2 text-sm leading-6 text-white/65">
+          {operatorAction.description}
+        </p>
+      </div>
+
       <pre className="mt-4 max-h-64 overflow-auto rounded-2xl border border-white/10 bg-black/25 p-4 text-xs leading-5 text-white/50">
         {resultText}
       </pre>
@@ -242,6 +299,27 @@ export default async function PubgPromotionAuditPage() {
               call it yet. Current approved operation is dry-run readiness review
               plus audit inspection only.
             </p>
+          </div>
+
+          <div className="mt-4 rounded-2xl border border-white/10 bg-white/[0.035] p-4">
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-[#ffd21a]">
+              Failure-state operator guide
+            </p>
+
+            <div className="mt-3 grid gap-3 text-sm leading-6 text-white/60 md:grid-cols-2">
+              <p>
+                Failed: inspect error_message and result payload, repair the root cause, then rerun dry-run before retry.
+              </p>
+              <p>
+                Blocked: readiness guard stopped the promotion; fix mapping, roster, AI, or team safety blockers first.
+              </p>
+              <p>
+                Started: if completed_at is missing, treat the attempt as unsafe until database state is verified.
+              </p>
+              <p>
+                Promoted: verify core_match_id, inserted stats, team results, and downstream ranking effects.
+              </p>
+            </div>
           </div>
 
           <div className="mt-8 flex flex-wrap gap-3">
@@ -311,6 +389,7 @@ export default async function PubgPromotionAuditPage() {
     </main>
   );
 }
+
 
 
 

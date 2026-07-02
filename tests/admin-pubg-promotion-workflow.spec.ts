@@ -192,3 +192,41 @@ test.describe('admin PUBG promotion confirmation workflow UI', () => {
     expect(routeSource).not.toContain('promote_pubg_api_match_to_playrank_core(');
   });
 });
+
+test.describe('admin PUBG promotion audit and failure-state copy', () => {
+  test('promotion audit page explains operator actions for failed, blocked, started, and promoted states', async () => {
+    const source = fs.readFileSync('src/app/admin/pubg/promotions/page.tsx', 'utf8');
+
+    expect(source).toContain('Failure-state operator guide');
+    expect(source).toContain('Promotion failed: operator action required');
+    expect(source).toContain('Promotion blocked by readiness guard');
+    expect(source).toContain('Started without completion');
+    expect(source).toContain('Promotion completed');
+    expect(source).toContain('error_message');
+    expect(source).toContain('completed_at');
+    expect(source).toContain('core_match_id');
+    expect(source).toContain('rerun dry-run before retry');
+  });
+
+  test('import detail page points operators back to audit after confirmed attempts', async () => {
+    const source = fs.readFileSync(
+      'src/app/admin/pubg/imports/[external_match_id]/page.tsx',
+      'utf8',
+    );
+
+    expect(source).toContain('Audit and failure follow-up');
+    expect(source).toContain('Promotion Audit');
+    expect(source).toContain('failed, blocked, started, and promoted states');
+    expect(source).toContain('error_message');
+    expect(source).toContain('completed_at');
+    expect(source).toContain('core_match_id');
+  });
+
+  test('failure-state copy still does not enable SQL RPC execution', async () => {
+    const routeSource = fs.readFileSync('src/app/api/admin/pubg/promote-match/route.ts', 'utf8');
+
+    expect(routeSource).toContain('SQL RPC call is still disabled in this phase');
+    expect(routeSource).not.toContain('.rpc(');
+    expect(routeSource).not.toContain('promote_pubg_api_match_to_playrank_core(');
+  });
+});

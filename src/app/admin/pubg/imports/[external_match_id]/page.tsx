@@ -238,6 +238,16 @@ export default async function PubgImportDetailPage({ params }: PageProps) {
           <p className="mt-4 text-sm leading-6 text-zinc-300">
             Required confirmation text: <span className="font-black text-yellow-300">PROMOTE_TO_PLAYRANK_CORE</span>
           </p>
+
+          <div className="mt-4 rounded-2xl border border-white/10 bg-black/20 p-4">
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-yellow-300">
+              Audit and failure follow-up
+            </p>
+
+            <p className="mt-2 text-sm leading-6 text-zinc-300">
+              After any confirmed attempt, review Promotion Audit for failed, blocked, started, and promoted states. Failed or started rows must remain in staging until error_message, completed_at, and core_match_id are reviewed.
+            </p>
+          </div>
         </div>
 
         <div className="mb-8 flex flex-col gap-4 border-b border-zinc-800 pb-6 md:flex-row md:items-end md:justify-between">
@@ -413,6 +423,8 @@ export default async function PubgImportDetailPage({ params }: PageProps) {
     </main>
   );
 }
+
+
 
 
 
