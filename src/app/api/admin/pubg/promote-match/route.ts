@@ -4,10 +4,14 @@ import { supabaseAdmin } from "@/lib/supabaseAdmin";
 export const dynamic = "force-dynamic";
 
 const MATCH_ID_PATTERN = /^[a-zA-Z0-9-]{16,80}$/;
+const PROMOTION_CONFIRMATION_TEXT = "PROMOTE_TO_PLAYRANK_CORE";
+const PROMOTION_ENV_FLAG = "PLAYRANK_ENABLE_PUBG_CORE_PROMOTION";
 
 type PromoteBody = {
   external_match_id?: unknown;
   dry_run?: unknown;
+  confirm_promotion?: unknown;
+  confirmation_text?: unknown;
 };
 
 type PromotionReadinessRow = {
@@ -63,6 +67,22 @@ function normalizeExternalMatchId(value: unknown) {
 
 function normalizeDryRun(value: unknown) {
   return value === true;
+}
+
+function normalizeConfirmPromotion(value: unknown) {
+  return value === true;
+}
+
+function normalizeConfirmationText(value: unknown) {
+  if (typeof value !== "string") {
+    return "";
+  }
+
+  return value.trim();
+}
+
+function isCorePromotionEnabled() {
+  return process.env[PROMOTION_ENV_FLAG] === "true";
 }
 
 function validateExternalMatchId(externalMatchId: string | null) {
@@ -147,6 +167,8 @@ export async function POST(request: NextRequest) {
     }
 
     const dryRun = normalizeDryRun(body.dry_run);
+    const confirmPromotion = normalizeConfirmPromotion(body.confirm_promotion);
+    const confirmationText = normalizeConfirmationText(body.confirmation_text);
 
     const { data: readiness, error: readinessError } = await supabaseAdmin
       .from("pubg_match_promotion_readiness")
@@ -215,6 +237,66 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    if (!confirmPromotion) {
+      return jsonResponse(
+        {
+          ok: false,
+          promoted: false,
+          blocked: false,
+          dry_run: false,
+          promotion_ready: true,
+          core_promotion_disabled: true,
+          confirmation_required: true,
+          error: "Explicit promotion confirmation is required.",
+          required_confirmation_text: PROMOTION_CONFIRMATION_TEXT,
+          next_step:
+            "Run a dry-run check first, then confirm promotion explicitly.",
+          readiness: readinessSummary,
+        },
+        423
+      );
+    }
+
+    if (confirmationText !== PROMOTION_CONFIRMATION_TEXT) {
+      return jsonResponse(
+        {
+          ok: false,
+          promoted: false,
+          blocked: false,
+          dry_run: false,
+          promotion_ready: true,
+          core_promotion_disabled: true,
+          confirmation_required: true,
+          error: "Promotion confirmation text did not match.",
+          required_confirmation_text: PROMOTION_CONFIRMATION_TEXT,
+          next_step:
+            "Use the exact confirmation text before enabling a real promotion request.",
+          readiness: readinessSummary,
+        },
+        423
+      );
+    }
+
+    if (!isCorePromotionEnabled()) {
+      return jsonResponse(
+        {
+          ok: false,
+          promoted: false,
+          blocked: false,
+          dry_run: false,
+          promotion_ready: true,
+          core_promotion_disabled: true,
+          promotion_env_flag: PROMOTION_ENV_FLAG,
+          error:
+            "Promotion confirmed, but the server-side promotion feature flag is disabled.",
+          next_step:
+            "Set PLAYRANK_ENABLE_PUBG_CORE_PROMOTION=true only after rollout approval.",
+          readiness: readinessSummary,
+        },
+        423
+      );
+    }
+
     return jsonResponse(
       {
         ok: false,
@@ -223,10 +305,11 @@ export async function POST(request: NextRequest) {
         dry_run: false,
         promotion_ready: true,
         core_promotion_disabled: true,
+        promotion_env_flag: PROMOTION_ENV_FLAG,
         error:
-          "Promotion gate passed, but core promotion is intentionally disabled.",
+          "Promotion gate passed and confirmation was accepted, but the SQL RPC call is still disabled in this phase.",
         next_step:
-          "Complete SQL safety audit before enabling PlayRank core promotion.",
+          "Phase 4A will enable the SQL RPC call behind this guarded contract.",
         readiness: readinessSummary,
       },
       423

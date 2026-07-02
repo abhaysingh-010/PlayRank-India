@@ -10,20 +10,24 @@ function readRoute() {
 }
 
 test.describe('admin PUBG promotion guarded enablement contract', () => {
-  test('current route remains locked before guarded enablement patch', async () => {
+  test('route now exposes guarded confirmation fields without enabling SQL RPC', async () => {
     const source = readRoute();
 
     expect(source).toContain('dry_run?: unknown');
-    expect(source).toContain('function normalizeDryRun');
-    expect(source).toContain('core_promotion_disabled: true');
-    expect(source).toContain('Promotion gate passed, but core promotion is intentionally disabled.');
+    expect(source).toContain('confirm_promotion?: unknown');
+    expect(source).toContain('confirmation_text?: unknown');
+    expect(source).toContain('PROMOTE_TO_PLAYRANK_CORE');
+    expect(source).toContain('PLAYRANK_ENABLE_PUBG_CORE_PROMOTION');
+    expect(source).toContain('function normalizeConfirmPromotion');
+    expect(source).toContain('function normalizeConfirmationText');
+    expect(source).toContain('function isCorePromotionEnabled');
+    expect(source).toContain('confirmation_required: true');
+    expect(source).toContain('Promotion confirmed, but the server-side promotion feature flag is disabled.');
+    expect(source).toContain('SQL RPC call is still disabled in this phase');
     expect(source).toContain('423');
 
-    expect(source).not.toContain('confirm_promotion?: unknown');
-    expect(source).not.toContain('confirmation_text?: unknown');
-    expect(source).not.toContain('PLAYRANK_ENABLE_PUBG_CORE_PROMOTION');
     expect(source).not.toContain('.rpc(');
-    expect(source).not.toContain('promote_pubg_api_match_to_playrank_core');
+    expect(source).not.toContain('promote_pubg_api_match_to_playrank_core(');
   });
 
   test('future guarded enablement contract is explicitly documented in tests before implementation', async () => {
@@ -66,3 +70,6 @@ test.describe('admin PUBG promotion guarded enablement contract', () => {
     expect(sqlSafetySource).toContain('admin promote route still does not call the write RPC directly');
   });
 });
+
+
+
