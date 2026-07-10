@@ -10,7 +10,7 @@ function readRoute() {
 }
 
 test.describe('admin PUBG promotion guarded enablement contract', () => {
-  test('route now exposes guarded confirmation fields without enabling SQL RPC', async () => {
+  test('route enables SQL RPC only after all guarded promotion checks pass', async () => {
     const source = readRoute();
 
     expect(source).toContain('dry_run?: unknown');
@@ -23,14 +23,17 @@ test.describe('admin PUBG promotion guarded enablement contract', () => {
     expect(source).toContain('function isCorePromotionEnabled');
     expect(source).toContain('confirmation_required: true');
     expect(source).toContain('Promotion confirmed, but the server-side promotion feature flag is disabled.');
-    expect(source).toContain('SQL RPC call is still disabled in this phase');
-    expect(source).toContain('423');
+    expect(source).toContain('promote_pubg_api_match_to_playrank_core');
+    expect(source).toContain('.rpc(');
+    expect(source).toContain('target_external_match_id: validated.externalMatchId');
 
-    expect(source).not.toContain('.rpc(');
-    expect(source).not.toContain('promote_pubg_api_match_to_playrank_core(');
+    expect(source.indexOf('if (dryRun)')).toBeLessThan(source.indexOf('promotionClient.rpc'));
+    expect(source.indexOf('if (!confirmPromotion)')).toBeLessThan(source.indexOf('promotionClient.rpc'));
+    expect(source.indexOf('confirmationText !== PROMOTION_CONFIRMATION_TEXT')).toBeLessThan(source.indexOf('promotionClient.rpc'));
+    expect(source.indexOf('if (!isCorePromotionEnabled())')).toBeLessThan(source.indexOf('promotionClient.rpc'));
   });
 
-  test('future guarded enablement contract is explicitly documented in tests before implementation', async () => {
+  test('guarded enablement contract preserves locked responses before SQL RPC', async () => {
     const contract = {
       body: {
         external_match_id: 'string',
@@ -60,16 +63,12 @@ test.describe('admin PUBG promotion guarded enablement contract', () => {
     expect(contract.allowedWritePath).toContain('may call SQL RPC');
   });
 
-  test('existing workflow tests still warn that admin route does not call the SQL RPC yet', async () => {
+  test('workflow and SQL safety tests now document guarded RPC enablement', async () => {
     const workflowSource = fs.readFileSync(workflowTestPath, 'utf8');
     const sqlSafetySource = fs.readFileSync(sqlSafetyTestPath, 'utf8');
 
-    expect(workflowSource).toContain('admin API route does not call the SQL promotion RPC yet');
-    expect(workflowSource).toContain('does not execute the SQL promotion RPC');
-    expect(workflowSource).toContain('expect(routeSource).not.toContain');
-    expect(sqlSafetySource).toContain('admin promote route still does not call the write RPC directly');
+    expect(workflowSource).toContain('guarded SQL RPC execution');
+    expect(workflowSource).toContain('readiness, confirmation, and feature flag checks');
+    expect(sqlSafetySource).toContain('guarded server checks');
   });
 });
-
-
-

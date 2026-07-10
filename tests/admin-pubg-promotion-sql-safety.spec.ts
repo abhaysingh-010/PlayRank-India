@@ -1,4 +1,4 @@
-﻿import { expect, test } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 import fs from 'node:fs';
 
 const migrationPath =
@@ -82,7 +82,7 @@ test.describe('admin PUBG promotion SQL safety contract', () => {
     expect(source).toContain('inserted_team_results < 2');
   });
 
-  test('admin promote route still does not call the write RPC directly', async () => {
+  test('admin promote route calls the write RPC only behind guarded server checks', async () => {
     const routeSource = fs.readFileSync(
       'src/app/api/admin/pubg/promote-match/route.ts',
       'utf8',
@@ -90,7 +90,9 @@ test.describe('admin PUBG promotion SQL safety contract', () => {
 
     expect(routeSource).toContain('dry_run?: unknown');
     expect(routeSource).toContain('core_promotion_disabled: true');
-    expect(routeSource).not.toContain('.rpc(');
-    expect(routeSource).not.toContain('promote_pubg_api_match_to_playrank_core(');
+    expect(routeSource).toContain('core_promotion_disabled: false');
+    expect(routeSource).toContain('target_external_match_id: validated.externalMatchId');
+    expect(routeSource).toContain('.rpc(');
+    expect(routeSource).toContain('promote_pubg_api_match_to_playrank_core');
   });
 });

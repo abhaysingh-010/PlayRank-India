@@ -1,4 +1,4 @@
-﻿import { expect, test } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 import fs from 'node:fs';
 import path from 'node:path';
 
@@ -212,7 +212,7 @@ test.describe('admin API safety regression tests', () => {
 
 
 test.describe('admin PUBG promotion dry-run source contract', () => {
-  test('/api/admin/pubg/promote-match exposes dry-run without enabling core writes', async () => {
+  test('/api/admin/pubg/promote-match keeps dry-run safe before guarded core writes', async () => {
     const source = fs.readFileSync('src/app/api/admin/pubg/promote-match/route.ts', 'utf8');
 
     expect(source).toContain('dry_run?: unknown');
@@ -222,7 +222,7 @@ test.describe('admin PUBG promotion dry-run source contract', () => {
     expect(source).toContain('would_promote: true');
     expect(source).toContain('core_promotion_disabled: true');
     expect(source).toContain('Dry run passed. Promotion gate is ready, but no core write was executed.');
-    expect(source).not.toContain('.rpc(');
-    expect(source).not.toContain('promote_pubg_api_match_to_playrank_core(');
+    expect(source).toContain('.rpc(');
+    expect(source).toContain('promote_pubg_api_match_to_playrank_core');
   });
 });

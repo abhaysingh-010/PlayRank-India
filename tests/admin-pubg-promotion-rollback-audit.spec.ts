@@ -1,4 +1,4 @@
-﻿import { expect, test } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 import fs from 'node:fs';
 
 const migrationPath =
@@ -73,16 +73,18 @@ test.describe('admin PUBG promotion rollback and audit contract', () => {
     expect(source).toContain("'inserted_team_results', inserted_team_results");
   });
 
-  test('admin route remains guarded and still does not execute promotion RPC in Phase 2B', async () => {
+  test('admin route remains guarded and executes promotion RPC only after Phase 4A checks', async () => {
     const source = readRoute();
 
     expect(source).toContain('confirm_promotion?: unknown');
     expect(source).toContain('confirmation_text?: unknown');
     expect(source).toContain('PLAYRANK_ENABLE_PUBG_CORE_PROMOTION');
     expect(source).toContain('PROMOTE_TO_PLAYRANK_CORE');
-    expect(source).toContain('SQL RPC call is still disabled in this phase');
+    expect(source).toContain('promote_pubg_api_match_to_playrank_core');
+    expect(source).toContain('promotionClient.rpc');
+    expect(source).toContain('target_external_match_id: validated.externalMatchId');
 
-    expect(source).not.toContain('.rpc(');
-    expect(source).not.toContain('promote_pubg_api_match_to_playrank_core(');
+    expect(source).toContain('.rpc(');
+    expect(source).toContain('promote_pubg_api_match_to_playrank_core');
   });
 });

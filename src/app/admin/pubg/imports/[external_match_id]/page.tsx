@@ -1,4 +1,4 @@
-﻿import Link from "next/link";
+import Link from "next/link";
 import { supabaseAdmin } from "../../../../../lib/supabaseAdmin";
 
 export const dynamic = "force-dynamic";
@@ -154,7 +154,7 @@ export default async function PubgImportDetailPage({ params }: PageProps) {
       : "unknown";
 
   const PROMOTION_WRITE_STATUS =
-    "Core promotion writes disabled. Dry-run checks are allowed, but this admin route does not execute the SQL promotion RPC.";
+    "Core promotion writes are guarded. Dry-run checks are allowed, but real promotion requires readiness, explicit confirmation, exact confirmation text, and PLAYRANK_ENABLE_PUBG_CORE_PROMOTION=true.";
 
   const PROMOTION_CONFIRMATION_TEXT = "PROMOTE_TO_PLAYRANK_CORE";
 
@@ -227,7 +227,7 @@ export default async function PubgImportDetailPage({ params }: PageProps) {
                 Step 2: Confirm promotion intent
               </p>
               <p className="mt-2 text-sm leading-6 text-zinc-300">
-                Confirmed promotion requires confirm_promotion, the exact confirmation_text, and the server flag PLAYRANK_ENABLE_PUBG_CORE_PROMOTION. Real writes are still disabled until Phase 4A.
+                Confirmed promotion requires confirm_promotion, the exact confirmation_text, and the server flag PLAYRANK_ENABLE_PUBG_CORE_PROMOTION. Real writes execute only after the guarded server flag is enabled.
               </p>
               <pre className="mt-3 overflow-auto rounded-xl border border-black/30 bg-black/30 p-3 text-xs leading-5 text-zinc-300">
                 {confirmedPromotionRequestBody}
@@ -423,12 +423,3 @@ export default async function PubgImportDetailPage({ params }: PageProps) {
     </main>
   );
 }
-
-
-
-
-
-
-
-
-

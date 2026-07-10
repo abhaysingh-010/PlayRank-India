@@ -31,6 +31,16 @@ type PromotionReadinessRow = {
   human_participants?: number | null;
 };
 
+type PromotionRpcClient = {
+  rpc: (
+    functionName: string,
+    args: Record<string, string>
+  ) => Promise<{
+    data: unknown;
+    error: { message: string } | null;
+  }>;
+};
+
 function jsonResponse(payload: unknown, status = 200) {
   return NextResponse.json(payload, {
     status,
@@ -139,6 +149,16 @@ function getReadinessSummary(row: PromotionReadinessRow) {
     ai_participants: row.ai_participants ?? null,
     human_participants: row.human_participants ?? null,
   };
+}
+
+function getPromotionRpcStatus(payload: unknown) {
+  if (!payload || typeof payload !== "object") {
+    return null;
+  }
+
+  const status = (payload as Record<string, unknown>).status;
+
+  return typeof status === "string" ? status : null;
 }
 
 export async function GET() {
@@ -297,22 +317,52 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const promotionClient = supabaseAdmin as unknown as PromotionRpcClient;
+    const { data: promotionResult, error: promotionError } =
+      await promotionClient.rpc("promote_pubg_api_match_to_playrank_core", {
+        target_external_match_id: validated.externalMatchId,
+      });
+
+    if (promotionError) {
+      return jsonResponse(
+        {
+          ok: false,
+          promoted: false,
+          blocked: false,
+          dry_run: false,
+          promotion_ready: true,
+          core_promotion_disabled: false,
+          promotion_env_flag: PROMOTION_ENV_FLAG,
+          error: "PUBG core promotion RPC failed.",
+          details: promotionError.message,
+          readiness: readinessSummary,
+        },
+        500
+      );
+    }
+
+    const promotionStatus = getPromotionRpcStatus(promotionResult);
+    const promoted = promotionStatus === "promoted";
+    const blocked = promotionStatus === "blocked";
+    const failed = promotionStatus === "failed";
+
     return jsonResponse(
       {
-        ok: false,
-        promoted: false,
-        blocked: false,
+        ok: promoted,
+        promoted,
+        blocked,
         dry_run: false,
         promotion_ready: true,
-        core_promotion_disabled: true,
+        core_promotion_disabled: false,
         promotion_env_flag: PROMOTION_ENV_FLAG,
-        error:
-          "Promotion gate passed and confirmation was accepted, but the SQL RPC call is still disabled in this phase.",
-        next_step:
-          "Phase 4A will enable the SQL RPC call behind this guarded contract.",
+        promotion_status: promotionStatus,
+        promotion_result: promotionResult,
+        message: promoted
+          ? "Promotion RPC executed and PlayRank core promotion completed."
+          : "Promotion RPC executed but did not return promoted status. Review the promotion audit log.",
         readiness: readinessSummary,
       },
-      423
+      promoted ? 200 : blocked ? 409 : failed ? 500 : 202
     );
   } catch {
     return jsonResponse(

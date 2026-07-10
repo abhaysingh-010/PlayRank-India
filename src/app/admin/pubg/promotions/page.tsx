@@ -1,4 +1,4 @@
-﻿import Link from "next/link";
+import Link from "next/link";
 import DataSourceBadge from "@/components/DataSourceBadge";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
 
@@ -295,9 +295,7 @@ export default async function PubgPromotionAuditPage() {
             </p>
 
             <p className="mt-2 text-sm leading-6 text-white/65">
-              SQL promotion function exists, but the admin API route does not
-              call it yet. Current approved operation is dry-run readiness review
-              plus audit inspection only.
+              SQL promotion function exists, and the admin API route calls it only after readiness, exact confirmation, and the server-side feature flag pass. Dry-run and locked responses still do not write.
             </p>
           </div>
 
@@ -389,8 +387,3 @@ export default async function PubgPromotionAuditPage() {
     </main>
   );
 }
-
-
-
-
-

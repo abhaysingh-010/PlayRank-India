@@ -1,4 +1,4 @@
-﻿import { expect, test } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 import fs from 'node:fs';
 
 test.describe('admin PUBG promotion workflow coverage', () => {
@@ -114,12 +114,12 @@ test.describe('admin PUBG promotion safety copy', () => {
   test('imports page explains dry-run only promotion safety mode', async () => {
     const source = fs.readFileSync('src/app/admin/pubg/imports/page.tsx', 'utf8');
 
-    expect(source).toContain('Core promotion writes are disabled');
+    expect(source).toContain('Core promotion writes are guarded');
     expect(source).toContain('Dry-run checks are allowed');
-    expect(source).toContain('admin API route does not call the SQL promotion RPC yet');
+    expect(source).toContain('admin API route only calls the SQL promotion RPC after readiness, confirmation, and feature flag checks pass');
     expect(source).toContain('/admin/pubg/promotions');
     expect(source).toContain('Promotion Audit');
-    expect(source).toContain('Dry-run only: real PlayRank core writes are');
+    expect(source).toContain('Guarded promotion: real PlayRank core writes are');
     expect(source).not.toContain('bg-[#ffd21a]/10px-5');
     expect(source).not.toContain('transitionhover:text-white');
     expect(source).not.toContain('bg-emerald-400/10p-5');
@@ -132,24 +132,26 @@ test.describe('admin PUBG promotion safety copy', () => {
     );
 
     expect(source).toContain('PROMOTION_WRITE_STATUS');
-    expect(source).toContain('Core promotion writes disabled');
+    expect(source).toContain('Core promotion writes are guarded');
     expect(source).toContain('Dry-run checks are allowed');
-    expect(source).toContain('does not execute the SQL promotion RPC');
+    expect(source).toContain('Real writes execute only after the guarded server flag is enabled.');
     expect(source).toContain('/admin/pubg/promotions');
     expect(source).toContain('Promotion Audit');
   });
 
-  test('promotion audit page states RPC is not called by admin route yet', async () => {
+  test('promotion audit page explains guarded SQL RPC execution', async () => {
     const source = fs.readFileSync('src/app/admin/pubg/promotions/page.tsx', 'utf8');
     const routeSource = fs.readFileSync('src/app/api/admin/pubg/promote-match/route.ts', 'utf8');
 
     expect(source).toContain('SQL promotion function exists');
-    expect(source).toContain('admin API route does not');
-    expect(source).toContain('Current approved operation is dry-run readiness review');
+    expect(source).toContain('admin API route calls it only after readiness');
+    expect(source).toContain('readiness, exact confirmation, and the server-side feature flag pass');
     expect(routeSource).toContain('dry_run?: unknown');
     expect(routeSource).toContain('core_promotion_disabled: true');
-    expect(routeSource).not.toContain('.rpc(');
-    expect(routeSource).not.toContain('promote_pubg_api_match_to_playrank_core(');
+    expect(routeSource).toContain('core_promotion_disabled: false');
+    expect(routeSource).toContain('core_promotion_disabled: false');
+    expect(routeSource).toContain('.rpc(');
+    expect(routeSource).toContain('promote_pubg_api_match_to_playrank_core');
   });
 });
 
@@ -181,15 +183,15 @@ test.describe('admin PUBG promotion confirmation workflow UI', () => {
     expect(source).toContain('confirmation_text');
     expect(source).toContain('PROMOTE_TO_PLAYRANK_CORE');
     expect(source).toContain('PLAYRANK_ENABLE_PUBG_CORE_PROMOTION');
-    expect(source).toContain('Real writes are still disabled until Phase 4A');
+    expect(source).toContain('Real writes execute only after the guarded server flag is enabled.');
   });
 
-  test('confirmation workflow UI does not enable SQL RPC execution yet', async () => {
+  test('confirmation workflow UI documents guarded SQL RPC execution', async () => {
     const routeSource = fs.readFileSync('src/app/api/admin/pubg/promote-match/route.ts', 'utf8');
 
-    expect(routeSource).toContain('SQL RPC call is still disabled in this phase');
-    expect(routeSource).not.toContain('.rpc(');
-    expect(routeSource).not.toContain('promote_pubg_api_match_to_playrank_core(');
+    expect(routeSource).toContain('promote_pubg_api_match_to_playrank_core');
+    expect(routeSource).toContain('.rpc(');
+    expect(routeSource).toContain('promote_pubg_api_match_to_playrank_core');
   });
 });
 
@@ -222,11 +224,43 @@ test.describe('admin PUBG promotion audit and failure-state copy', () => {
     expect(source).toContain('core_match_id');
   });
 
-  test('failure-state copy still does not enable SQL RPC execution', async () => {
+  test('failure-state copy preserves guarded SQL RPC execution', async () => {
     const routeSource = fs.readFileSync('src/app/api/admin/pubg/promote-match/route.ts', 'utf8');
 
-    expect(routeSource).toContain('SQL RPC call is still disabled in this phase');
-    expect(routeSource).not.toContain('.rpc(');
-    expect(routeSource).not.toContain('promote_pubg_api_match_to_playrank_core(');
+    expect(routeSource).toContain('promote_pubg_api_match_to_playrank_core');
+    expect(routeSource).toContain('.rpc(');
+    expect(routeSource).toContain('promote_pubg_api_match_to_playrank_core');
+  });
+});
+
+test.describe('admin PUBG promotion Phase 4A guarded SQL RPC execution', () => {
+  test('route keeps every guard before the SQL RPC call', async () => {
+    const source = fs.readFileSync('src/app/api/admin/pubg/promote-match/route.ts', 'utf8');
+
+    expect(source).toContain('promotionClient.rpc("promote_pubg_api_match_to_playrank_core"');
+    expect(source).toContain('target_external_match_id: validated.externalMatchId');
+    expect(source).toContain('core_promotion_disabled: false');
+    expect(source).toContain('promotion_result: promotionResult');
+
+    expect(source.indexOf('readinessRow.promotion_allowed !== true')).toBeLessThan(source.indexOf('promotionClient.rpc'));
+    expect(source.indexOf('if (dryRun)')).toBeLessThan(source.indexOf('promotionClient.rpc'));
+    expect(source.indexOf('if (!confirmPromotion)')).toBeLessThan(source.indexOf('promotionClient.rpc'));
+    expect(source.indexOf('confirmationText !== PROMOTION_CONFIRMATION_TEXT')).toBeLessThan(source.indexOf('promotionClient.rpc'));
+    expect(source.indexOf('if (!isCorePromotionEnabled())')).toBeLessThan(source.indexOf('promotionClient.rpc'));
+  });
+
+  test('operator copy reflects guarded enablement rather than unconditional writes', async () => {
+    const importsSource = fs.readFileSync('src/app/admin/pubg/imports/page.tsx', 'utf8');
+    const detailSource = fs.readFileSync(
+      'src/app/admin/pubg/imports/[external_match_id]/page.tsx',
+      'utf8',
+    );
+    const auditSource = fs.readFileSync('src/app/admin/pubg/promotions/page.tsx', 'utf8');
+
+    expect(importsSource).toContain('Core promotion writes are guarded');
+    expect(importsSource).toContain('readiness, confirmation, and feature flag checks pass');
+    expect(detailSource).toContain('Core promotion writes are guarded');
+    expect(detailSource).toContain('PLAYRANK_ENABLE_PUBG_CORE_PROMOTION=true');
+    expect(auditSource).toContain('admin API route calls it only after readiness');
   });
 });

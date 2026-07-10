@@ -1,4 +1,4 @@
-﻿import Link from "next/link";
+import Link from "next/link";
 import DataSourceBadge from "@/components/DataSourceBadge";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
 
@@ -597,11 +597,11 @@ export default async function PubgImportsPage() {
 
                             <div className="mt-5 rounded-2xl border border-yellow-400/20 bg-yellow-400/10 p-4">
                 <p className="text-xs font-black uppercase tracking-[0.18em] text-yellow-300">
-                  Core promotion writes are disabled
+                  Core promotion writes are guarded
                 </p>
 
                 <p className="mt-2 text-sm leading-6 text-white/65">
-                  Dry-run checks are allowed for readiness review, but the admin API route does not call the SQL promotion RPC yet. Use the promotion audit page to review historical promotion attempts.
+                  Dry-run checks are allowed for readiness review, but the admin API route only calls the SQL promotion RPC after readiness, confirmation, and feature flag checks pass. Use the promotion audit page to review historical promotion attempts.
                 </p>
               </div>
 
@@ -770,7 +770,7 @@ export default async function PubgImportsPage() {
 
               <p className="mt-3 text-sm leading-6 text-white/50">
                 Imported rows stay in staging until promotion_allowed is true in
-                the readiness view. Dry-run only: real PlayRank core writes are disabled until the SQL safety audit is approved.
+                the readiness view. Guarded promotion: real PlayRank core writes are disabled until the SQL safety audit is approved.
               </p>
             </div>
           </div>
@@ -853,18 +853,3 @@ export default async function PubgImportsPage() {
     </main>
   );
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
