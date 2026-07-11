@@ -1,10 +1,21 @@
 import { NextRequest, NextResponse } from "next/server";
 
+const UNSAFE_METHODS = new Set(["POST", "PUT", "PATCH", "DELETE"]);
+
 function unauthorized() {
   return new NextResponse("Unauthorized", {
     status: 401,
     headers: {
       "WWW-Authenticate": 'Basic realm="PlayRank Admin"',
+      "Cache-Control": "no-store",
+    },
+  });
+}
+
+function csrfRejected() {
+  return new NextResponse("Cross-site request rejected", {
+    status: 403,
+    headers: {
       "Cache-Control": "no-store",
     },
   });
@@ -30,6 +41,32 @@ function safeDecodeBasicAuth(authHeader: string) {
     };
   } catch {
     return null;
+  }
+}
+
+function hasValidSameOrigin(request: NextRequest) {
+  const originHeader = request.headers.get("origin");
+
+  if (!originHeader) {
+    return false;
+  }
+
+  const host =
+    request.headers.get("x-forwarded-host") ??
+    request.headers.get("host");
+
+  if (!host) {
+    return false;
+  }
+
+  const protocol =
+    request.headers.get("x-forwarded-proto") ??
+    request.nextUrl.protocol.replace(":", "");
+
+  try {
+    return new URL(originHeader).origin === `${protocol}://${host}`;
+  } catch {
+    return false;
   }
 }
 
@@ -69,6 +106,10 @@ export default function proxy(req: NextRequest) {
 
   if (decoded.username !== username || decoded.password !== password) {
     return unauthorized();
+  }
+
+  if (UNSAFE_METHODS.has(req.method) && !hasValidSameOrigin(req)) {
+    return csrfRejected();
   }
 
   return NextResponse.next();

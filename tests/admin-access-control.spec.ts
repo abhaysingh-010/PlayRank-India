@@ -106,3 +106,73 @@ test.describe('admin access-control regression tests', () => {
     expect(body).not.toContain('Admin protection is not configured');
   });
 });
+
+test('admin unsafe requests reject missing or cross-site origins', async ({ request }) => {
+  const credentials = getAdminCredentials();
+
+  test.skip(
+    !credentials.username || !credentials.password,
+    'ADMIN_USERNAME and ADMIN_PASSWORD are not available to the Playwright test runner',
+  );
+
+  const authorization = basicAuth(
+    credentials.username!,
+    credentials.password!,
+  );
+
+  const missingOriginResponse = await request.post(
+    '/api/admin/pubg/promotion-readiness',
+    {
+      headers: {
+        Authorization: authorization,
+      },
+    },
+  );
+
+  expect(missingOriginResponse.status()).toBe(403);
+  expect(missingOriginResponse.headers()['cache-control']).toContain('no-store');
+  expect(await missingOriginResponse.text()).toContain(
+    'Cross-site request rejected',
+  );
+
+  const crossSiteResponse = await request.post(
+    '/api/admin/pubg/promotion-readiness',
+    {
+      headers: {
+        Authorization: authorization,
+        Origin: 'https://attacker.example',
+      },
+    },
+  );
+
+  expect(crossSiteResponse.status()).toBe(403);
+  expect(await crossSiteResponse.text()).toContain(
+    'Cross-site request rejected',
+  );
+});
+
+test('admin unsafe requests allow the configured same origin', async ({ request }) => {
+  const credentials = getAdminCredentials();
+
+  test.skip(
+    !credentials.username || !credentials.password,
+    'ADMIN_USERNAME and ADMIN_PASSWORD are not available to the Playwright test runner',
+  );
+
+  const response = await request.post(
+    '/api/admin/pubg/promotion-readiness',
+    {
+      headers: {
+        Authorization: basicAuth(
+          credentials.username!,
+          credentials.password!,
+        ),
+        Origin: 'http://127.0.0.1:3000',
+      },
+    },
+  );
+
+  expect(response.status()).not.toBe(401);
+  expect(response.status()).not.toBe(403);
+  expect(response.status()).toBeLessThan(500);
+});
