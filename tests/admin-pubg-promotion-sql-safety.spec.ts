@@ -96,3 +96,57 @@ test.describe('admin PUBG promotion SQL safety contract', () => {
     expect(routeSource).toContain('promote_pubg_api_match_to_playrank_core');
   });
 });
+
+test.describe('Sprint 7 database security hardening contract', () => {
+  const securityMigrationPath =
+    'supabase/migrations/20260711040000_sprint_7_database_security_hardening.sql';
+
+  test('promotion audit table remains service-role only', async () => {
+    const source = fs.readFileSync(securityMigrationPath, 'utf8');
+
+    expect(source).toContain(
+      'alter table public.pubg_core_promotions enable row level security;',
+    );
+    expect(source).toContain(
+      'revoke all on table public.pubg_core_promotions from anon;',
+    );
+    expect(source).toContain(
+      'revoke all on table public.pubg_core_promotions from authenticated;',
+    );
+    expect(source).toContain(
+      'grant select, insert, update, delete',
+    );
+    expect(source).toContain(
+      'to service_role;',
+    );
+  });
+
+  test('player analytics and promotion RPC use hardened security settings', async () => {
+    const source = fs.readFileSync(securityMigrationPath, 'utf8');
+
+    expect(source).toContain(
+      'alter view public.player_analytics',
+    );
+    expect(source).toContain(
+      'set (security_invoker = true);',
+    );
+    expect(source).toContain(
+      'alter function public.promote_pubg_api_match_to_playrank_core(text)',
+    );
+    expect(source).toContain(
+      'set search_path = public, pg_temp;',
+    );
+    expect(source).toContain(
+      'revoke all',
+    );
+    expect(source).toContain(
+      'from authenticated;',
+    );
+    expect(source).toContain(
+      'grant execute',
+    );
+    expect(source).toContain(
+      'to service_role;',
+    );
+  });
+});
