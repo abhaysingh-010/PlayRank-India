@@ -1,6 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 
 const UNSAFE_METHODS = new Set(["POST", "PUT", "PATCH", "DELETE"]);
+const RATE_LIMIT_WINDOW_MS = 60_000;
+const RATE_LIMIT_MAX_REQUESTS = 20;
+
+type RateLimitEntry = {
+  count: number;
+  resetAt: number;
+};
+
+const rateLimitStore = new Map<string, RateLimitEntry>();
 
 function unauthorized() {
   return new NextResponse("Unauthorized", {
@@ -17,6 +26,18 @@ function csrfRejected() {
     status: 403,
     headers: {
       "Cache-Control": "no-store",
+    },
+  });
+}
+
+function rateLimited(retryAfterSeconds: number) {
+  return new NextResponse("Too many admin requests", {
+    status: 429,
+    headers: {
+      "Cache-Control": "no-store",
+      "Retry-After": String(retryAfterSeconds),
+      "X-RateLimit-Limit": String(RATE_LIMIT_MAX_REQUESTS),
+      "X-RateLimit-Remaining": "0",
     },
   });
 }
@@ -70,6 +91,54 @@ function hasValidSameOrigin(request: NextRequest) {
   }
 }
 
+function getClientIp(request: NextRequest) {
+  const forwardedFor = request.headers.get("x-forwarded-for");
+
+  if (forwardedFor) {
+    return forwardedFor.split(",")[0]?.trim() || "unknown";
+  }
+
+  return request.headers.get("x-real-ip") ?? "unknown";
+}
+
+function checkRateLimit(request: NextRequest) {
+  const now = Date.now();
+  const key = `${getClientIp(request)}:${request.nextUrl.pathname}`;
+  const current = rateLimitStore.get(key);
+
+  if (!current || current.resetAt <= now) {
+    const resetAt = now + RATE_LIMIT_WINDOW_MS;
+
+    rateLimitStore.set(key, {
+      count: 1,
+      resetAt,
+    });
+
+    return {
+      allowed: true,
+      remaining: RATE_LIMIT_MAX_REQUESTS - 1,
+      resetAt,
+    };
+  }
+
+  if (current.count >= RATE_LIMIT_MAX_REQUESTS) {
+    return {
+      allowed: false,
+      remaining: 0,
+      resetAt: current.resetAt,
+    };
+  }
+
+  current.count += 1;
+  rateLimitStore.set(key, current);
+
+  return {
+    allowed: true,
+    remaining: RATE_LIMIT_MAX_REQUESTS - current.count,
+    resetAt: current.resetAt,
+  };
+}
+
 export default function proxy(req: NextRequest) {
   const pathname = req.nextUrl.pathname;
 
@@ -108,8 +177,37 @@ export default function proxy(req: NextRequest) {
     return unauthorized();
   }
 
-  if (UNSAFE_METHODS.has(req.method) && !hasValidSameOrigin(req)) {
+  const isUnsafeAdminApiRequest =
+    pathname.startsWith("/api/admin") && UNSAFE_METHODS.has(req.method);
+
+  if (isUnsafeAdminApiRequest && !hasValidSameOrigin(req)) {
     return csrfRejected();
+  }
+
+  if (isUnsafeAdminApiRequest) {
+    const result = checkRateLimit(req);
+
+    if (!result.allowed) {
+      const retryAfterSeconds = Math.max(
+        1,
+        Math.ceil((result.resetAt - Date.now()) / 1000),
+      );
+
+      return rateLimited(retryAfterSeconds);
+    }
+
+    const response = NextResponse.next();
+
+    response.headers.set(
+      "X-RateLimit-Limit",
+      String(RATE_LIMIT_MAX_REQUESTS),
+    );
+    response.headers.set(
+      "X-RateLimit-Remaining",
+      String(result.remaining),
+    );
+
+    return response;
   }
 
   return NextResponse.next();

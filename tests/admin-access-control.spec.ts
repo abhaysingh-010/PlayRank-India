@@ -176,3 +176,48 @@ test('admin unsafe requests allow the configured same origin', async ({ request 
   expect(response.status()).not.toBe(403);
   expect(response.status()).toBeLessThan(500);
 });
+
+test('admin write requests are rate limited per client and route', async ({ request }) => {
+  const credentials = getAdminCredentials();
+
+  test.skip(
+    !credentials.username || !credentials.password,
+    'ADMIN_USERNAME and ADMIN_PASSWORD are not available to the Playwright test runner',
+  );
+
+  const headers = {
+    Authorization: basicAuth(
+      credentials.username!,
+      credentials.password!,
+    ),
+    Origin: 'http://127.0.0.1:3000',
+    'X-Forwarded-For': '198.51.100.77',
+  };
+
+  for (let attempt = 1; attempt <= 20; attempt += 1) {
+    const response = await request.post(
+      '/api/admin/pubg/promotion-readiness',
+      { headers },
+    );
+
+    expect(response.status()).not.toBe(429);
+    expect(response.headers()['x-ratelimit-limit']).toBe('20');
+    expect(Number(response.headers()['x-ratelimit-remaining'])).toBe(
+      20 - attempt,
+    );
+  }
+
+  const blockedResponse = await request.post(
+    '/api/admin/pubg/promotion-readiness',
+    { headers },
+  );
+
+  expect(blockedResponse.status()).toBe(429);
+  expect(blockedResponse.headers()['cache-control']).toContain('no-store');
+  expect(blockedResponse.headers()['retry-after']).toBeTruthy();
+  expect(blockedResponse.headers()['x-ratelimit-limit']).toBe('20');
+  expect(blockedResponse.headers()['x-ratelimit-remaining']).toBe('0');
+  expect(await blockedResponse.text()).toContain(
+    'Too many admin requests',
+  );
+});
