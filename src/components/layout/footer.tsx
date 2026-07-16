@@ -2,29 +2,24 @@
 import Link from "next/link";
 
 const productLinks = [
+  { label: "Rankings", href: "/rankings" },
   { label: "Teams", href: "/teams" },
   { label: "Players", href: "/players" },
   { label: "Matches", href: "/matches" },
-  { label: "Rankings", href: "/rankings" },
-  { label: "Compare", href: "/compare" },
   { label: "Tournaments", href: "/tournaments" },
+  { label: "Compare", href: "/compare" },
 ];
 
-const dataLinks = [
-  { label: "Data Trust Layer", href: "/data" },
+const resourceLinks = [
+  { label: "Data", href: "/data" },
   { label: "Methodology", href: "/methodology" },
-  { label: "Official Rankings", href: "/rankings" },
-  { label: "Team Database", href: "/teams" },
-  { label: "Player Database", href: "/players" },
-  { label: "Match Intelligence", href: "/matches" },
-  { label: "Tournament Records", href: "/tournaments" },
+  { label: "Leaderboards", href: "/leaderboards" },
+  { label: "Standings", href: "/standings" },
 ];
 
 const companyLinks = [
-  { label: "About PlayRank", href: "/about" },
-  { label: "Esports Intelligence", href: "/compare" },
-  { label: "Data Transparency", href: "/data" },
-  { label: "Methodology", href: "/methodology" },
+  { label: "About", href: "/about" },
+  { label: "Search", href: "/search" },
 ];
 
 function FooterColumn({
@@ -32,23 +27,23 @@ function FooterColumn({
   links,
 }: {
   title: string;
-  links: {
+  links: Array<{
     label: string;
     href: string;
-  }[];
+  }>;
 }) {
   return (
     <div>
-      <p className="text-xs font-black uppercase tracking-[0.28em] text-white/45">
+      <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--text-muted)]">
         {title}
       </p>
 
-      <div className="mt-5 space-y-3">
+      <div className="mt-4 space-y-3">
         {links.map((link) => (
           <Link
-            key={link.label}
+            key={`${title}-${link.href}`}
             href={link.href}
-            className="block text-sm font-semibold text-white/55 transition hover:text-[#ff4038]"
+            className="block text-sm text-[var(--text-secondary)] transition hover:text-[var(--brand-hover)]"
           >
             {link.label}
           </Link>
@@ -58,94 +53,58 @@ function FooterColumn({
   );
 }
 
-function FooterBadge({ label }: { label: string }) {
-  return (
-    <span className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-[10px] font-black uppercase tracking-[0.14em] text-white/45">
-      {label}
-    </span>
-  );
-}
-
 export default function Footer() {
   return (
-    <footer className="border-t border-white/10 bg-black px-7 py-16 text-white md:px-14">
-      <div className="mx-auto max-w-[1600px]">
-        <div className="grid gap-12 lg:grid-cols-[1.2fr_0.8fr_0.8fr_0.8fr]">
+    <footer className="border-t border-[var(--border-soft)] bg-[var(--background-deep)]">
+      <div className="mx-auto max-w-[1440px] px-4 py-14 md:px-6 lg:px-8">
+        <div className="grid gap-12 lg:grid-cols-[1.25fr_0.75fr_0.75fr_0.75fr]">
           <div>
-            <Link href="/" className="inline-flex items-center">
+            <Link
+              href="/"
+              className="inline-flex items-center"
+              aria-label="PlayRank home"
+            >
               <Image
                 src="/brand/playrank-logo.png"
                 alt="PlayRank"
-                width={180}
-                height={48}
-                className="h-10 w-auto object-contain"
-                priority={false}
+                width={168}
+                height={40}
+                className="h-8 w-auto object-contain"
               />
             </Link>
 
-            <p className="mt-5 max-w-md text-sm leading-7 text-white/55">
-              India&apos;s esports intelligence platform for rankings, teams,
-              players, matches, tournaments and competitive comparison.
+            <p className="mt-5 max-w-md text-sm leading-7 text-[var(--text-secondary)]">
+              India&apos;s esports intelligence platform for competitive
+              rankings, verified team and player records, match context, and
+              data-led comparison.
             </p>
 
-            <div className="mt-6 flex flex-wrap gap-2">
-              <FooterBadge label="Independent Platform" />
-              <FooterBadge label="Source Attribution" />
-              <FooterBadge label="No Predictions" />
-            </div>
-
-            <div className="mt-8 flex flex-wrap gap-3">
-              <Link
-                href="/rankings"
-                className="rounded-full bg-[#ff4038] px-5 py-2.5 text-xs font-black uppercase tracking-[0.14em] text-black transition hover:bg-white"
-              >
-                View Rankings
-              </Link>
-
-              <Link
-                href="/compare"
-                className="rounded-full border border-white/15 bg-white/[0.04] px-5 py-2.5 text-xs font-black uppercase tracking-[0.14em] text-white transition hover:border-[#ff4038] hover:text-[#ff4038]"
-              >
-                Compare
-              </Link>
-
-              <Link
-                href="/methodology"
-                className="rounded-full border border-white/15 bg-white/[0.04] px-5 py-2.5 text-xs font-black uppercase tracking-[0.14em] text-white transition hover:border-[#ffd21a] hover:text-[#ffd21a]"
-              >
-                Methodology
-              </Link>
-            </div>
+            <Link
+              href="/rankings"
+              className="mt-6 inline-flex min-h-10 items-center justify-center rounded-xl border border-[var(--border-medium)] bg-[var(--brand-soft)] px-4 text-sm font-semibold text-[var(--brand-hover)] transition hover:border-[var(--border-strong)] hover:bg-[rgba(139,163,197,0.16)]"
+            >
+              Explore rankings
+            </Link>
           </div>
 
           <FooterColumn title="Product" links={productLinks} />
-          <FooterColumn title="Data" links={dataLinks} />
+          <FooterColumn title="Resources" links={resourceLinks} />
           <FooterColumn title="Company" links={companyLinks} />
         </div>
 
-        <div className="mt-14 rounded-[2rem] border border-red-400/20 bg-red-400/[0.06] p-5">
-          <p className="text-xs font-black uppercase tracking-[0.22em] text-red-200">
-            Independent Platform Disclaimer
-          </p>
-
-          <p className="mt-3 max-w-5xl text-xs leading-6 text-white/45">
-            PlayRank is an independent esports intelligence platform. It is not
-            affiliated with, endorsed by, or operated by Krafton, PUBG, BGMI, or
-            tournament organizers. Official rankings and source data are
-            attributed where available. PlayRank analytics, rankings, edge
-            scores and confidence labels are independently calculated from
-            available source, roster, match and ranking data.
+        <div className="mt-12 border-t border-[var(--border-soft)] pt-6">
+          <p className="max-w-5xl text-xs leading-6 text-[var(--text-subtle)]">
+            PlayRank is an independent esports intelligence platform and is not
+            affiliated with, endorsed by, or operated by Krafton, PUBG, BGMI,
+            or tournament organisers. Official source data is attributed where
+            available. PlayRank rankings and analytics are independently
+            calculated from available competitive data.
           </p>
         </div>
 
-        <div className="mt-8 flex flex-col gap-4 border-t border-white/10 pt-7 md:flex-row md:items-center md:justify-between">
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-white/40">
-            © {new Date().getFullYear()} PlayRank. All rights reserved.
-          </p>
-
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-white/40">
-            Built for India&apos;s competitive esports ecosystem.
-          </p>
+        <div className="mt-6 flex flex-col gap-3 border-t border-[var(--border-soft)] pt-6 text-xs text-[var(--text-subtle)] md:flex-row md:items-center md:justify-between">
+          <p>© {new Date().getFullYear()} PlayRank. All rights reserved.</p>
+          <p>Built for India&apos;s competitive esports ecosystem.</p>
         </div>
       </div>
     </footer>
