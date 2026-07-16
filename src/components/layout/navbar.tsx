@@ -4,7 +4,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { Menu, Search, X } from "lucide-react";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import GlobalSearch from "@/components/GlobalSearch";
 
 const primaryLinks = [
   { label: "Rankings", href: "/rankings" },
@@ -23,6 +24,18 @@ const secondaryLinks = [
 export default function Navbar() {
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
+
+  useEffect(() => {
+    if (!menuOpen) return;
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [menuOpen]);
 
   return (
     <header className="pr-nav">
@@ -50,29 +63,34 @@ export default function Navbar() {
         </nav>
 
         <div className="hidden items-center gap-2 lg:flex">
-          <Link href="/search" className="pr-icon-button" aria-label="Search PlayRank">
+          <button type="button" onClick={() => setSearchOpen(true)} className="pr-icon-button" aria-label="Search PlayRank">
             <Search size={17} strokeWidth={2} />
-          </Link>
+          </button>
           <Link href="/compare" className="pr-button pr-button-primary h-10 px-5 text-[11px]">
             Compare
           </Link>
         </div>
 
-        <button
-          type="button"
-          className="pr-icon-button pr-mobile-toggle"
-          onClick={() => setMenuOpen((open) => !open)}
-          aria-expanded={menuOpen}
-          aria-controls="mobile-navigation"
-          aria-label={menuOpen ? "Close navigation" : "Open navigation"}
-        >
-          {menuOpen ? <X size={20} /> : <Menu size={20} />}
-        </button>
+        <div className="flex items-center gap-2 lg:hidden">
+          <button type="button" onClick={() => { setMenuOpen(false); setSearchOpen(true); }} className="pr-icon-button" aria-label="Search PlayRank">
+            <Search size={18} strokeWidth={2} />
+          </button>
+          <button
+            type="button"
+            className="pr-icon-button pr-mobile-toggle"
+            onClick={() => setMenuOpen((open) => !open)}
+            aria-expanded={menuOpen}
+            aria-controls="mobile-navigation"
+            aria-label={menuOpen ? "Close navigation" : "Open navigation"}
+          >
+            {menuOpen ? <X size={20} /> : <Menu size={20} />}
+          </button>
+        </div>
       </div>
 
       {menuOpen ? (
-        <div id="mobile-navigation" className="border-t border-white/10 bg-[var(--pr-bg)] lg:hidden">
-          <nav className="pr-container grid gap-0 py-4" aria-label="Mobile navigation">
+        <div id="mobile-navigation" className="absolute inset-x-0 top-full h-[calc(100dvh-72px)] overflow-y-auto border-t border-white/10 bg-[var(--pr-bg)] lg:hidden">
+          <nav className="pr-container grid gap-0 py-4 pb-10" aria-label="Mobile navigation">
             {[...primaryLinks, ...secondaryLinks].map((link, index) => (
               <Link
                 key={link.href}
@@ -86,6 +104,10 @@ export default function Navbar() {
             ))}
           </nav>
         </div>
+      ) : null}
+
+      {searchOpen ? (
+        <GlobalSearch forceOpen onRequestClose={() => setSearchOpen(false)} />
       ) : null}
     </header>
   );
