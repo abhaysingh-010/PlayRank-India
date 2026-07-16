@@ -188,7 +188,7 @@ export default function GlobalSearch({
 
       {open ? (
         <div
-          className="fixed inset-0 z-[60] flex items-start justify-center bg-[rgba(2,6,15,0.78)] px-4 pt-[10vh] backdrop-blur-xl"
+          className="fixed inset-0 z-[60] flex items-start justify-center bg-black/75 px-3 pt-3 backdrop-blur-md sm:px-5 sm:pt-[12vh]"
           onMouseDown={(event) => {
             if (event.target === event.currentTarget) {
               closeSearch();
@@ -199,49 +199,57 @@ export default function GlobalSearch({
             role="dialog"
             aria-modal="true"
             aria-label="Search PlayRank"
-            className="w-full max-w-2xl overflow-hidden rounded-[var(--radius-large)] border border-[var(--border-medium)] bg-[var(--surface)] shadow-[var(--shadow-elevated)]"
+            className="w-full max-w-xl overflow-hidden border border-white/15 bg-[#0a0a0a] shadow-[0_30px_100px_rgba(0,0,0,.65)]"
           >
-            <div className="flex items-center gap-3 border-b border-[var(--border-soft)] px-4">
+            <div className="flex items-center justify-between border-b border-white/10 px-5 py-3">
+              <p className="text-[9px] font-black uppercase tracking-[.22em] text-white/30">
+                Search PlayRank
+              </p>
+              <button
+                type="button"
+                onClick={closeSearch}
+                className="inline-flex h-8 w-8 shrink-0 items-center justify-center text-white/35 transition hover:bg-white/[0.05] hover:text-white"
+                aria-label="Close search"
+              >
+                <X size={16} />
+              </button>
+            </div>
+
+            <div className="flex items-center gap-4 border-b border-white/15 px-5">
               <Search
-                size={19}
-                className="shrink-0 text-[var(--text-muted)]"
+                size={20}
+                className="shrink-0 text-[#f4473b]"
               />
 
               <input
                 ref={inputRef}
                 value={query}
                 onChange={(event) => handleQueryChange(event.target.value)}
-                placeholder="Search players, teams, and tournaments"
-                className="h-16 flex-1 border-0 bg-transparent px-0 text-base text-[var(--text-primary)] shadow-none outline-none placeholder:text-[var(--text-subtle)] focus:bg-transparent focus:shadow-none"
+                placeholder="Player, team or tournament…"
+                className="h-[72px] min-w-0 flex-1 !border-0 !bg-transparent px-0 text-lg font-medium text-white !shadow-none !outline-none placeholder:text-white/20 focus:!border-0 focus:!bg-transparent focus:!shadow-none"
                 aria-label="Search query"
               />
-
-              <button
-                type="button"
-                onClick={closeSearch}
-                className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-[var(--text-muted)] transition hover:bg-white/[0.05] hover:text-[var(--text-primary)]"
-                aria-label="Close search"
-              >
-                <X size={18} />
-              </button>
             </div>
 
-            <div className="max-h-[min(480px,65vh)] overflow-y-auto p-3">
+            <div className="max-h-[min(430px,65vh)] overflow-y-auto">
               {!query.trim() ? (
-                <div>
-                  <p className="px-3 py-2 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--text-muted)]">
-                    Explore PlayRank
+                <div className="p-5">
+                  <p className="mb-3 text-[9px] font-black uppercase tracking-[.2em] text-white/25">
+                    Quick access
                   </p>
 
-                  <div className="grid gap-1 sm:grid-cols-2">
-                    {suggestedLinks.map((item) => (
+                  <div className="grid border-l border-t border-white/10 sm:grid-cols-2">
+                    {suggestedLinks.map((item, index) => (
                       <Link
                         key={item.href}
                         href={item.href}
                         onClick={closeSearch}
-                        className="rounded-xl px-3 py-3 text-sm font-medium text-[var(--text-secondary)] transition hover:bg-white/[0.04] hover:text-[var(--text-primary)]"
+                        className="group flex items-center justify-between border-b border-r border-white/10 px-4 py-3.5 text-sm font-semibold text-white/55 transition hover:bg-white/[0.04] hover:text-white"
                       >
-                        {item.label}
+                        <span>{item.label}</span>
+                        <span className="font-mono text-[9px] text-white/15 transition group-hover:text-[#f4473b]">
+                          0{index + 1}
+                        </span>
                       </Link>
                     ))}
                   </div>
@@ -249,38 +257,38 @@ export default function GlobalSearch({
               ) : null}
 
               {loading ? (
-                <div className="px-3 py-8 text-center text-sm text-[var(--text-muted)]">
+                <div className="px-5 py-12 text-center text-sm text-white/35">
                   Searching…
                 </div>
               ) : null}
 
               {error ? (
-                <div className="rounded-xl border border-[rgba(201,75,85,0.24)] bg-[var(--danger-soft)] px-4 py-4 text-sm text-[var(--danger)]">
+                <div className="m-5 border border-red-400/25 bg-red-400/10 px-4 py-4 text-sm text-red-300">
                   {error}
                 </div>
               ) : null}
 
               {!loading && !error && results.length > 0 ? (
-                <div className="space-y-1">
+                <div>
                   {results.map((item) => (
                     <Link
                       key={`${item.type}-${item.id}`}
                       href={resultHref(item)}
                       onClick={closeSearch}
-                      className="flex items-center justify-between gap-4 rounded-xl px-3 py-3 transition hover:bg-white/[0.045]"
+                      className="group flex items-center justify-between gap-4 border-b border-white/10 px-5 py-4 transition hover:bg-white/[0.04]"
                     >
                       <div className="min-w-0">
-                        <p className="truncate text-sm font-semibold text-[var(--text-primary)]">
+                        <p className="truncate text-sm font-semibold text-white">
                           {item.name || item.ign || "Unnamed"}
                         </p>
 
-                        <p className="mt-1 text-xs capitalize text-[var(--text-muted)]">
+                        <p className="mt-1 text-[9px] font-bold uppercase tracking-[.15em] text-white/25">
                           {item.type}
                         </p>
                       </div>
 
-                      <span className="text-xs font-medium text-[var(--brand)]">
-                        Open
+                      <span className="text-sm text-white/20 transition group-hover:translate-x-1 group-hover:text-[#f4473b]">
+                        →
                       </span>
                     </Link>
                   ))}
@@ -291,21 +299,21 @@ export default function GlobalSearch({
               !error &&
               query.trim() &&
               results.length === 0 ? (
-                <div className="px-3 py-8 text-center">
-                  <p className="text-sm font-medium text-[var(--text-secondary)]">
+                <div className="px-5 py-12 text-center">
+                  <p className="text-sm font-medium text-white/60">
                     No results found
                   </p>
 
-                  <p className="mt-1 text-xs text-[var(--text-muted)]">
+                  <p className="mt-2 text-xs text-white/25">
                     Try a different player, team, or tournament name.
                   </p>
                 </div>
               ) : null}
             </div>
 
-            <div className="flex items-center justify-between border-t border-[var(--border-soft)] px-4 py-3 text-xs text-[var(--text-subtle)]">
-              <span>Press Esc to close</span>
-              <span>Players · Teams · Tournaments</span>
+            <div className="flex items-center justify-between border-t border-white/10 px-5 py-3 text-[9px] uppercase tracking-[.14em] text-white/20">
+              <span>Esc to close</span>
+              <span>Live records</span>
             </div>
           </section>
         </div>
