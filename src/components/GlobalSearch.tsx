@@ -189,7 +189,7 @@ export default function GlobalSearch({
 
       {open && typeof document !== "undefined" ? createPortal((
         <div
-          className="fixed inset-0 z-[10000] flex items-start justify-center bg-black/35 px-3 pt-3 backdrop-blur-[64px] backdrop-saturate-0 sm:px-5 sm:pt-[10vh]"
+          className="pr-search-overlay fixed inset-0 z-[10000] flex items-start justify-center bg-black/35 px-3 pt-3 backdrop-blur-[64px] backdrop-saturate-0 sm:px-5 sm:pt-[10vh]"
           onMouseDown={(event) => {
             if (event.target === event.currentTarget) {
               closeSearch();
@@ -198,8 +198,8 @@ export default function GlobalSearch({
         >
           <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
             <div className="absolute inset-0 opacity-25 [background-image:linear-gradient(rgba(255,255,255,.08)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.08)_1px,transparent_1px)] [background-size:96px_96px] [mask-image:radial-gradient(circle_at_center,black,transparent_78%)]" />
-            <div className="absolute -right-[12vw] -top-[24vh] h-[70vh] w-[70vh] rounded-full bg-[#f4473b]/20 blur-[140px]" />
-            <div className="absolute -bottom-[30vh] -left-[14vw] h-[78vh] w-[78vh] rounded-full bg-[#ffd21a]/10 blur-[160px]" />
+            <div className="pr-search-orb pr-search-orb-red absolute -right-[12vw] -top-[24vh] h-[70vh] w-[70vh] rounded-full bg-[#f4473b]/20 blur-[140px]" />
+            <div className="pr-search-orb pr-search-orb-gold absolute -bottom-[30vh] -left-[14vw] h-[78vh] w-[78vh] rounded-full bg-[#ffd21a]/10 blur-[160px]" />
             <p className="absolute left-[4vw] top-[24vh] select-none text-[clamp(6rem,17vw,18rem)] font-black uppercase leading-[.72] tracking-[-.09em] text-white/[.035]">
               Find the
               <br />
@@ -213,7 +213,7 @@ export default function GlobalSearch({
             role="dialog"
             aria-modal="true"
             aria-label="Search PlayRank"
-            className="relative z-10 w-full max-w-[900px] overflow-hidden border border-white/20 bg-[#080808]/95 shadow-[0_35px_140px_rgba(0,0,0,.78),inset_0_1px_0_rgba(255,255,255,.08)] backdrop-blur-[40px] backdrop-saturate-150 before:pointer-events-none before:absolute before:inset-0 before:bg-[linear-gradient(135deg,rgba(255,255,255,.055),transparent_35%,rgba(244,71,59,.025))]"
+            className="pr-search-panel relative z-10 w-full max-w-[900px] overflow-hidden border border-white/20 bg-[#080808]/95 shadow-[0_35px_140px_rgba(0,0,0,.78),inset_0_1px_0_rgba(255,255,255,.08)] backdrop-blur-[40px] backdrop-saturate-150 before:pointer-events-none before:absolute before:inset-0 before:bg-[linear-gradient(135deg,rgba(255,255,255,.055),transparent_35%,rgba(244,71,59,.025))]"
           >
             <div className="relative flex items-center justify-between border-b border-white/10 bg-white/[0.025] px-5 py-3">
               <p className="text-[9px] font-black uppercase tracking-[.22em] text-white/30">

@@ -89,7 +89,7 @@ export default function Navbar() {
       </div>
 
       {menuOpen ? (
-        <div id="mobile-navigation" className="absolute inset-x-0 top-full h-[calc(100dvh-72px)] overflow-y-auto border-t border-white/10 bg-[var(--pr-bg)] lg:hidden">
+        <div id="mobile-navigation" className="pr-mobile-menu absolute inset-x-0 top-full h-[calc(100dvh-72px)] overflow-y-auto border-t border-white/10 bg-[var(--pr-bg)] lg:hidden">
           <nav className="pr-container grid gap-0 py-4 pb-10" aria-label="Mobile navigation">
             {[...primaryLinks, ...secondaryLinks].map((link, index) => (
               <Link
