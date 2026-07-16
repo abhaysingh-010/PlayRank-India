@@ -200,7 +200,7 @@ export default function GlobalSearch({
             <div className="absolute inset-0 opacity-25 [background-image:linear-gradient(rgba(255,255,255,.08)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.08)_1px,transparent_1px)] [background-size:96px_96px] [mask-image:radial-gradient(circle_at_center,black,transparent_78%)]" />
             <div className="pr-search-orb pr-search-orb-red absolute -right-[12vw] -top-[24vh] h-[70vh] w-[70vh] rounded-full bg-[#f4473b]/20 blur-[140px]" />
             <div className="pr-search-orb pr-search-orb-gold absolute -bottom-[30vh] -left-[14vw] h-[78vh] w-[78vh] rounded-full bg-[#ffd21a]/10 blur-[160px]" />
-            <p className="absolute left-[4vw] top-[24vh] select-none text-[clamp(6rem,17vw,18rem)] font-black uppercase leading-[.72] tracking-[-.09em] text-white/[.035]">
+            <p className="pr-search-backdrop-title absolute left-[4vw] top-[24vh] select-none text-[clamp(6rem,17vw,18rem)] font-black uppercase leading-[.72] tracking-[-.09em] text-white/[.035]">
               Find the
               <br />
               signal.
@@ -232,7 +232,7 @@ export default function GlobalSearch({
             <div className="relative flex items-center gap-4 border-b border-white/15 bg-black/10 px-5">
               <Search
                 size={20}
-                className="shrink-0 text-[#f4473b]"
+                className="pr-search-icon shrink-0 text-[#f4473b]"
               />
 
               <input
@@ -258,7 +258,7 @@ export default function GlobalSearch({
                         key={item.href}
                         href={item.href}
                         onClick={closeSearch}
-                        className="group flex items-center justify-between border-b border-r border-white/10 px-4 py-3.5 text-sm font-semibold text-white/55 transition hover:bg-white/[0.04] hover:text-white"
+                        className="pr-search-shortcut group flex items-center justify-between border-b border-r border-white/10 px-4 py-3.5 text-sm font-semibold text-white/55 transition hover:bg-white/[0.04] hover:text-white"
                       >
                         <span>{item.label}</span>
                         <span className="font-mono text-[9px] text-white/15 transition group-hover:text-[#f4473b]">
@@ -289,7 +289,7 @@ export default function GlobalSearch({
                       key={`${item.type}-${item.id}`}
                       href={resultHref(item)}
                       onClick={closeSearch}
-                      className="group flex items-center justify-between gap-4 border-b border-white/10 px-5 py-4 transition hover:bg-white/[0.04]"
+                      className="pr-search-result group flex items-center justify-between gap-4 border-b border-white/10 px-5 py-4 transition hover:bg-white/[0.04]"
                     >
                       <div className="min-w-0">
                         <p className="truncate text-sm font-semibold text-white">
