@@ -188,7 +188,7 @@ export default function GlobalSearch({
 
       {open ? (
         <div
-          className="fixed inset-0 z-[60] flex items-start justify-center bg-black/60 px-3 pt-3 backdrop-blur-xl sm:px-5 sm:pt-[10vh]"
+          className="fixed inset-0 z-[60] flex items-start justify-center bg-black/45 px-3 pt-3 backdrop-blur-xl sm:px-5 sm:pt-[10vh]"
           onMouseDown={(event) => {
             if (event.target === event.currentTarget) {
               closeSearch();
@@ -199,9 +199,9 @@ export default function GlobalSearch({
             role="dialog"
             aria-modal="true"
             aria-label="Search PlayRank"
-            className="w-full max-w-[900px] overflow-hidden border border-white/15 bg-[#0a0a0a]/95 shadow-[0_30px_120px_rgba(0,0,0,.7)]"
+            className="relative w-full max-w-[900px] overflow-hidden border border-white/20 bg-black/55 shadow-[0_35px_140px_rgba(0,0,0,.72),inset_0_1px_0_rgba(255,255,255,.08)] backdrop-blur-2xl backdrop-saturate-150 before:pointer-events-none before:absolute before:inset-0 before:bg-[linear-gradient(135deg,rgba(255,255,255,.07),transparent_35%,rgba(244,71,59,.035))]"
           >
-            <div className="flex items-center justify-between border-b border-white/10 px-5 py-3">
+            <div className="relative flex items-center justify-between border-b border-white/10 bg-white/[0.025] px-5 py-3">
               <p className="text-[9px] font-black uppercase tracking-[.22em] text-white/30">
                 Search PlayRank
               </p>
@@ -215,7 +215,7 @@ export default function GlobalSearch({
               </button>
             </div>
 
-            <div className="flex items-center gap-4 border-b border-white/15 px-5">
+            <div className="relative flex items-center gap-4 border-b border-white/15 bg-black/10 px-5">
               <Search
                 size={20}
                 className="shrink-0 text-[#f4473b]"
@@ -231,7 +231,7 @@ export default function GlobalSearch({
               />
             </div>
 
-            <div className="max-h-[min(430px,65vh)] overflow-y-auto">
+            <div className="relative max-h-[min(430px,65vh)] overflow-y-auto">
               {!query.trim() ? (
                 <div className="p-5">
                   <p className="mb-3 text-[9px] font-black uppercase tracking-[.2em] text-white/25">
@@ -311,7 +311,7 @@ export default function GlobalSearch({
               ) : null}
             </div>
 
-            <div className="flex items-center justify-between border-t border-white/10 px-5 py-3 text-[9px] uppercase tracking-[.14em] text-white/20">
+            <div className="relative flex items-center justify-between border-t border-white/10 bg-black/10 px-5 py-3 text-[9px] uppercase tracking-[.14em] text-white/20">
               <span>Esc to close</span>
               <span>Live records</span>
             </div>
