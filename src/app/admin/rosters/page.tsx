@@ -182,60 +182,58 @@ export default async function AdminRostersPage()
   const inactiveRosters = rosters.filter((roster) => roster.active !== true);
 
   return (
-    <main className="min-h-screen bg-black px-7 py-24 text-white md:px-14">
-      <section className="krafton-grid relative overflow-hidden rounded-[2rem] border border-white/10 bg-[#07080c] p-8 md:p-12">
-        <div className="blueprint-lines" />
-        <div className="relative z-10">
-          <p className="krafton-label">Admin Console</p>
-          <h1 className="krafton-display mt-6 text-[14vw] md:text-[8vw] xl:text-[7rem]">
-            ROSTER
-            <br />
-            CONTROL
-          </h1>
-          <p className="mt-6 max-w-3xl text-base font-black uppercase leading-6 tracking-[-0.03em] text-white/80 md:text-xl">
+    <main className="bg-[#030406] text-white">
+      <header className="border-b border-white/10 bg-[#050609]">
+        <div className="mx-auto grid max-w-[1500px] gap-8 px-5 py-10 md:px-8 lg:grid-cols-[1fr_auto] lg:items-end">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.24em] text-[#f4473b]">Relationship management / rosters</p>
+            <h1 className="mt-4 text-5xl font-black uppercase leading-[0.86] tracking-[-0.065em] md:text-7xl">Roster control.</h1>
+          <p className="mt-5 max-w-3xl text-sm leading-6 text-white/45">
             Link players to teams so PlayRank rankings, team profiles, match
             results and PUBG mapping readiness can resolve correctly.
           </p>
-          <div className="mt-10 flex flex-wrap gap-3">
-            <Link href="/admin/players" className="btn-primary px-6 py-3 text-sm">Admin Players</Link>
-            <Link href="/admin/teams" className="btn-secondary px-6 py-3 text-sm">Admin Teams</Link>
-            <Link href="/admin/pubg/mappings" className="btn-secondary px-6 py-3 text-sm">PUBG Mappings</Link>
-            <Link href="/admin" className="btn-secondary px-6 py-3 text-sm">Admin Home</Link>
-            <Link href="/admin/rosters/health"className="btn-secondary px-6 py-3 text-sm">Roster Health</Link>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <Link href="/admin/rosters/health" className="pr-button pr-button-primary">Roster health</Link>
+            <Link href="/admin/pubg/mappings" className="pr-button pr-button-secondary">PUBG mappings</Link>
           </div>
         </div>
+      </header>
+
+      <div className="mx-auto max-w-[1500px] px-5 py-10 md:px-8">
+      <section className="grid gap-px border border-white/10 bg-white/10 md:grid-cols-4">
+        <div className="bg-[#080a0f] p-5">
+          <p className="text-[10px] font-black uppercase tracking-[0.18em] text-white/30">Players</p>
+          <p className="mt-3 text-4xl font-black">{players.length}</p>
+        </div>
+        <div className="bg-[#080a0f] p-5">
+          <p className="text-[10px] font-black uppercase tracking-[0.18em] text-white/30">Teams</p>
+          <p className="mt-3 text-4xl font-black">{teams.length}</p>
+        </div>
+        <div className="bg-[#080a0f] p-5">
+          <p className="text-[10px] font-black uppercase tracking-[0.18em] text-emerald-300">Active rosters</p>
+          <p className="mt-3 text-4xl font-black text-emerald-300">{activeRosters.length}</p>
+        </div>
+        <div className="bg-[#080a0f] p-5">
+          <p className="text-[10px] font-black uppercase tracking-[0.18em] text-yellow-300">Inactive rosters</p>
+          <p className="mt-3 text-4xl font-black text-yellow-300">{inactiveRosters.length}</p>
+        </div>
       </section>
-      <section className="mt-8 grid gap-5 md:grid-cols-4">
-        <div className="krafton-card p-6">
-          <p className="data-label">Players</p>
-          <p className="mt-3 text-5xl font-black">{players.length}</p>
-        </div>
-        <div className="krafton-card p-6">
-          <p className="data-label">Teams</p>
-          <p className="mt-3 text-5xl font-black">{teams.length}</p>
-        </div>
-        <div className="krafton-card border-emerald-400/25 p-6">
-          <p className="data-label text-emerald-300">Active Rosters</p>
-          <p className="mt-3 text-5xl font-black text-emerald-300">{activeRosters.length}</p>
-        </div>
-        <div className="krafton-card border-yellow-400/25 p-6">
-          <p className="data-label text-yellow-300">Inactive Rosters</p>
-          <p className="mt-3 text-5xl font-black text-yellow-300">{inactiveRosters.length}</p>
-        </div>
-      </section>
-      <section className="mt-8 grid gap-6 xl:grid-cols-[0.9fr_1.1fr]">
-        <div className="krafton-card p-7">
-          <p className="krafton-label">Create Link</p>
-          <h2 className="mt-4 text-4xl font-black uppercase tracking-[-0.05em]">Assign Player</h2>
-          <p className="mt-4 leading-7 text-white/50">
+      <section className="mt-6 grid gap-6 xl:grid-cols-[0.72fr_1.28fr]">
+        <div className="border border-white/10 bg-[#080a0f] p-6">
+          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[#ffd21a]">Create relationship</p>
+          <h2 className="mt-4 text-3xl font-black uppercase tracking-[-0.05em]">Assign player</h2>
+          <p className="mt-4 text-sm leading-6 text-white/45">
             Assigning a player to a team updates both `team_rosters` and the
             player&apos;s direct `team_id`. Existing active roster links for that
             player are closed automatically.
           </p>
         </div>
-        <form action={addRoster} className="krafton-card p-7">
-          <div className="space-y-4">
-            <select name="player_id"required className="w-full rounded-xl border border-white/10 bg-black px-4 py-4 text-white outline-none">
+        <form action={addRoster} className="border border-white/10 bg-[#080a0f] p-6">
+          <div className="grid gap-5 md:grid-cols-2">
+            <label className="space-y-2">
+              <span className="text-[10px] font-black uppercase tracking-[0.16em] text-white/45">Player *</span>
+            <select name="player_id" required className="w-full border border-white/10 bg-[#050609] px-4 py-3.5 text-sm text-white outline-none focus:border-[#ffd21a]/60">
               <option value="">Select Player</option>
               {players.map
                 ((player) => 
@@ -245,7 +243,10 @@ export default async function AdminRostersPage()
                 )
               }
             </select>
-            <select name="team_id"required className="w-full rounded-xl border border-white/10 bg-black px-4 py-4 text-white outline-none">
+            </label>
+            <label className="space-y-2">
+              <span className="text-[10px] font-black uppercase tracking-[0.16em] text-white/45">Team *</span>
+            <select name="team_id" required className="w-full border border-white/10 bg-[#050609] px-4 py-3.5 text-sm text-white outline-none focus:border-[#ffd21a]/60">
               <option value="">Select Team</option>
               {teams.map
                 ((team) => 
@@ -255,18 +256,21 @@ export default async function AdminRostersPage()
                 )
               }
             </select>
-
-            <input name="role"placeholder="Role, e.g. IGL / Assaulter / Support"className="w-full rounded-xl border border-white/10 bg-black px-4 py-4 text-white outline-none placeholder:text-white/35"/>
-            <button type="submit" className="w-full rounded-xl border border-emerald-400/25 bg-emerald-400/10 px-5 py-4 text-sm font-black uppercase tracking-[0.16em] text-emerald-300 hover:bg-emerald-400/20">
+            </label>
+            <label className="space-y-2 md:col-span-2">
+              <span className="text-[10px] font-black uppercase tracking-[0.16em] text-white/45">Competitive role</span>
+            <input name="role" placeholder="IGL / Assaulter / Support" className="w-full border border-white/10 bg-[#050609] px-4 py-3.5 text-sm text-white outline-none placeholder:text-white/20 focus:border-[#ffd21a]/60" />
+            </label>
+            <button type="submit" className="bg-[#f4473b] px-5 py-4 text-xs font-black uppercase tracking-[0.18em] text-black transition hover:bg-[#ff5a4f] md:col-span-2">
               Link Player To Team
             </button>
           </div>
         </form>
       </section>
-      <section className="mt-12">
+      <section className="mt-12 pb-4">
         <div className="mb-8 border-b border-white/10 pb-5">
-          <p className="krafton-label">Roster Links</p>
-          <h2 className="mt-3 text-4xl font-black uppercase tracking-[-0.04em]">Active Team Rosters</h2>
+          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[#ffd21a]">Roster links</p>
+          <h2 className="mt-3 text-3xl font-black uppercase tracking-[-0.04em]">Active team rosters</h2>
         </div>
         <div className="space-y-4">
           {activeRosters.length === 0 ? 
@@ -282,7 +286,7 @@ export default async function AdminRostersPage()
                 const player = roster.player_id? playerById.get(roster.player_id): null;
                 const team = roster.team_id ? teamById.get(roster.team_id) : null;
                 return (
-                  <div key={roster.id}className="grid gap-4 border border-white/10 bg-white/[0.03] p-5 md:grid-cols-[1fr_1fr_1fr_auto]">
+                  <div key={roster.id} className="grid gap-4 border border-white/10 bg-[#080a0f] p-5 md:grid-cols-[1fr_1fr_1fr_auto] md:items-center">
                     <div>
                       <p className="data-label">Player</p>
                       <p className="mt-2 font-black text-white">{player?.ign || "Unknown Player"}</p>
@@ -298,7 +302,7 @@ export default async function AdminRostersPage()
                     <form action={deactivateRoster}>
                       <input type="hidden" name="roster_id" value={roster.id} />
                       <input type="hidden"name="player_id"value={roster.player_id || ""}/>
-                      <button type="submit"className="rounded-xl border border-red-400/25 bg-red-400/10 px-4 py-3 text-xs font-black uppercase tracking-[0.14em] text-red-300 hover:bg-red-400/20">
+                      <button type="submit" className="border border-red-400/25 bg-red-400/10 px-4 py-3 text-xs font-black uppercase tracking-[0.14em] text-red-300 hover:bg-red-400/20">
                         Deactivate
                       </button>
                     </form>
@@ -309,6 +313,7 @@ export default async function AdminRostersPage()
           }
         </div>
       </section>
+      </div>
     </main>
   );
 }
