@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowDown, ArrowRight, BarChart3, Database, Swords } from "lucide-react";
 import { supabase } from "@/lib/supabase";
+import { AnimatedCount, HeroTitle, PageProgress, Reveal } from "@/components/home/HomeMotion";
 
 type RankingRow = { entity_id: string; rank: number; score: number; change: number | null };
 type TeamRow = { id: string; name: string; short_name: string | null; slug: string; logo_url: string | null };
@@ -29,7 +30,7 @@ function TeamMark({ team, large = false }: { team: TeamRow; large?: boolean }) {
 function Count({ value, label }: { value: number; label: string }) {
   return (
     <div className="border-l border-white/15 pl-4 md:pl-6">
-      <p className="text-3xl font-semibold tracking-[-0.05em] text-white md:text-5xl">{value.toLocaleString("en-IN")}</p>
+      <p className="text-3xl font-semibold tracking-[-0.05em] text-white md:text-5xl"><AnimatedCount value={value} /></p>
       <p className="mt-2 text-[10px] font-bold uppercase tracking-[0.18em] text-white/38">{label}</p>
     </div>
   );
@@ -69,6 +70,7 @@ export default async function HomePage() {
 
   return (
     <main className="overflow-hidden bg-[var(--pr-bg)] text-white">
+      <PageProgress />
       <section className="relative border-b border-white/15">
         <div className="pointer-events-none absolute inset-0 opacity-30 [background-image:linear-gradient(rgba(255,255,255,.055)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.055)_1px,transparent_1px)] [background-size:25vw_25vw]" />
         <div className="pr-container relative flex min-h-[680px] flex-col justify-between py-9 md:min-h-[760px] md:py-12">
@@ -78,16 +80,10 @@ export default async function HomePage() {
           </div>
 
           <div className="py-14 md:py-16">
-            <h1 className="pr-display max-w-[1320px]">
-              THE DATA LAYER
-              <br />
-              FOR <span className="text-[var(--pr-red)]">INDIAN</span>
-              <br />
-              ESPORTS.
-            </h1>
+            <HeroTitle />
           </div>
 
-          <div className="grid gap-8 border-t border-white/15 pt-7 md:grid-cols-[1.2fr_.8fr] md:items-end">
+          <Reveal className="grid gap-8 border-t border-white/15 pt-7 md:grid-cols-[1.2fr_.8fr] md:items-end" delay={0.4} distance={18}>
             <p className="max-w-xl text-base leading-7 text-white/55 md:text-lg">
               Rankings, competitive history and performance intelligence—built to make India&apos;s esports ecosystem easier to understand.
             </p>
@@ -95,12 +91,12 @@ export default async function HomePage() {
               <Link href="/rankings" className="pr-button pr-button-primary text-xs">Explore rankings <ArrowRight size={15} /></Link>
               <Link href="#pulse" className="pr-button pr-button-secondary gap-2 text-xs">See the data <ArrowDown size={15} /></Link>
             </div>
-          </div>
+          </Reveal>
         </div>
       </section>
 
       <section id="pulse" className="pr-container py-20 md:py-24">
-        <div className="grid gap-12 lg:grid-cols-[.72fr_1.28fr] lg:gap-20">
+        <Reveal className="grid gap-12 lg:grid-cols-[.72fr_1.28fr] lg:gap-20">
           <div>
             <p className="pr-kicker">Competitive pulse</p>
             <h2 className="pr-section-title mt-5">One ecosystem.<br />Connected by data.</h2>
@@ -112,7 +108,7 @@ export default async function HomePage() {
             <Count value={matchCountResult.count || 0} label="Matches" />
             <Count value={tournamentCountResult.count || 0} label="Events" />
           </div>
-        </div>
+        </Reveal>
       </section>
 
       {topTeam && teamRanking ? (
@@ -132,34 +128,40 @@ export default async function HomePage() {
       ) : null}
 
       <section className="pr-container py-20 md:py-24">
-        <div className="flex flex-col gap-6 border-b border-white/15 pb-10 md:flex-row md:items-end md:justify-between">
+        <Reveal className="flex flex-col gap-6 border-b border-white/15 pb-10 md:flex-row md:items-end md:justify-between">
           <div><p className="pr-kicker">Latest signals</p><h2 className="pr-section-title mt-5">What&apos;s moving now.</h2></div>
           <Link href="/matches" className="inline-flex items-center gap-3 text-xs font-black uppercase tracking-[.18em] text-white/55 hover:text-white">All matches <ArrowRight size={16} /></Link>
-        </div>
+        </Reveal>
 
         <div className="grid lg:grid-cols-3">
-          <article className="border-b border-white/15 py-8 lg:border-b-0 lg:border-r lg:pr-8">
+          <Reveal className="pr-signal-card border-b border-white/15 py-8 lg:border-b-0 lg:border-r lg:pr-8">
+          <article>
             <div className="flex items-center justify-between"><span className="pr-kicker">Latest match</span><Swords size={18} className="text-white/35" /></div>
             {recentMatch ? <Link href={`/match/${recentMatch.id}`} className="group mt-16 block"><p className="text-xs uppercase tracking-[.18em] text-white/38">{recentMatch.stage || "Competitive match"} · {formatDate(recentMatch.date)}</p><div className="mt-7 space-y-4 text-2xl font-semibold"><div className="flex justify-between gap-4"><span>{recentMatch.team1?.name || "Team 1"}</span><span>{recentMatch.team1_score ?? 0}</span></div><div className="flex justify-between gap-4"><span>{recentMatch.team2?.name || "Team 2"}</span><span>{recentMatch.team2_score ?? 0}</span></div></div><p className="mt-10 text-sm text-white/45">Winner <span className="font-bold text-[var(--pr-gold)]">{recentMatch.winner?.name || "Pending"}</span></p></Link> : <p className="mt-16 text-white/40">No match data available.</p>}
           </article>
+          </Reveal>
 
-          <article className="border-b border-white/15 py-8 lg:border-b-0 lg:border-r lg:px-8">
+          <Reveal className="pr-signal-card border-b border-white/15 py-8 lg:border-b-0 lg:border-r lg:px-8" delay={0.1}>
+          <article>
             <div className="flex items-center justify-between"><span className="pr-kicker">Top player</span><BarChart3 size={18} className="text-white/35" /></div>
             {topPlayer && playerRanking ? <Link href={`/players/${topPlayer.slug}`} className="group mt-16 block"><p className="text-6xl font-semibold tracking-[-.06em]">{topPlayer.ign}</p><p className="mt-4 text-sm text-white/45">{topPlayer.role || "Competitive player"} · {topPlayer.team?.short_name || topPlayer.team?.name || "Independent"}</p><div className="mt-12 flex items-end justify-between border-t border-white/15 pt-5"><span className="text-xs font-bold uppercase tracking-[.16em] text-white/40">Player rank</span><span className="text-5xl font-semibold text-[var(--pr-gold)]">#{playerRanking.rank}</span></div></Link> : <p className="mt-16 text-white/40">No player ranking available.</p>}
           </article>
+          </Reveal>
 
-          <article className="py-8 lg:pl-8">
+          <Reveal className="pr-signal-card py-8 lg:pl-8" delay={0.2}>
+          <article>
             <div className="flex items-center justify-between"><span className="pr-kicker">Latest event</span><Database size={18} className="text-white/35" /></div>
             {tournament ? <Link href={`/tournaments/${tournament.slug}`} className="group mt-16 block"><p className="text-4xl font-semibold leading-[1] tracking-[-.05em]">{tournament.name}</p><div className="mt-12 border-t border-white/15 pt-5"><p className="text-xs font-bold uppercase tracking-[.16em] text-white/40">{tournament.status || "Status pending"}</p><p className="mt-3 text-sm text-white/55">{formatDate(tournament.start_date)}</p></div></Link> : <p className="mt-16 text-white/40">No tournament data available.</p>}
           </article>
+          </Reveal>
         </div>
       </section>
 
       <section className="pr-cta border-t border-white/15">
-        <div className="pr-container grid gap-12 py-20 md:grid-cols-[1.2fr_.8fr] md:items-end md:py-24">
+        <Reveal className="pr-container grid gap-12 py-20 md:grid-cols-[1.2fr_.8fr] md:items-end md:py-24">
           <h2 className="pr-cta-title text-[clamp(3.2rem,6vw,6.5rem)] font-semibold leading-[.86] tracking-[-.065em]">DON&apos;T FOLLOW<br />THE NOISE.<br />READ THE GAME.</h2>
           <div><p className="pr-cta-copy max-w-md text-base leading-7">Compare teams and players with performance context, recent form and competitive history in one view.</p><Link href="/compare" className="pr-cta-button mt-8 inline-flex min-h-12 items-center gap-3 rounded-full px-6 text-xs font-black uppercase tracking-[.16em]">Start comparing <ArrowRight size={16} /></Link></div>
-        </div>
+        </Reveal>
       </section>
     </main>
   );

@@ -1156,6 +1156,40 @@ body {
 .pr-surface { border: 1px solid var(--pr-line); background: var(--pr-surface); }
 .pr-rule { border-top: 1px solid var(--pr-line); }
 
+.pr-page-progress {
+  position: fixed;
+  top: 0;
+  right: 0;
+  left: 0;
+  z-index: 10000;
+  height: 2px;
+  background: var(--pr-red);
+  transform-origin: 0 50%;
+}
+
+.pr-signal-card {
+  transition: background 260ms ease, transform 260ms ease;
+}
+
+.pr-signal-card:hover {
+  background: rgba(255, 255, 255, 0.018);
+  transform: translateY(-4px);
+}
+
+.pr-featured-team img {
+  transition: transform 500ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.pr-featured-team:hover img { transform: scale(1.08) rotate(-2deg); }
+
+@media (prefers-reduced-motion: reduce) {
+  .pr-page-progress { display: none; }
+  .pr-signal-card,
+  .pr-featured-team img { transition: none; }
+  .pr-signal-card:hover,
+  .pr-featured-team:hover img { transform: none; }
+}
+
 .pr-featured-team {
   background:
     radial-gradient(circle at 18% 40%, rgba(240, 68, 56, 0.14), transparent 32%),
