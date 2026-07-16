@@ -199,7 +199,7 @@ export default function GlobalSearch({
             role="dialog"
             aria-modal="true"
             aria-label="Search PlayRank"
-            className="relative w-full max-w-[900px] overflow-hidden border border-white/20 bg-black/45 shadow-[0_35px_140px_rgba(0,0,0,.72),inset_0_1px_0_rgba(255,255,255,.08)] backdrop-blur-[40px] backdrop-saturate-150 before:pointer-events-none before:absolute before:inset-0 before:bg-[linear-gradient(135deg,rgba(255,255,255,.08),transparent_35%,rgba(244,71,59,.04))]"
+            className="relative w-full max-w-[900px] overflow-hidden border border-white/20 bg-[#080808]/95 shadow-[0_35px_140px_rgba(0,0,0,.78),inset_0_1px_0_rgba(255,255,255,.08)] backdrop-blur-[40px] backdrop-saturate-150 before:pointer-events-none before:absolute before:inset-0 before:bg-[linear-gradient(135deg,rgba(255,255,255,.055),transparent_35%,rgba(244,71,59,.025))]"
           >
             <div className="relative flex items-center justify-between border-b border-white/10 bg-white/[0.025] px-5 py-3">
               <p className="text-[9px] font-black uppercase tracking-[.22em] text-white/30">
