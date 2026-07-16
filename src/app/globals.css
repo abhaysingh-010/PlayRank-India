@@ -1010,3 +1010,135 @@ tbody tr:last-child td {
     padding-inline: 0.75rem;
   }
 }
+
+/* ==========================
+   PLAYRANK REDESIGN V2
+========================== */
+
+:root {
+  --pr-bg: #070707;
+  --pr-bg-soft: #0d0d0d;
+  --pr-surface: #121212;
+  --pr-surface-raised: #181818;
+  --pr-text: #f4f2ed;
+  --pr-text-muted: #96938c;
+  --pr-line: rgba(244, 242, 237, 0.14);
+  --pr-line-strong: rgba(244, 242, 237, 0.28);
+  --pr-red: #f04438;
+  --pr-red-strong: #ff5146;
+  --pr-gold: #e8c66a;
+  --pr-positive: #62d69b;
+  --pr-content: 1440px;
+}
+
+body {
+  background: var(--pr-bg);
+  color: var(--pr-text);
+}
+
+.pr-container {
+  width: min(calc(100% - 40px), var(--pr-content));
+  margin-inline: auto;
+}
+
+.pr-nav {
+  position: sticky;
+  top: 0;
+  z-index: 9999;
+  border-bottom: 1px solid var(--pr-line);
+  background: rgba(7, 7, 7, 0.88);
+  backdrop-filter: blur(18px);
+}
+
+.pr-nav-link {
+  position: relative;
+  padding-block: 27px;
+  color: rgba(244, 242, 237, 0.58);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  transition: color 180ms ease;
+}
+
+.pr-nav-link::after {
+  position: absolute;
+  right: 0;
+  bottom: -1px;
+  left: 0;
+  height: 2px;
+  background: var(--pr-red);
+  content: "";
+  opacity: 0;
+  transform: scaleX(0.4);
+  transition: 180ms ease;
+}
+
+.pr-nav-link:hover,
+.pr-nav-link.is-active { color: var(--pr-text); }
+.pr-nav-link.is-active::after { opacity: 1; transform: scaleX(1); }
+
+.pr-button,
+.pr-icon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--pr-line);
+  transition: background 180ms ease, border-color 180ms ease, color 180ms ease, transform 180ms ease;
+}
+
+.pr-button {
+  min-height: 46px;
+  padding-inline: 22px;
+  border-radius: 999px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.pr-button:hover { transform: translateY(-1px); }
+.pr-button-primary { border-color: var(--pr-red); background: var(--pr-red); color: #090909; }
+.pr-button-primary:hover { border-color: var(--pr-text); background: var(--pr-text); }
+.pr-button-secondary { background: transparent; color: var(--pr-text); }
+.pr-button-secondary:hover { border-color: var(--pr-text); }
+
+.pr-icon-button {
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  color: var(--pr-text);
+}
+
+.pr-icon-button:hover { border-color: var(--pr-red); color: var(--pr-red); }
+
+.pr-kicker {
+  color: var(--pr-red-strong);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+
+.pr-display {
+  color: var(--pr-text);
+  font-size: clamp(4rem, 9.5vw, 9.75rem);
+  font-weight: 800;
+  letter-spacing: -0.075em;
+  line-height: 0.8;
+}
+
+.pr-section-title {
+  color: var(--pr-text);
+  font-size: clamp(2.4rem, 5vw, 5.5rem);
+  font-weight: 750;
+  letter-spacing: -0.06em;
+  line-height: 0.92;
+}
+
+.pr-surface { border: 1px solid var(--pr-line); background: var(--pr-surface); }
+.pr-rule { border-top: 1px solid var(--pr-line); }
+
+@media (max-width: 640px) {
+  .pr-container { width: min(calc(100% - 32px), var(--pr-content)); }
+  .pr-display { font-size: clamp(3.6rem, 20vw, 6rem); line-height: 0.82; }
+}
