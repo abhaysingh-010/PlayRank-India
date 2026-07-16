@@ -1164,7 +1164,43 @@ body {
   z-index: 10000;
   height: 2px;
   background: var(--pr-red);
+  transform: scaleX(0);
   transform-origin: 0 50%;
+  animation: pr-scroll-progress linear both;
+  animation-timeline: scroll(root);
+}
+
+/* Content is visible by default. Motion only changes position, so a failed
+   animation can never leave the page blank. */
+.pr-hero-line {
+  animation: pr-hero-enter 850ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.pr-reveal {
+  animation: pr-reveal-enter 700ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@supports (animation-timeline: view()) {
+  .pr-reveal {
+    animation-delay: 0s !important;
+    animation-timeline: view();
+    animation-range: entry 0% cover 24%;
+  }
+}
+
+@keyframes pr-hero-enter {
+  from { transform: translateY(108%); }
+  to { transform: translateY(0); }
+}
+
+@keyframes pr-reveal-enter {
+  from { transform: translateY(24px); }
+  to { transform: translateY(0); }
+}
+
+@keyframes pr-scroll-progress {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
 }
 
 .pr-signal-card {
@@ -1184,6 +1220,8 @@ body {
 
 @media (prefers-reduced-motion: reduce) {
   .pr-page-progress { display: none; }
+  .pr-hero-line,
+  .pr-reveal { animation: none; }
   .pr-signal-card,
   .pr-featured-team img { transition: none; }
   .pr-signal-card:hover,
