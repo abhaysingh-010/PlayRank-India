@@ -188,7 +188,7 @@ export default function GlobalSearch({
 
       {open ? (
         <div
-          className="fixed inset-0 z-[60] flex items-start justify-center bg-black/75 px-3 pt-3 backdrop-blur-md sm:px-5 sm:pt-[12vh]"
+          className="fixed inset-0 z-[60] flex items-start justify-center bg-black/60 px-3 pt-3 backdrop-blur-xl sm:px-5 sm:pt-[10vh]"
           onMouseDown={(event) => {
             if (event.target === event.currentTarget) {
               closeSearch();
@@ -199,7 +199,7 @@ export default function GlobalSearch({
             role="dialog"
             aria-modal="true"
             aria-label="Search PlayRank"
-            className="w-full max-w-xl overflow-hidden border border-white/15 bg-[#0a0a0a] shadow-[0_30px_100px_rgba(0,0,0,.65)]"
+            className="w-full max-w-[900px] overflow-hidden border border-white/15 bg-[#0a0a0a]/95 shadow-[0_30px_120px_rgba(0,0,0,.7)]"
           >
             <div className="flex items-center justify-between border-b border-white/10 px-5 py-3">
               <p className="text-[9px] font-black uppercase tracking-[.22em] text-white/30">
