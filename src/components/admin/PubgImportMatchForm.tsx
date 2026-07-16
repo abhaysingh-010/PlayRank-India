@@ -62,43 +62,49 @@ export default function PubgImportMatchForm() {
   }
 
   return (
-    <div className="krafton-card p-7">
+    <div className="border border-white/10 bg-[#050609] p-5 md:p-6">
       <div className="space-y-4">
+        <label className="block space-y-2">
+          <span className="text-[10px] font-black uppercase tracking-[0.16em] text-white/45">External match ID *</span>
         <input
           value={matchId}
           onChange={(event) => setMatchId(event.target.value)}
           placeholder="PUBG Match ID"
-          className="w-full rounded-xl border border-white/10 bg-black px-4 py-4 text-white outline-none placeholder:text-white/35"
+          className="w-full border border-white/10 bg-black px-4 py-3.5 text-sm text-white outline-none placeholder:text-white/25 focus:border-[#ffd21a]/60"
         />
+        </label>
 
+        <label className="block space-y-2">
+          <span className="text-[10px] font-black uppercase tracking-[0.16em] text-white/45">PUBG shard</span>
         <select
           value={shard}
           onChange={(event) => setShard(event.target.value)}
-          className="w-full rounded-xl border border-white/10 bg-black px-4 py-4 text-white outline-none"
+          className="w-full border border-white/10 bg-black px-4 py-3.5 text-sm text-white outline-none focus:border-[#ffd21a]/60"
         >
           <option value="steam">steam</option>
           <option value="kakao">kakao</option>
           <option value="xbox">xbox</option>
           <option value="psn">psn</option>
         </select>
+        </label>
 
         <button
           type="button"
           onClick={importMatch}
           disabled={loading}
-          className="w-full rounded-xl border border-emerald-400/25 bg-emerald-400/10 px-5 py-4 text-sm font-black uppercase tracking-[0.16em] text-emerald-300 hover:bg-emerald-400/20 disabled:cursor-not-allowed disabled:opacity-50"
+          className="w-full bg-[#f4473b] px-5 py-4 text-xs font-black uppercase tracking-[0.18em] text-black transition hover:bg-[#ff5a4f] disabled:cursor-not-allowed disabled:opacity-45"
         >
           {loading ? "Importing..." : "Import PUBG Match"}
         </button>
 
         {message ? (
-          <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4 text-sm font-black uppercase tracking-[0.12em] text-white/70">
+          <div role="status" className="border border-white/10 bg-white/[0.03] p-4 text-sm font-black uppercase tracking-[0.12em] text-white/70">
             {message}
           </div>
         ) : null}
 
         {json ? (
-          <pre className="max-h-[420px] overflow-auto rounded-xl border border-white/10 bg-black p-4 text-xs leading-6 text-white/55">
+          <pre className="max-h-[420px] overflow-auto border border-white/10 bg-black p-4 text-xs leading-6 text-white/55">
             {JSON.stringify(json, null, 2)}
           </pre>
         ) : null}

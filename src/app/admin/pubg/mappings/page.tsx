@@ -285,7 +285,7 @@ function MappingCard({
           </p>
 
           <p className="mt-2 text-xs text-white/35">
-            Confidence {n(mapping.confidence_score).toFixed(2)} Â· Updated{" "}
+            Confidence {n(mapping.confidence_score).toFixed(2)} · Updated{" "}
             {formatDate(mapping.updated_at)}
           </p>
         </div>
@@ -680,6 +680,5 @@ export default async function PubgMappingsPage({
     </main>
   );
 }
-
 
 

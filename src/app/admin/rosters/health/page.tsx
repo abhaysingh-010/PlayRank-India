@@ -130,7 +130,7 @@ function SectionHeader({
           href={actionHref}
           className="w-fit text-sm font-black text-white/40 transition hover:text-[#ffd21a]"
         >
-          {actionLabel} â†’
+          {actionLabel} →
         </Link>
       ) : null}
     </div>

@@ -292,8 +292,8 @@ function PubgReadinessPanel({
               </p>
 
               <p className="mt-2 text-sm text-white/45">
-                {latest.map_name || "Unknown map"} Â·{" "}
-                {latest.game_mode || "Unknown mode"} Â· {latest.shard}
+                {latest.map_name || "Unknown map"} ·{" "}
+                {latest.game_mode || "Unknown mode"} · {latest.shard}
               </p>
             </div>
 

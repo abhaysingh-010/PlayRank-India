@@ -310,7 +310,7 @@ export default async function PubgBlockedPromotionsPage() {
                           {row.map_name || "Unknown Map"}
                         </p>
                         <p className="mt-1 text-xs uppercase tracking-[0.16em] text-white/35">
-                          {row.game_mode || "mode"} Â· {row.shard || "shard"}
+                          {row.game_mode || "mode"} · {row.shard || "shard"}
                         </p>
                       </td>
 
@@ -396,5 +396,4 @@ export default async function PubgBlockedPromotionsPage() {
     </main>
   );
 }
-
 
