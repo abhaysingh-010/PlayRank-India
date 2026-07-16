@@ -60,7 +60,7 @@ export default function Navbar() {
 
         <button
           type="button"
-          className="pr-icon-button lg:hidden"
+          className="pr-icon-button pr-mobile-toggle"
           onClick={() => setMenuOpen((open) => !open)}
           aria-expanded={menuOpen}
           aria-controls="mobile-navigation"

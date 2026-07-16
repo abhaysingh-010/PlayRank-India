@@ -55,8 +55,8 @@ function FooterColumn({
 
 export default function Footer() {
   return (
-    <footer className="border-t border-[var(--border-soft)] bg-[var(--background-deep)]">
-      <div className="mx-auto max-w-[1440px] px-4 py-14 md:px-6 lg:px-8">
+    <footer className="border-t border-white/15 bg-[var(--pr-bg)]">
+      <div className="pr-container py-14">
         <div className="grid gap-12 lg:grid-cols-[1.25fr_0.75fr_0.75fr_0.75fr]">
           <div>
             <Link

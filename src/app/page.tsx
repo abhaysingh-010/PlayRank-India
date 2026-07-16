@@ -69,15 +69,15 @@ export default async function HomePage() {
 
   return (
     <main className="overflow-hidden bg-[var(--pr-bg)] text-white">
-      <section className="relative min-h-[calc(100svh-72px)] border-b border-white/15">
+      <section className="relative border-b border-white/15">
         <div className="pointer-events-none absolute inset-0 opacity-30 [background-image:linear-gradient(rgba(255,255,255,.055)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.055)_1px,transparent_1px)] [background-size:25vw_25vw]" />
-        <div className="pr-container relative flex min-h-[calc(100svh-72px)] flex-col justify-between py-9 md:py-12">
+        <div className="pr-container relative flex min-h-[680px] flex-col justify-between py-9 md:min-h-[760px] md:py-12">
           <div className="flex items-center justify-between gap-6">
             <p className="pr-kicker">Indian esports intelligence</p>
             <p className="hidden text-[10px] font-bold uppercase tracking-[0.2em] text-white/35 sm:block">Rankings · Players · Matches · History</p>
           </div>
 
-          <div className="py-16 md:py-24">
+          <div className="py-14 md:py-16">
             <h1 className="pr-display max-w-[1320px]">
               THE DATA LAYER
               <br />
@@ -99,7 +99,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section id="pulse" className="pr-container py-20 md:py-32">
+      <section id="pulse" className="pr-container py-20 md:py-24">
         <div className="grid gap-12 lg:grid-cols-[.72fr_1.28fr] lg:gap-20">
           <div>
             <p className="pr-kicker">Competitive pulse</p>
@@ -116,22 +116,22 @@ export default async function HomePage() {
       </section>
 
       {topTeam && teamRanking ? (
-        <section className="border-y border-white/15 bg-[var(--pr-text)] text-black">
-          <Link href={`/teams/${topTeam.slug}`} className="group pr-container grid min-h-[560px] gap-10 py-16 md:grid-cols-[.7fr_1.3fr] md:items-center md:py-24">
+        <section className="pr-featured-team border-y border-white/15">
+          <Link href={`/teams/${topTeam.slug}`} className="group pr-container grid gap-10 py-16 md:grid-cols-[.72fr_1.28fr] md:items-center md:py-20">
             <div>
-              <p className="text-[11px] font-black uppercase tracking-[0.22em] text-black/50">Current number one</p>
-              <p className="mt-4 text-[clamp(6rem,18vw,15rem)] font-semibold leading-[.72] tracking-[-.09em]">01</p>
-              <div className="mt-10 flex items-center gap-5"><TeamMark team={topTeam} large /><div><p className="text-2xl font-bold">{topTeam.name}</p><p className="mt-1 text-sm text-black/50">{formatScore(teamRanking.score)} ranking points</p></div></div>
+              <p className="pr-featured-label text-[11px] font-black uppercase tracking-[0.22em]">Current number one</p>
+              <p className="pr-featured-rank mt-4 text-[clamp(6rem,15vw,12rem)] font-semibold leading-[.72] tracking-[-.09em]">01</p>
+              <div className="mt-10 flex items-center gap-5"><TeamMark team={topTeam} large /><div><p className="pr-featured-name text-2xl font-bold">{topTeam.name}</p><p className="pr-featured-meta mt-1 text-sm">{formatScore(teamRanking.score)} ranking points</p></div></div>
             </div>
-            <div className="md:border-l md:border-black/20 md:pl-16">
-              <h2 className="text-[clamp(3.6rem,8vw,8.5rem)] font-semibold leading-[.82] tracking-[-.075em] text-black">THE TEAM<br />SETTING THE<br />STANDARD.</h2>
-              <p className="mt-9 inline-flex items-center gap-3 text-xs font-black uppercase tracking-[.18em]">View team intelligence <ArrowRight className="transition group-hover:translate-x-2" size={17} /></p>
+            <div className="md:border-l md:border-white/15 md:pl-16">
+              <h2 className="pr-featured-title text-[clamp(3.2rem,6vw,6.5rem)] font-semibold leading-[.86] tracking-[-.065em]">THE TEAM<br />SETTING THE<br />STANDARD.</h2>
+              <p className="pr-featured-link mt-9 inline-flex items-center gap-3 text-xs font-black uppercase tracking-[.18em]">View team intelligence <ArrowRight className="transition group-hover:translate-x-2" size={17} /></p>
             </div>
           </Link>
         </section>
       ) : null}
 
-      <section className="pr-container py-20 md:py-32">
+      <section className="pr-container py-20 md:py-24">
         <div className="flex flex-col gap-6 border-b border-white/15 pb-10 md:flex-row md:items-end md:justify-between">
           <div><p className="pr-kicker">Latest signals</p><h2 className="pr-section-title mt-5">What&apos;s moving now.</h2></div>
           <Link href="/matches" className="inline-flex items-center gap-3 text-xs font-black uppercase tracking-[.18em] text-white/55 hover:text-white">All matches <ArrowRight size={16} /></Link>
@@ -155,10 +155,10 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section className="border-t border-white/15 bg-[var(--pr-red)] text-black">
-        <div className="pr-container grid gap-12 py-20 md:grid-cols-[1.25fr_.75fr] md:items-end md:py-28">
-          <h2 className="text-[clamp(3.6rem,8vw,8rem)] font-semibold leading-[.83] tracking-[-.075em]">DON&apos;T FOLLOW<br />THE NOISE.<br />READ THE GAME.</h2>
-          <div><p className="max-w-md text-base leading-7 text-black/65">Compare teams and players with performance context, recent form and competitive history in one view.</p><Link href="/compare" className="mt-8 inline-flex min-h-12 items-center gap-3 rounded-full bg-black px-6 text-xs font-black uppercase tracking-[.16em] text-white">Start comparing <ArrowRight size={16} /></Link></div>
+      <section className="pr-cta border-t border-white/15">
+        <div className="pr-container grid gap-12 py-20 md:grid-cols-[1.2fr_.8fr] md:items-end md:py-24">
+          <h2 className="pr-cta-title text-[clamp(3.2rem,6vw,6.5rem)] font-semibold leading-[.86] tracking-[-.065em]">DON&apos;T FOLLOW<br />THE NOISE.<br />READ THE GAME.</h2>
+          <div><p className="pr-cta-copy max-w-md text-base leading-7">Compare teams and players with performance context, recent form and competitive history in one view.</p><Link href="/compare" className="pr-cta-button mt-8 inline-flex min-h-12 items-center gap-3 rounded-full px-6 text-xs font-black uppercase tracking-[.16em]">Start comparing <ArrowRight size={16} /></Link></div>
         </div>
       </section>
     </main>

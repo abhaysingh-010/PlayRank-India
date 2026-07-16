@@ -1029,6 +1029,22 @@ tbody tr:last-child td {
   --pr-gold: #e8c66a;
   --pr-positive: #62d69b;
   --pr-content: 1440px;
+
+  /* V2 is now the active source of truth. */
+  --background: var(--pr-bg);
+  --background-deep: #050505;
+  --background-soft: var(--pr-bg-soft);
+  --surface: var(--pr-surface);
+  --surface-2: var(--pr-surface-raised);
+  --text-primary: var(--pr-text);
+  --text-secondary: var(--pr-text-muted);
+  --text-muted: #77746e;
+  --text-subtle: #64615c;
+  --border-soft: var(--pr-line);
+  --border-medium: var(--pr-line-strong);
+  --brand: var(--pr-red);
+  --brand-hover: var(--pr-red-strong);
+  --brand-soft: rgba(240, 68, 56, 0.12);
 }
 
 body {
@@ -1111,6 +1127,8 @@ body {
 
 .pr-icon-button:hover { border-color: var(--pr-red); color: var(--pr-red); }
 
+.pr-mobile-toggle { display: inline-flex; }
+
 .pr-kicker {
   color: var(--pr-red-strong);
   font-size: 11px;
@@ -1121,10 +1139,10 @@ body {
 
 .pr-display {
   color: var(--pr-text);
-  font-size: clamp(4rem, 9.5vw, 9.75rem);
+  font-size: clamp(3.75rem, 7.6vw, 7.75rem);
   font-weight: 800;
   letter-spacing: -0.075em;
-  line-height: 0.8;
+  line-height: 0.84;
 }
 
 .pr-section-title {
@@ -1137,6 +1155,35 @@ body {
 
 .pr-surface { border: 1px solid var(--pr-line); background: var(--pr-surface); }
 .pr-rule { border-top: 1px solid var(--pr-line); }
+
+.pr-featured-team {
+  background:
+    radial-gradient(circle at 18% 40%, rgba(240, 68, 56, 0.14), transparent 32%),
+    #0d0d0d;
+  color: var(--pr-text);
+}
+
+.pr-featured-label,
+.pr-featured-meta { color: var(--pr-text-muted) !important; }
+.pr-featured-rank { color: var(--pr-red) !important; }
+.pr-featured-name,
+.pr-featured-title { color: var(--pr-text) !important; }
+.pr-featured-link { color: var(--pr-gold) !important; }
+
+.pr-cta {
+  background:
+    linear-gradient(110deg, rgba(240, 68, 56, 0.17), transparent 55%),
+    var(--pr-surface);
+}
+
+.pr-cta-title { color: var(--pr-text) !important; }
+.pr-cta-copy { color: var(--pr-text-muted) !important; }
+.pr-cta-button { background: var(--pr-red); color: #080808 !important; }
+.pr-cta-button:hover { background: var(--pr-text); }
+
+@media (min-width: 1024px) {
+  .pr-mobile-toggle { display: none; }
+}
 
 @media (max-width: 640px) {
   .pr-container { width: min(calc(100% - 32px), var(--pr-content)); }
