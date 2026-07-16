@@ -166,7 +166,7 @@ export default function GlobalSearch({
         <button
           type="button"
           onClick={openSearch}
-          className="flex h-10 w-full min-w-[280px] items-center justify-between gap-4 rounded-xl border border-[var(--border-soft)] bg-white/[0.025] px-3.5 text-left transition hover:border-[var(--border-medium)] hover:bg-white/[0.04]"
+          className="flex h-10 w-full min-w-0 items-center justify-between gap-4 rounded-xl border border-[var(--border-soft)] bg-white/[0.025] px-3.5 text-left transition hover:border-[var(--border-medium)] hover:bg-white/[0.04] sm:min-w-[280px]"
           aria-label="Search PlayRank"
         >
           <span className="flex min-w-0 items-center gap-2.5">

@@ -418,7 +418,7 @@ export default async function AdminRankingsSyncPage() {
                 No ranking rows found.
               </p>
             ) : (
-              <div className="overflow-hidden rounded-2xl border border-white/10">
+              <div className="overflow-x-auto border border-white/10">
                 <table className="w-full min-w-[620px] text-left text-sm">
                   <thead className="bg-white/[0.04] text-[10px] uppercase tracking-[0.18em] text-white/35">
                     <tr>
