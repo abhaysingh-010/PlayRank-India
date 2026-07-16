@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, ArrowRight, Crosshair, ShieldCheck, Trophy } from "lucide-react";
+import { ArrowLeft, Crosshair, ShieldCheck, Trophy } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 
 type Team={id:string;name:string;slug:string;source:string|null;verified:boolean|null;active:boolean|null};
