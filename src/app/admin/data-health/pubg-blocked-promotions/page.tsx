@@ -143,7 +143,7 @@ export default async function PubgBlockedPromotionsPage() {
   if (error) {
     return (
       <main className="page-shell py-10 text-white">
-        <section className="rounded-[2rem] border border-red-500/20 bg-red-500/5 p-8">
+        <section className="border border-red-500/20 bg-red-500/5 p-8">
           <p className="text-xs font-black uppercase tracking-[0.22em] text-red-300">
             Admin Data Health
           </p>
@@ -159,7 +159,7 @@ export default async function PubgBlockedPromotionsPage() {
 
   return (
     <main className="page-shell space-y-6 py-8 text-white">
-      <section className="rounded-[2rem] border border-white/10 bg-[#07080c] p-7 md:p-9">
+      <section className="border border-white/10 bg-[#07080c] p-7 md:p-9">
         <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
           <div>
             <div className="flex flex-wrap gap-2">
@@ -235,14 +235,14 @@ export default async function PubgBlockedPromotionsPage() {
         </div>
 
         <div className="mt-7 flex flex-wrap gap-3">
-          <Link href="/admin/data-health" className="btn-secondary px-5 py-3 text-sm">Back to Data Health</Link>
-          <Link href="/admin/pubg/mappings" className="btn-primary px-5 py-3 text-sm">Fix Player Mappings</Link>
-          <Link href="/admin/pubg/imports" className="btn-secondary px-5 py-3 text-sm">PUBG Imports</Link>
-          <Link href="/admin/pubg" className="btn-secondary px-5 py-3 text-sm">PUBG Admin</Link>
+          <Link href="/admin/data-health" className="pr-button pr-button-secondary">Back to Data Health</Link>
+          <Link href="/admin/pubg/mappings" className="pr-button pr-button-primary">Fix Player Mappings</Link>
+          <Link href="/admin/pubg/imports" className="pr-button pr-button-secondary">PUBG Imports</Link>
+          <Link href="/admin/pubg" className="pr-button pr-button-secondary">PUBG Admin</Link>
         </div>
       </section>
 
-      <section className="rounded-[2rem] border border-red-400/20 bg-red-400/[0.06] p-6">
+      <section className="border border-red-400/20 bg-red-400/[0.06] p-6">
         <div className="flex flex-wrap gap-2">
           <DataSourceBadge label="Promotion Disabled" />
           <DataSourceBadge label="Safety First" />
@@ -261,7 +261,7 @@ export default async function PubgBlockedPromotionsPage() {
         </p>
       </section>
 
-      <section className="overflow-hidden rounded-[2rem] border border-white/10 bg-[#090b10] shadow-2xl">
+      <section className="overflow-hidden border border-white/10 bg-[#090b10] shadow-2xl">
         <div className="border-b border-white/10 p-6">
           <h2 className="text-2xl font-black">Blocked Matches</h2>
           <p className="mt-2 text-sm text-white/45">
@@ -396,4 +396,3 @@ export default async function PubgBlockedPromotionsPage() {
     </main>
   );
 }
-
