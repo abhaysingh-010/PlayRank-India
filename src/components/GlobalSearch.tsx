@@ -188,7 +188,7 @@ export default function GlobalSearch({
 
       {open ? (
         <div
-          className="fixed inset-0 z-[60] flex items-start justify-center bg-black/45 px-3 pt-3 backdrop-blur-xl sm:px-5 sm:pt-[10vh]"
+          className="fixed inset-0 z-[60] flex items-start justify-center bg-black/20 px-3 pt-3 backdrop-blur-[32px] backdrop-saturate-50 sm:px-5 sm:pt-[10vh]"
           onMouseDown={(event) => {
             if (event.target === event.currentTarget) {
               closeSearch();
@@ -199,7 +199,7 @@ export default function GlobalSearch({
             role="dialog"
             aria-modal="true"
             aria-label="Search PlayRank"
-            className="relative w-full max-w-[900px] overflow-hidden border border-white/20 bg-black/55 shadow-[0_35px_140px_rgba(0,0,0,.72),inset_0_1px_0_rgba(255,255,255,.08)] backdrop-blur-2xl backdrop-saturate-150 before:pointer-events-none before:absolute before:inset-0 before:bg-[linear-gradient(135deg,rgba(255,255,255,.07),transparent_35%,rgba(244,71,59,.035))]"
+            className="relative w-full max-w-[900px] overflow-hidden border border-white/20 bg-black/45 shadow-[0_35px_140px_rgba(0,0,0,.72),inset_0_1px_0_rgba(255,255,255,.08)] backdrop-blur-[40px] backdrop-saturate-150 before:pointer-events-none before:absolute before:inset-0 before:bg-[linear-gradient(135deg,rgba(255,255,255,.08),transparent_35%,rgba(244,71,59,.04))]"
           >
             <div className="relative flex items-center justify-between border-b border-white/10 bg-white/[0.025] px-5 py-3">
               <p className="text-[9px] font-black uppercase tracking-[.22em] text-white/30">
