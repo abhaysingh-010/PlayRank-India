@@ -53,10 +53,10 @@ type SafeCount = {
 };
 
 const shell =
-  "rounded-[2rem] border border-white/10 bg-[#080a0f] shadow-[0_24px_80px_rgba(0,0,0,0.28)]";
+  "border border-white/10 bg-[#080a0f] shadow-[0_24px_80px_rgba(0,0,0,0.28)]";
 
 const panel =
-  "rounded-2xl border border-white/10 bg-white/[0.035] shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]";
+  "border border-white/10 bg-white/[0.035] shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]";
 
 function n(value: unknown, fallback = 0) {
   const numberValue = Number(value);
@@ -161,7 +161,7 @@ function SectionHeader({
           href={actionHref}
           className="w-fit text-sm font-black text-white/40 transition hover:text-[#ffd21a]"
         >
-          {actionLabel} â†’
+          {actionLabel} →
         </Link>
       ) : null}
     </div>
@@ -617,9 +617,9 @@ export default async function DataHealthPage() {
   );
 
   return (
-    <main className="min-h-screen bg-[#030406] text-white">
+    <main className="bg-[#030406] text-white">
       <section className="border-b border-white/10 bg-[#050609]">
-        <div className="mx-auto max-w-7xl px-5 py-12 md:py-16">
+        <div className="mx-auto max-w-[1500px] px-5 py-10 md:px-8 md:py-14">
           <div className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:items-end">
             <div>
               <div className="flex flex-wrap gap-2">
@@ -628,7 +628,10 @@ export default async function DataHealthPage() {
                 <DataSourceBadge label="Protected" size="md" />
               </div>
 
-              <h1 className="mt-7 text-5xl font-black uppercase leading-[0.9] tracking-[-0.07em] text-white md:text-7xl">
+              <p className="mt-7 text-xs font-black uppercase tracking-[0.24em] text-[#f4473b]">
+                Integrity monitor / live database checks
+              </p>
+              <h1 className="mt-4 text-5xl font-black uppercase leading-[0.9] tracking-[-0.07em] text-white md:text-7xl">
                 Data Health
                 <br />
                 Control
@@ -638,20 +641,14 @@ export default async function DataHealthPage() {
                 match data, source imports, roster sync and PUBG API staging.
               </p>
               <div className="mt-8 flex flex-wrap gap-3">
-                <Link href="/admin" className="rounded-full border border-white/10 bg-white/[0.04] px-5 py-2.5 text-sm font-black text-white/65 transition hover:border-white/25 hover:text-white">
-                  Admin Home
-                </Link>
-                <Link href="/admin/pubg" className="rounded-full border border-[#ffd21a]/30 bg-[#ffd21a]/10 px-5 py-2.5 text-sm font-black text-[#ffd21a] transition hover:bg-[#ffd21a]/15">
+                <Link href="/admin/pubg" className="border border-[#ffd21a]/30 bg-[#ffd21a]/10 px-5 py-2.5 text-xs font-black uppercase tracking-[0.14em] text-[#ffd21a] transition hover:bg-[#ffd21a]/15">
                   PUBG Hub
                 </Link>
-                <Link href="/admin/rosters/health" className="rounded-full border border-white/10 bg-white/[0.04] px-5 py-2.5 text-sm font-black text-white/65 transition hover:border-white/25 hover:text-white">
+                <Link href="/admin/rosters/health" className="border border-white/10 bg-white/[0.04] px-5 py-2.5 text-xs font-black uppercase tracking-[0.14em] text-white/65 transition hover:border-white/25 hover:text-white">
                   Roster Health
-                </Link>                <Link href="/admin/pubg/promotions" className="rounded-full border border-white/10 bg-white/[0.04] px-5 py-2.5 text-sm font-black text-white/65 transition hover:border-white/25 hover:text-white">
-                  Promotion Audit
                 </Link>
-
-                <Link href="/admin/data-health/missing-logos" className="rounded-full border border-white/10 bg-white/[0.04] px-5 py-2.5 text-sm font-black text-white/65 transition hover:border-white/25 hover:text-white">
-                  Missing Logos
+                <Link href="/admin/pubg/promotions" className="border border-white/10 bg-white/[0.04] px-5 py-2.5 text-xs font-black uppercase tracking-[0.14em] text-white/65 transition hover:border-white/25 hover:text-white">
+                  Promotion Audit
                 </Link>
               </div>
             </div>
@@ -664,7 +661,7 @@ export default async function DataHealthPage() {
           </div>
         </div>
       </section>
-      <section className="mx-auto grid max-w-7xl gap-5 px-5 py-10 lg:grid-cols-[1.05fr_0.95fr]">
+      <section className="mx-auto grid max-w-[1500px] gap-5 px-5 py-10 md:px-8 lg:grid-cols-[1.05fr_0.95fr]">
         <PubgReadinessPanel totalImportedMatches={pubgReadinessRows.length} readyForPromotion={pubgReadyForPromotionCount} blocked={pubgBlockedPromotionCount} latest={latestPubgReadiness} />
         <section className={shell + " p-5 md:p-6"}>
           <SectionHeader eyebrow="Roster Guard" title="Roster Promotion Safety" actionHref="/admin/rosters/health" actionLabel="Open Roster Health"/>
@@ -682,7 +679,7 @@ export default async function DataHealthPage() {
         </section>
       </section>
 
-      <section className="mx-auto grid max-w-7xl gap-5 px-5 pb-10 lg:grid-cols-[0.92fr_1.08fr]">
+      <section className="mx-auto grid max-w-[1500px] gap-5 px-5 pb-10 md:px-8 lg:grid-cols-[0.92fr_1.08fr]">
         <section className={shell + " p-5 md:p-6"}>
           <SectionHeader
             eyebrow="Quality Checks"
@@ -711,7 +708,7 @@ export default async function DataHealthPage() {
       </section>
 
       <section className="border-t border-white/10 bg-[#050609]">
-        <div className="mx-auto max-w-7xl px-5 py-10">
+        <div className="mx-auto max-w-[1500px] px-5 py-10 md:px-8">
           <SectionHeader eyebrow="Errors" title="Table Access Report" />
 
           {tableErrors.length > 0 ? (
@@ -745,4 +742,3 @@ export default async function DataHealthPage() {
     </main>
   );
 }
-
