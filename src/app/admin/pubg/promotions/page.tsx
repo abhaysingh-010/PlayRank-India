@@ -16,7 +16,7 @@ type PromotionAuditRow = {
 type Tone = "neutral" | "healthy" | "warning" | "danger";
 
 const shell =
-  "rounded-[2rem] border border-white/10 bg-[#080a0f] shadow-[0_24px_80px_rgba(0,0,0,0.28)]";
+  "border border-white/10 bg-[#080a0f] shadow-[0_24px_80px_rgba(0,0,0,0.28)]";
 
 function toneStyle(tone: Tone) {
   if (tone === "healthy") {
@@ -269,16 +269,17 @@ export default async function PubgPromotionAuditPage() {
   const started = rows.filter((row) => row.status === "started").length;
 
   return (
-    <main className="min-h-screen bg-[#030406] text-white">
+    <main className="bg-[#030406] text-white">
       <section className="border-b border-white/10 bg-[#050609]">
-        <div className="mx-auto max-w-7xl px-5 py-12 md:py-16">
+        <div className="mx-auto max-w-[1500px] px-5 py-10 md:px-8 md:py-14">
           <div className="flex flex-wrap gap-2">
             <DataSourceBadge label="Admin Console" size="md" />
             <DataSourceBadge label="PUBG Promotion Audit" size="md" />
             <DataSourceBadge label="Core Write Guard" size="md" />
           </div>
 
-          <h1 className="mt-7 text-5xl font-black uppercase leading-[0.9] tracking-[-0.07em] text-white md:text-7xl">
+          <p className="mt-7 text-xs font-black uppercase tracking-[0.24em] text-[#f4473b]">Core-write history / operator accountability</p>
+          <h1 className="mt-4 text-5xl font-black uppercase leading-[0.9] tracking-[-0.07em] text-white md:text-7xl">
             PUBG Promotion
             <br />
             Audit Log
@@ -323,21 +324,21 @@ export default async function PubgPromotionAuditPage() {
           <div className="mt-8 flex flex-wrap gap-3">
             <Link
               href="/admin/pubg"
-              className="rounded-full border border-[#ffd21a]/30 bg-[#ffd21a]/10 px-5 py-2.5 text-sm font-black text-[#ffd21a] transition hover:bg-[#ffd21a]/15"
+              className="border border-[#ffd21a]/30 bg-[#ffd21a]/10 px-5 py-2.5 text-xs font-black uppercase tracking-[0.14em] text-[#ffd21a] transition hover:bg-[#ffd21a]/15"
             >
               PUBG Hub
             </Link>
 
             <Link
               href="/admin/pubg/imports"
-              className="rounded-full border border-white/10 bg-white/[0.04] px-5 py-2.5 text-sm font-black text-white/65 transition hover:border-white/25 hover:text-white"
+              className="border border-white/10 bg-white/[0.04] px-5 py-2.5 text-xs font-black uppercase tracking-[0.14em] text-white/65 transition hover:border-white/25 hover:text-white"
             >
               Import Review
             </Link>
 
             <Link
               href="/admin/data-health/pubg-blocked-promotions"
-              className="rounded-full border border-white/10 bg-white/[0.04] px-5 py-2.5 text-sm font-black text-white/65 transition hover:border-white/25 hover:text-white"
+              className="border border-white/10 bg-white/[0.04] px-5 py-2.5 text-xs font-black uppercase tracking-[0.14em] text-white/65 transition hover:border-white/25 hover:text-white"
             >
               Blocked Promotions
             </Link>
@@ -345,7 +346,7 @@ export default async function PubgPromotionAuditPage() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-5 py-10">
+      <section className="mx-auto max-w-[1500px] px-5 py-10 md:px-8">
         <section className={shell + " p-5 md:p-6"}>
           <SectionHeader eyebrow="Audit Status" title="Promotion Attempts" />
 
