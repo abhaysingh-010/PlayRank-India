@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { Search, X } from "lucide-react";
+import { createPortal } from "react-dom";
 import {
   useCallback,
   useEffect,
@@ -186,9 +187,9 @@ export default function GlobalSearch({
         </button>
       ) : null}
 
-      {open ? (
+      {open && typeof document !== "undefined" ? createPortal((
         <div
-          className="fixed inset-0 z-[60] flex items-start justify-center bg-black/20 px-3 pt-3 backdrop-blur-[32px] backdrop-saturate-50 sm:px-5 sm:pt-[10vh]"
+          className="fixed inset-0 z-[10000] flex items-start justify-center bg-black/35 px-3 pt-3 backdrop-blur-[64px] backdrop-saturate-0 sm:px-5 sm:pt-[10vh]"
           onMouseDown={(event) => {
             if (event.target === event.currentTarget) {
               closeSearch();
@@ -317,7 +318,7 @@ export default function GlobalSearch({
             </div>
           </section>
         </div>
-      ) : null}
+      ), document.body) : null}
     </>
   );
 }
