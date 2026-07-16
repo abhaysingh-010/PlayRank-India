@@ -20,7 +20,7 @@ type RosterHealthRow = {
 };
 
 const shell =
-  "rounded-[2rem] border border-white/10 bg-[#080a0f] shadow-[0_24px_80px_rgba(0,0,0,0.28)]";
+  "border border-white/10 bg-[#080a0f] shadow-[0_24px_80px_rgba(0,0,0,0.28)]";
 
 const panel =
   "rounded-2xl border border-white/10 bg-white/[0.035] shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]";
@@ -324,9 +324,9 @@ export default async function AdminRosterHealthPage({
   ];
 
   return (
-    <main className="min-h-screen bg-[#030406] text-white">
+    <main className="bg-[#030406] text-white">
       <section className="border-b border-white/10 bg-[#050609]">
-        <div className="mx-auto max-w-7xl px-5 py-12 md:py-16">
+        <div className="mx-auto max-w-[1500px] px-5 py-10 md:px-8 md:py-14">
           <div className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:items-end">
             <div>
               <div className="flex flex-wrap gap-2">
@@ -335,7 +335,8 @@ export default async function AdminRosterHealthPage({
                 <DataSourceBadge label="Promotion Safety" size="md" />
               </div>
 
-              <h1 className="mt-7 text-5xl font-black uppercase leading-[0.9] tracking-[-0.07em] text-white md:text-7xl">
+              <p className="mt-7 text-xs font-black uppercase tracking-[0.24em] text-[#f4473b]">Integrity monitor / player-team links</p>
+              <h1 className="mt-4 text-5xl font-black uppercase leading-[0.9] tracking-[-0.07em] text-white md:text-7xl">
                 Roster
                 <br />
                 Health
@@ -350,31 +351,25 @@ export default async function AdminRosterHealthPage({
               <div className="mt-8 flex flex-wrap gap-3">
                 <Link
                   href="/admin/rosters"
-                  className="rounded-full border border-[#ffd21a]/30 bg-[#ffd21a]/10 px-5 py-2.5 text-sm font-black text-[#ffd21a] transition hover:bg-[#ffd21a]/15"
+                  className="border border-[#ffd21a]/30 bg-[#ffd21a]/10 px-5 py-2.5 text-xs font-black uppercase tracking-[0.14em] text-[#ffd21a] transition hover:bg-[#ffd21a]/15"
                 >
                   Roster Control
                 </Link>
 
                 <Link
                   href="/admin/pubg"
-                  className="rounded-full border border-white/10 bg-white/[0.04] px-5 py-2.5 text-sm font-black text-white/65 transition hover:border-white/25 hover:text-white"
+                  className="border border-white/10 bg-white/[0.04] px-5 py-2.5 text-xs font-black uppercase tracking-[0.14em] text-white/65 transition hover:border-white/25 hover:text-white"
                 >
                   PUBG Hub
                 </Link>
 
                 <Link
                   href="/admin/data-health"
-                  className="rounded-full border border-white/10 bg-white/[0.04] px-5 py-2.5 text-sm font-black text-white/65 transition hover:border-white/25 hover:text-white"
+                  className="border border-white/10 bg-white/[0.04] px-5 py-2.5 text-xs font-black uppercase tracking-[0.14em] text-white/65 transition hover:border-white/25 hover:text-white"
                 >
                   Data Health
                 </Link>
 
-                <Link
-                  href="/admin"
-                  className="rounded-full border border-white/10 bg-white/[0.04] px-5 py-2.5 text-sm font-black text-white/65 transition hover:border-white/25 hover:text-white"
-                >
-                  Admin Home
-                </Link>
               </div>
             </div>
 
@@ -401,7 +396,7 @@ export default async function AdminRosterHealthPage({
       </section>
 
       {error ? (
-        <section className="mx-auto max-w-7xl px-5 py-8">
+        <section className="mx-auto max-w-[1500px] px-5 py-8 md:px-8">
           <div className="rounded-2xl border border-red-400/25 bg-red-400/10 p-5">
             <p className="font-black uppercase text-red-300">
               Failed to load roster health
@@ -412,7 +407,7 @@ export default async function AdminRosterHealthPage({
         </section>
       ) : null}
 
-      <section className="mx-auto grid max-w-7xl gap-5 px-5 py-10 lg:grid-cols-[0.85fr_1.15fr]">
+      <section className="mx-auto grid max-w-[1500px] gap-5 px-5 py-10 md:px-8 lg:grid-cols-[0.85fr_1.15fr]">
         <section className={shell + " p-5 md:p-6"}>
           <SectionHeader
             eyebrow="Issue Breakdown"
@@ -470,7 +465,7 @@ export default async function AdminRosterHealthPage({
               <Link
                 key={filter.value}
                 href={`/admin/rosters/health?status=${filter.value}`}
-                className={`rounded-full border px-4 py-2 text-xs font-black uppercase tracking-[0.14em] ${
+                className={`border px-4 py-2 text-xs font-black uppercase tracking-[0.14em] ${
                   selectedStatus === filter.value
                     ? "border-[#ffd21a]/40 bg-[#ffd21a]/10 text-[#ffd21a]"
                     : "border-white/10 bg-white/[0.03] text-white/50 hover:text-white"
@@ -509,4 +504,3 @@ export default async function AdminRosterHealthPage({
     </main>
   );
 }
-

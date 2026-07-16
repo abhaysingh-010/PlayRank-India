@@ -46,7 +46,7 @@ export default function RecalculateRankingsButton() {
   }
 
   return (
-    <div className="rounded-[2rem] border border-yellow-400/20 bg-yellow-400/[0.06] p-5">
+    <div className="border border-yellow-400/20 bg-yellow-400/[0.06] p-5">
       <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
         <div>
           <p className="text-xs font-black uppercase tracking-[0.25em] text-yellow-300">
@@ -66,7 +66,7 @@ export default function RecalculateRankingsButton() {
           type="button"
           onClick={runRecalculation}
           disabled={loading}
-          className="rounded-full border border-yellow-400/30 bg-yellow-400/10 px-5 py-3 text-sm font-black text-yellow-300 transition hover:bg-yellow-400/15 disabled:cursor-not-allowed disabled:opacity-50"
+          className="border border-yellow-400/30 bg-yellow-400/10 px-5 py-3 text-xs font-black uppercase tracking-[0.16em] text-yellow-300 transition hover:bg-yellow-400/15 disabled:cursor-not-allowed disabled:opacity-50"
         >
           {loading ? "Running..." : "Run Recalculation"}
         </button>
