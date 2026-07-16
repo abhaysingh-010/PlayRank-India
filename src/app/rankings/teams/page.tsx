@@ -1,362 +1,85 @@
-﻿import Image from "next/image";
+import Image from "next/image";
 import Link from "next/link";
+import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp, Minus, ShieldCheck } from "lucide-react";
+import { Reveal } from "@/components/home/HomeMotion";
 import { supabase } from "@/lib/supabase";
-import DataSourceBadge from "@/components/DataSourceBadge";
-import DataFreshnessBadge from "@/components/DataFreshnessBadge";
-import RankingExplanationPanel from "@/components/RankingExplanationPanel";
 
-type RankingRow = {
-  id: string;
-  entity_id: string;
-  entity_type: "team";
-  rank: number;
-  score: number;
-  change: number | null;
-  updated_at: string | null;
-};
+type RankingRow = { id: string; entity_id: string; rank: number; score: number; change: number | null; updated_at: string | null };
+type TeamRow = { id: string; name: string; short_name: string | null; slug: string; country: string | null; logo_url: string | null; wins: number | null; kills: number | null; matches_played: number | null; source: string | null; verified: boolean | null };
 
-type TeamRow = {
-  id: string;
-  name: string;
-  short_name: string | null;
-  slug: string;
-  country: string | null;
-  logo_url: string | null;
-  points: number | null;
-  wins: number | null;
-  kills: number | null;
-  matches_played: number | null;
-  source: string | null;
-  verified: boolean | null;
-  active: boolean | null;
-};
-
-function n(value: unknown, fallback = 0) {
-  const numberValue = Number(value);
-  return Number.isFinite(numberValue) ? numberValue : fallback;
+function formatDate(value?: string | null) {
+  return value ? new Date(value).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }) : "Not available";
 }
 
-function getInitials(name: string) {
-  return name
-    .split(" ")
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((word) => word[0])
-    .join("")
-    .toUpperCase();
+function initials(value: string) {
+  return value.split(" ").filter(Boolean).slice(0, 2).map((part) => part[0]).join("").toUpperCase();
 }
 
-function formatDate(value: string | null) {
-  if (!value) return "Not available";
-
-  return new Date(value).toLocaleDateString("en-IN", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-  });
-}
-
-function getLatestDate(values: Array<string | null | undefined>) 
-{
-  const timestamps = values
-    .filter(Boolean)
-    .map((value) => new Date(value as string).getTime())
-    .filter((value) => Number.isFinite(value));
-
-  if (timestamps.length === 0) return null;
-
-  return new Date(Math.max(...timestamps)).toISOString();
-}
-
-function formatChange(value: number | null) {
-  if (!value) return "â€”";
-  if (value > 0) return `+${value}`;
-
-  return String(value);
-}
-
-function changeTone(value: number | null) {
-  if (!value) return "text-white/35";
-  if (value > 0) return "text-emerald-300";
-
-  return "text-red-300";
-}
-
-function rankPill(rank: number) {
-  if (rank === 1) return "border-yellow-400/30 bg-yellow-400/10 text-yellow-300";
-  if (rank === 2) return "border-slate-300/25 bg-slate-300/10 text-slate-200";
-  if (rank === 3) return "border-orange-400/25 bg-orange-400/10 text-orange-300";
-  if (rank <= 10) return "border-emerald-400/25 bg-emerald-400/10 text-emerald-300";
-
-  return "border-white/10 bg-white/[0.035] text-white/75";
-}
-
-function TeamLogo({
-  name,
-  logoUrl,
-}: {
-  name: string;
-  logoUrl: string | null;
-}) {
+function TeamMark({ team, large = false }: { team: TeamRow; large?: boolean }) {
   return (
-    <div className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-white/10 bg-white/[0.04]">
-      {logoUrl ? (
-        <Image src={logoUrl} alt={`${name} logo`} width={44} height={44} sizes="44px" className="h-full w-full object-contain p-2"/>
-      ) : (
-        <span className="text-sm font-black text-white/70">
-          {getInitials(name)}
-        </span>
-      )}
+    <div className={`flex shrink-0 items-center justify-center overflow-hidden border border-white/15 bg-white/[0.035] ${large ? "h-20 w-20" : "h-12 w-12"}`}>
+      {team.logo_url ? <Image src={team.logo_url} alt={`${team.name} logo`} width={large ? 80 : 48} height={large ? 80 : 48} className="h-full w-full object-contain p-2" /> : <span className="text-xs font-black text-white/60">{initials(team.name)}</span>}
     </div>
   );
 }
 
+function Movement({ value }: { value: number | null }) {
+  if (!value) return <span className="inline-flex items-center gap-1 text-white/30"><Minus size={13} /> 0</span>;
+  if (value > 0) return <span className="inline-flex items-center gap-1 text-[var(--pr-positive)]"><ArrowUp size={13} /> {value}</span>;
+  return <span className="inline-flex items-center gap-1 text-[var(--pr-red)]"><ArrowDown size={13} /> {Math.abs(value)}</span>;
+}
+
 export default async function TeamRankingsPage() {
-  const [rankingsResult, latestSnapshotResult, teamCountResult] =
-    await Promise.all([
-      supabase
-        .from("rankings")
-        .select("id, entity_id, entity_type, rank, score, change, updated_at")
-        .eq("entity_type", "team")
-        .order("rank", { ascending: true })
-        .range(0, 49),
-
-      supabase
-        .from("ranking_history")
-        .select("snapshot_date, created_at")
-        .eq("entity_type", "team")
-        .order("snapshot_date", { ascending: false })
-        .limit(1)
-        .maybeSingle(),
-
-      supabase.from("teams").select("*", { count: "exact", head: true }),
-    ]);
-
+  const [rankingsResult, snapshotResult, countResult] = await Promise.all([
+    supabase.from("rankings").select("id,entity_id,rank,score,change,updated_at").eq("entity_type", "team").order("rank", { ascending: true }).range(0, 49),
+    supabase.from("ranking_history").select("snapshot_date,created_at").eq("entity_type", "team").order("snapshot_date", { ascending: false }).limit(1).maybeSingle(),
+    supabase.from("teams").select("*", { count: "exact", head: true }),
+  ]);
   const rankings = (rankingsResult.data || []) as RankingRow[];
-  
-  const teamIds = rankings.map((row) => row.entity_id);
+  const ids = rankings.map((row) => row.entity_id);
+  const teamsResult = ids.length ? await supabase.from("teams").select("id,name,short_name,slug,country,logo_url,wins,kills,matches_played,source,verified").in("id", ids) : { data: [], error: null };
 
-  const { data: teamsRaw, error: teamsError } = teamIds.length > 0? await supabase
-  .from("teams")
-  .select
-  (
-    "id, name, short_name, slug, country, logo_url, points, wins, kills, matches_played, source, verified, active"
-  )
-  .in("id", teamIds) : { data: [], error: null };
-  if (rankingsResult.error || teamsError) 
-  {
-    return (
-      <main className="page-shell py-10 text-white">
-        <section className="rounded-[2rem] border border-red-500/20 bg-red-500/5 p-8">
-          <h1 className="text-2xl font-black">Team Rankings</h1>
-          <p className="mt-3 text-red-300">
-            Failed to load team rankings. Check Supabase permissions and table
-            columns.
-          </p>
-        </section>
-      </main>
-    );
-  }
+  if (rankingsResult.error || teamsResult.error) return <ErrorState />;
 
-  const teams = (teamsRaw || []) as TeamRow[];
-  const teamById = new Map(teams.map((team) => [team.id, team]));
-
-  const rankedTeams = rankings
-    .map((ranking) => ({
-      ranking,
-      team: teamById.get(ranking.entity_id),
-    }))
-    .filter((item): item is { ranking: RankingRow; team: TeamRow } =>
-      Boolean(item.team)
-    );
-
-  const latestSnapshot = latestSnapshotResult.data?.snapshot_date || latestSnapshotResult.data?.created_at || null;
-  const latestRankingUpdate = getLatestDate(rankings.map((row) => row.updated_at)) || latestSnapshot;
+  const teams = (teamsResult.data || []) as TeamRow[];
+  const byId = new Map(teams.map((team) => [team.id, team]));
+  const ranked = rankings.map((ranking) => ({ ranking, team: byId.get(ranking.entity_id) })).filter((item): item is { ranking: RankingRow; team: TeamRow } => Boolean(item.team));
+  const snapshot = rankings[0]?.updated_at || snapshotResult.data?.snapshot_date || snapshotResult.data?.created_at || null;
 
   return (
-    <main className="page-shell space-y-8 py-8 text-white">
-      <section className="rounded-[2rem] border border-white/10 bg-[#07080c] p-7 md:p-9">
-        <div className="flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
-          <div>
-            <div className="flex flex-wrap gap-2">
-              <DataSourceBadge label="Official + Verified Layer" />
-              <DataSourceBadge label="Ranking Snapshot" />
-              <DataSourceBadge label="Source Controlled" />
-            </div>
-            <p className="krafton-label mt-6">Team Rankings</p>
-            <h1 className="mt-4 text-6xl font-black uppercase leading-[0.9] tracking-[-0.07em] text-white md:text-8xl">
-              Team
-              <br />
-              Rankings
-            </h1>
-            <p className="mt-5 max-w-3xl text-white/50">Current PlayRank team order using official and verified team ranking records where available.</p>
-            <div className="mt-7 flex flex-wrap gap-3">
-              <Link href="/rankings" className="btn-primary px-5 py-3 text-sm">All Rankings</Link>
-              <Link href="/rankings/players"className="btn-secondary px-5 py-3 text-sm">Player Rankings</Link>
-              <Link href="/data" className="btn-secondary px-5 py-3 text-sm">Data Trust</Link>
-            </div>
-          </div>
-          <div className="grid gap-3 md:grid-cols-2">
-            <div className="rounded-2xl border border-white/10 bg-white/[0.035] p-4">
-              <p className="data-label">Last Updated</p>
-              <p className="mt-2 text-xl font-black">{formatDate(latestRankingUpdate)}</p>
-            </div>
-            <div className="rounded-2xl border border-white/10 bg-white/[0.035] p-4">
-              <p className="data-label">Ranked Teams</p>
-              <p className="mt-2 text-xl font-black">{rankedTeams.length.toLocaleString("en-IN")}</p>
-            </div>
-            <div className="rounded-2xl border border-white/10 bg-white/[0.035] p-4">
-              <p className="data-label">Team Database</p>
-              <p className="mt-2 text-xl font-black">{n(teamCountResult.count).toLocaleString("en-IN")}</p>
-            </div>
-            <div className="rounded-2xl border border-white/10 bg-white/[0.035] p-4">
-              <p className="data-label">Confidence</p>
-              <p className="mt-2 text-xl font-black">Source based</p>
-            </div>
+    <main className="bg-[var(--pr-bg)] text-white">
+      <section className="border-b border-white/15">
+        <div className="pr-container py-14 md:py-20">
+          <Link href="/rankings" className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-[.18em] text-white/35 transition hover:text-white"><ArrowLeft size={13} /> Rankings overview</Link>
+          <div className="mt-14 grid gap-10 lg:grid-cols-[1.25fr_.75fr] lg:items-end">
+            <div><p className="pr-kicker">Official + verified team layer</p><h1 className="mt-5 text-[clamp(4.3rem,9vw,8.5rem)] font-semibold uppercase leading-[.78] tracking-[-.08em]">Team<br /><span className="text-[var(--pr-red)]">order.</span></h1></div>
+            <div className="lg:pb-1"><p className="max-w-lg text-base leading-7 text-white/50">The current competitive hierarchy of Indian esports teams, with form, movement and performance context in one view.</p><div className="mt-7 flex gap-3"><Link href="/rankings/players" className="pr-button pr-button-secondary text-[10px]">Player rankings</Link><Link href="/teams" className="pr-button pr-button-primary text-[10px]">Team directory</Link></div></div>
           </div>
         </div>
       </section>
-      <RankingExplanationPanel variant="team" lastUpdatedValue={latestRankingUpdate} />
 
-      <section className="rounded-[2rem] border border-red-400/20 bg-red-400/[0.06] p-6">
-        <div className="flex flex-wrap gap-2">
-          <DataSourceBadge label="Independent Platform" />
-          <DataSourceBadge label="Source Attribution" />
-          <DataSourceBadge label="No Predictions" />
-        </div>
-
-        <h2 className="mt-4 text-2xl font-black uppercase tracking-[-0.04em]">
-          Team rankings are intelligence signals
-        </h2>
-
-        <p className="mt-3 max-w-5xl text-sm leading-7 text-white/55">
-          PlayRank is an independent esports intelligence platform. It is not
-          affiliated with, endorsed by, or operated by Krafton, PUBG, BGMI, or
-          tournament organizers. Official source data is credited where
-          available. PlayRank rankings are independently structured from
-          available source, roster, match and ranking data.
-        </p>
-      </section>
-      <section className="overflow-hidden rounded-[2rem] border border-white/10 bg-[#090b10] shadow-2xl">
-        <div className="flex flex-col gap-4 border-b border-white/10 p-6 md:flex-row md:items-end md:justify-between">
-          <div>
-            <div className="flex flex-wrap gap-2">
-              <DataFreshnessBadge value={latestRankingUpdate} label="Team Freshness" />
-              <DataSourceBadge label="Official + Verified Records" />
-            </div>
-            <h2 className="mt-4 text-2xl font-black">Team Ranking Table</h2>
-            <p className="mt-2 text-sm text-white/45">
-              Ordered by current rank. Use source badges and update timestamps
-              to understand confidence.
-            </p>
-          </div>
-          <Link href="/teams" className="rounded-full border border-white/10 bg-white/[0.03] px-5 py-2 text-sm text-white/60 transition hover:border-white/25 hover:text-white">
-            Explore teams
-          </Link>
-        </div>
-        <div className="overflow-x-auto">
-          <table className="w-full min-w-[980px] border-collapse text-left">
-            <thead>
-              <tr className="border-b border-white/10 bg-white/[0.025] text-xs uppercase tracking-[0.22em] text-white/35">
-                <th className="px-6 py-4">Rank</th>
-                <th className="px-6 py-4">Team</th>
-                <th className="px-6 py-4">Country</th>
-                <th className="px-6 py-4 text-right">Score</th>
-                <th className="px-6 py-4 text-right">Change</th>
-                <th className="px-6 py-4 text-right">WWCD</th>
-                <th className="px-6 py-4 text-right">Matches</th>
-                <th className="px-6 py-4 text-right">Kills</th>
-                <th className="px-6 py-4">Source</th>
-              </tr>
-            </thead>
-            <tbody>
-              {rankedTeams.length > 0 ? 
-                (
-                  rankedTeams.map
-                  (
-                    (
-                      { ranking, team }) => 
-                      (
-                        <tr key={ranking.id} className="border-b border-white/[0.06] transition hover:bg-white/[0.025]">
-                        <td className="px-6 py-5">
-                          <span className={`rounded-full border px-3 py-1 text-sm font-black ${rankPill(ranking.rank)}`}>#{ranking.rank}</span>
-                        </td>
-
-                    <td className="px-6 py-5">
-                      <div className="flex items-center gap-4">
-                        <TeamLogo name={team.name} logoUrl={team.logo_url} />
-                        <div>
-                          <Link
-                            href={`/teams/${team.slug}`}
-                            className="font-bold text-white hover:underline"
-                          >
-                            {team.name}
-                          </Link>
-                          <p className="mt-1 text-xs uppercase tracking-[0.18em] text-white/35">
-                            {team.short_name || "TEAM"}
-                          </p>
-                        </div>
-                      </div>
-                    </td>
-
-                    <td className="px-6 py-5 text-white/55">
-                      {team.country || "India"}
-                    </td>
-
-                    <td className="px-6 py-5 text-right font-black">
-                      {ranking.score}
-                    </td>
-
-                    <td
-                      className={`px-6 py-5 text-right font-black ${changeTone(
-                        ranking.change
-                      )}`}
-                    >
-                      {formatChange(ranking.change)}
-                    </td>
-
-                    <td className="px-6 py-5 text-right text-white/60">
-                      {team.wins ?? 0}
-                    </td>
-
-                    <td className="px-6 py-5 text-right text-white/45">
-                      {team.matches_played ?? 0}
-                    </td>
-
-                    <td className="px-6 py-5 text-right text-white/45">
-                      {team.kills ?? 0}
-                    </td>
-
-                    <td className="px-6 py-5">
-                      <DataSourceBadge
-                        source={team.source}
-                        verified={team.verified}
-                        label={
-                          team.source === "krafton_india_esports"
-                            ? "Official Krafton"
-                            : team.verified
-                              ? "Verified"
-                              : "Record"
-                        }
-                      />
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan={9} className="px-6 py-10 text-center text-white/45">
-                    No team rankings available yet.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+      <section className="border-b border-white/15">
+        <div className="pr-container grid grid-cols-2 md:grid-cols-4">
+          {[[formatDate(snapshot), "Latest snapshot"], [ranked.length.toLocaleString("en-IN"), "Ranked teams"], [(countResult.count || 0).toLocaleString("en-IN"), "Team database"], ["Source based", "Confidence"]].map(([value, label]) => <div key={label} className="border-r border-white/15 px-5 py-7 first:border-l md:px-7"><p className="text-lg font-semibold tracking-[-.03em] md:text-2xl">{value}</p><p className="mt-2 text-[10px] font-bold uppercase tracking-[.18em] text-white/30">{label}</p></div>)}
         </div>
       </section>
+
+      {ranked.length > 0 ? <section className="pr-container py-16 md:py-24">
+        <Reveal><div className="border-b border-white/15 pb-7"><p className="pr-kicker">Front runners</p><h2 className="mt-4 text-4xl font-semibold tracking-[-.055em] md:text-6xl">The top three.</h2></div></Reveal>
+        <div className="grid md:grid-cols-3">{ranked.slice(0, 3).map(({ ranking, team }, index) => <Reveal key={team.id} delay={index * .08} className="border-b border-white/15 py-8 md:border-r md:px-7 md:first:pl-0 md:last:border-r-0 md:last:pr-0"><Link href={`/teams/${team.slug}`} className="group block"><div className="flex items-start justify-between"><TeamMark team={team} large /><span className="text-7xl font-semibold tracking-[-.08em] text-[var(--pr-gold)]">{String(ranking.rank).padStart(2, "0")}</span></div><h3 className="mt-14 text-2xl font-semibold tracking-[-.04em]">{team.name}</h3><p className="mt-2 text-[10px] font-bold uppercase tracking-[.16em] text-white/30">{team.short_name || team.country || "India"}</p><div className="mt-6 grid grid-cols-3 border-t border-white/15 pt-4"><Metric value={Math.round(ranking.score)} label="Score" /><Metric value={team.wins || 0} label="Wins" /><div className="text-right"><Movement value={ranking.change} /><p className="mt-1 text-[9px] uppercase tracking-[.14em] text-white/25">Move</p></div></div></Link></Reveal>)}</div>
+      </section> : null}
+
+      <section className="border-y border-white/15 bg-[var(--pr-surface)]">
+        <div className="pr-container py-16 md:py-20"><div className="flex flex-col gap-4 border-b border-white/15 pb-7 sm:flex-row sm:items-end sm:justify-between"><div><p className="pr-kicker">Complete table</p><h2 className="mt-4 text-4xl font-semibold tracking-[-.05em]">Team leaderboard.</h2></div><p className="text-xs uppercase tracking-[.15em] text-white/30">Score · movement · match record</p></div>
+          <div>{ranked.length ? ranked.map(({ ranking, team }) => <Link key={ranking.id} href={`/teams/${team.slug}`} className="pr-ranking-row group grid grid-cols-[42px_1fr_auto] items-center gap-3 border-b border-white/10 py-5 md:grid-cols-[62px_1.4fr_repeat(4,.55fr)_24px] md:gap-5"><span className={`text-xl font-semibold ${ranking.rank <= 3 ? "text-[var(--pr-gold)]" : "text-white/45"}`}>{String(ranking.rank).padStart(2, "0")}</span><div className="flex min-w-0 items-center gap-3"><TeamMark team={team} /><div className="min-w-0"><p className="truncate font-semibold">{team.name}</p><p className="mt-1 text-[9px] font-bold uppercase tracking-[.15em] text-white/25">{team.short_name || team.country || "India"}</p></div></div><div className="text-right md:text-left"><p className="font-semibold">{Math.round(ranking.score)}</p><p className="mt-1 text-[9px] uppercase tracking-[.14em] text-white/25 md:hidden">Score</p></div><RowMetric value={<Movement value={ranking.change} />} label="Movement" /><RowMetric value={team.wins || 0} label="Wins" /><RowMetric value={team.matches_played || 0} label="Matches" /><RowMetric value={team.kills || 0} label="Kills" /><ArrowRight size={15} className="hidden text-white/20 transition group-hover:text-[var(--pr-red)] md:block" /></Link>) : <p className="py-14 text-white/40">No team rankings are available yet.</p>}</div>
+        </div>
+      </section>
+
+      <section className="pr-container py-14 md:py-18"><div className="grid gap-7 border-b border-white/15 pb-12 md:grid-cols-[.7fr_1.3fr]"><div><ShieldCheck size={20} className="text-[var(--pr-red)]" /><h2 className="mt-5 text-3xl font-semibold tracking-[-.04em]">Read the signal.</h2></div><p className="max-w-3xl text-sm leading-7 text-white/45">Team rankings use official and verified ranking records where available, structured alongside roster and match context. They are independent intelligence signals—not predictions or official tournament decisions. Snapshot shown: {formatDate(snapshot)}.</p></div></section>
     </main>
   );
 }
 
-
-
-
+function Metric({ value, label }: { value: number; label: string }) { return <div><p className="font-semibold">{value}</p><p className="mt-1 text-[9px] uppercase tracking-[.14em] text-white/25">{label}</p></div>; }
+function RowMetric({ value, label }: { value: React.ReactNode; label: string }) { return <div className="hidden md:block"><p className="text-sm font-semibold">{value}</p><p className="mt-1 text-[9px] uppercase tracking-[.14em] text-white/25">{label}</p></div>; }
+function ErrorState() { return <main className="pr-container py-20"><section className="border border-[var(--pr-red)]/30 bg-[var(--pr-red)]/5 p-8"><p className="pr-kicker">Data unavailable</p><h1 className="mt-4 text-4xl font-semibold">Team rankings could not be loaded.</h1><p className="mt-3 text-white/45">Check Supabase permissions and the latest ranking snapshot.</p></section></main>; }
