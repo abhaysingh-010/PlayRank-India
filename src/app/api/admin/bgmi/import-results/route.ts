@@ -261,3 +261,6 @@ export async function POST(request: NextRequest) {
 
   return NextResponse.json({
     ok: true,
+    batch_id: batchId,
+  });
+}

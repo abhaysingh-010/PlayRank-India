@@ -1,0 +1,2463 @@
+{
+  "index_page": "Battlegrounds_Mobile_India",
+  "requested_years": [
+    2021,
+    2022,
+    2023,
+    2024,
+    2025,
+    2026
+  ],
+  "pages": [
+    {
+      "title": "1M DYNASTY",
+      "page_id": 92128,
+      "revision_id": 712964,
+      "revision_parent_id": 712955,
+      "revision_timestamp": "2026-07-14T08:05:38Z",
+      "years": [
+        2024
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/1M_DYNASTY",
+      "retrieved_at": "2026-07-17T09:32:10.768Z"
+    },
+    {
+      "title": "1M DYNASTY/Season 2",
+      "page_id": 94574,
+      "revision_id": 708162,
+      "revision_parent_id": 705749,
+      "revision_timestamp": "2026-06-03T13:03:24Z",
+      "years": [
+        2025
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/1M_DYNASTY/Season_2",
+      "retrieved_at": "2026-07-17T09:32:10.773Z"
+    },
+    {
+      "title": "1M/Slayy Zone",
+      "page_id": 92582,
+      "revision_id": 710318,
+      "revision_parent_id": 707890,
+      "revision_timestamp": "2026-06-22T15:15:50Z",
+      "years": [
+        2025
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/1M/Slayy_Zone",
+      "retrieved_at": "2026-07-17T09:32:10.771Z"
+    },
+    {
+      "title": "7Sea Invitational",
+      "page_id": 81732,
+      "revision_id": 706857,
+      "revision_parent_id": 692974,
+      "revision_timestamp": "2026-06-03T10:40:11Z",
+      "years": [
+        2022
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/7Sea_Invitational",
+      "retrieved_at": "2026-07-17T09:32:10.755Z"
+    },
+    {
+      "title": "AKEF BGMI Gaming Saga",
+      "page_id": 77479,
+      "revision_id": 706659,
+      "revision_parent_id": 647931,
+      "revision_timestamp": "2026-06-03T10:16:17Z",
+      "years": [
+        2021
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/AKEF_BGMI_Gaming_Saga",
+      "retrieved_at": "2026-07-17T09:32:10.749Z"
+    },
+    {
+      "title": "APL Invitational/Season 2/Round 1",
+      "page_id": 75234,
+      "revision_id": 706556,
+      "revision_parent_id": 647894,
+      "revision_timestamp": "2026-06-03T10:04:36Z",
+      "years": [
+        2021
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/APL_Invitational/Season_2/Round_1",
+      "retrieved_at": "2026-07-17T09:32:10.733Z"
+    },
+    {
+      "title": "APL Invitational/Season 2/Round 2",
+      "page_id": 76231,
+      "revision_id": 706616,
+      "revision_parent_id": 647908,
+      "revision_timestamp": "2026-06-03T10:11:31Z",
+      "years": [
+        2021
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/APL_Invitational/Season_2/Round_2",
+      "retrieved_at": "2026-07-17T09:32:10.747Z"
+    },
+    {
+      "title": "APL/Winter Showdown/Season 2",
+      "page_id": 88779,
+      "revision_id": 707544,
+      "revision_parent_id": 695601,
+      "revision_timestamp": "2026-06-03T11:59:16Z",
+      "years": [
+        2023
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/APL/Winter_Showdown/Season_2",
+      "retrieved_at": "2026-07-17T09:32:10.763Z"
+    },
+    {
+      "title": "Battle For Revolution/Season 1",
+      "page_id": 87201,
+      "revision_id": 707385,
+      "revision_parent_id": 660027,
+      "revision_timestamp": "2026-06-03T11:43:16Z",
+      "years": [
+        2023
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/Battle_For_Revolution/Season_1",
+      "retrieved_at": "2026-07-17T09:32:10.757Z"
+    },
+    {
+      "title": "Battle For Revolution/Season 2",
+      "page_id": 88001,
+      "revision_id": 707447,
+      "revision_parent_id": 660028,
+      "revision_timestamp": "2026-06-03T11:49:43Z",
+      "years": [
+        2023
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/Battle_For_Revolution/Season_2",
+      "retrieved_at": "2026-07-17T09:32:10.761Z"
+    },
+    {
+      "title": "Battle For Revolution/Season 3",
+      "page_id": 90999,
+      "revision_id": 707734,
+      "revision_parent_id": 688819,
+      "revision_timestamp": "2026-06-03T12:18:54Z",
+      "years": [
+        2024
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/Battle_For_Revolution/Season_3",
+      "retrieved_at": "2026-07-17T09:32:10.766Z"
+    },
+    {
+      "title": "Battle of Rivals/Season 1",
+      "page_id": 78873,
+      "revision_id": 706717,
+      "revision_parent_id": 705637,
+      "revision_timestamp": "2026-06-03T10:22:43Z",
+      "years": [
+        2021
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/Battle_of_Rivals/Season_1",
+      "retrieved_at": "2026-07-17T09:32:10.750Z"
+    },
+    {
+      "title": "Battlegrounds Mobile India International Cup/2025",
+      "page_id": 94240,
+      "revision_id": 708141,
+      "revision_parent_id": 697423,
+      "revision_timestamp": "2026-06-03T13:01:35Z",
+      "years": [
+        2025
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/Battlegrounds_Mobile_India_International_Cup/2025",
+      "retrieved_at": "2026-07-17T09:32:10.772Z"
+    },
+    {
+      "title": "Battlegrounds Mobile India International Cup/2026",
+      "page_id": 94603,
+      "revision_id": 703261,
+      "revision_parent_id": 698229,
+      "revision_timestamp": "2026-05-08T09:48:34Z",
+      "years": [
+        2026
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/Battlegrounds_Mobile_India_International_Cup/2026",
+      "retrieved_at": "2026-07-17T09:32:10.775Z"
+    },
+    {
+      "title": "Battlegrounds Mobile India Open Challenge/2022",
+      "page_id": 81550,
+      "revision_id": 706836,
+      "revision_parent_id": 660031,
+      "revision_timestamp": "2026-06-03T10:37:42Z",
+      "years": [
+        2022
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/Battlegrounds_Mobile_India_Open_Challenge/2022",
+      "retrieved_at": "2026-07-17T09:32:10.754Z"
+    },
+    {
+      "title": "Battlegrounds Mobile India Open Challenge/2022/The Grind",
+      "page_id": 81806,
+      "revision_id": 706861,
+      "revision_parent_id": 660032,
+      "revision_timestamp": "2026-06-03T10:40:43Z",
+      "years": [
+        2022
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/Battlegrounds_Mobile_India_Open_Challenge/2022/The_Grind",
+      "retrieved_at": "2026-07-17T09:32:10.756Z"
+    },
+    {
+      "title": "Battlegrounds Mobile India Pro Series/2023",
+      "page_id": 88420,
+      "revision_id": 707492,
+      "revision_parent_id": 692333,
+      "revision_timestamp": "2026-06-03T11:54:03Z",
+      "years": [
+        2023
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/Battlegrounds_Mobile_India_Pro_Series/2023",
+      "retrieved_at": "2026-07-17T09:32:10.762Z"
+    },
+    {
+      "title": "Battlegrounds Mobile India Pro Series/2024",
+      "page_id": 91047,
+      "revision_id": 711581,
+      "revision_parent_id": 711319,
+      "revision_timestamp": "2026-07-04T07:40:31Z",
+      "years": [
+        2024
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/Battlegrounds_Mobile_India_Pro_Series/2024",
+      "retrieved_at": "2026-07-17T09:32:10.767Z"
+    },
+    {
+      "title": "Battlegrounds Mobile India Pro Series/2025",
+      "page_id": 92325,
+      "revision_id": 712967,
+      "revision_parent_id": 712958,
+      "revision_timestamp": "2026-07-14T08:07:48Z",
+      "years": [
+        2025
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/Battlegrounds_Mobile_India_Pro_Series/2025",
+      "retrieved_at": "2026-07-17T09:32:10.770Z"
+    },
+    {
+      "title": "Battlegrounds Mobile India Pro Series/2026",
+      "page_id": 94601,
+      "revision_id": 710520,
+      "revision_parent_id": 710374,
+      "revision_timestamp": "2026-06-25T09:26:30Z",
+      "years": [
+        2026
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/Battlegrounds_Mobile_India_Pro_Series/2026",
+      "retrieved_at": "2026-07-17T09:32:10.774Z"
+    },
+    {
+      "title": "Battlegrounds Mobile India Pro Series/2026/Qualifiers",
+      "page_id": 95683,
+      "revision_id": 710376,
+      "revision_parent_id": 709917,
+      "revision_timestamp": "2026-06-23T05:06:40Z",
+      "years": [
+        2026
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/Battlegrounds_Mobile_India_Pro_Series/2026/Qualifiers",
+      "retrieved_at": "2026-07-17T09:32:10.775Z"
+    },
+    {
+      "title": "Battlegrounds Mobile India Pro Series/2026/Survival Stage",
+      "page_id": 95965,
+      "revision_id": 712969,
+      "revision_parent_id": 709464,
+      "revision_timestamp": "2026-07-14T08:12:50Z",
+      "years": [
+        2026
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/Battlegrounds_Mobile_India_Pro_Series/2026/Survival_Stage",
+      "retrieved_at": "2026-07-17T09:32:10.776Z"
+    },
+    {
+      "title": "Battlegrounds Mobile India Pro Series/Season 1",
+      "page_id": 81581,
+      "revision_id": 708685,
+      "revision_parent_id": 708679,
+      "revision_timestamp": "2026-06-05T10:30:10Z",
+      "years": [
+        2022
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/Battlegrounds_Mobile_India_Pro_Series/Season_1",
+      "retrieved_at": "2026-07-17T09:32:10.755Z"
+    },
+    {
+      "title": "Battlegrounds Mobile India Series/2021",
+      "page_id": 75330,
+      "revision_id": 706559,
+      "revision_parent_id": 660038,
+      "revision_timestamp": "2026-06-03T10:04:52Z",
+      "years": [
+        2021,
+        2022
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/Battlegrounds_Mobile_India_Series/2021",
+      "retrieved_at": "2026-07-17T09:32:10.746Z"
+    },
+    {
+      "title": "Battlegrounds Mobile India Series/2021/The Grind",
+      "page_id": 79026,
+      "revision_id": 708219,
+      "revision_parent_id": 706720,
+      "revision_timestamp": "2026-06-03T13:09:12Z",
+      "years": [
+        2021
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/Battlegrounds_Mobile_India_Series/2021/The_Grind",
+      "retrieved_at": "2026-07-17T09:32:10.752Z"
+    },
+    {
+      "title": "Battlegrounds Mobile India Series/2023",
+      "page_id": 87253,
+      "revision_id": 707392,
+      "revision_parent_id": 689836,
+      "revision_timestamp": "2026-06-03T11:44:01Z",
+      "years": [
+        2023
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/Battlegrounds_Mobile_India_Series/2023",
+      "retrieved_at": "2026-07-17T09:32:10.759Z"
+    },
+    {
+      "title": "Battlegrounds Mobile India Series/2023/The Grind",
+      "page_id": 87256,
+      "revision_id": 660041,
+      "revision_parent_id": 562014,
+      "revision_timestamp": "2025-03-29T09:12:07Z",
+      "years": [
+        2023
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/Battlegrounds_Mobile_India_Series/2023/The_Grind",
+      "retrieved_at": "2026-07-17T09:32:10.761Z"
+    },
+    {
+      "title": "Battlegrounds Mobile India Series/2024",
+      "page_id": 89890,
+      "revision_id": 707656,
+      "revision_parent_id": 695932,
+      "revision_timestamp": "2026-06-03T12:11:23Z",
+      "years": [
+        2024
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/Battlegrounds_Mobile_India_Series/2024",
+      "retrieved_at": "2026-07-17T09:32:10.764Z"
+    },
+    {
+      "title": "Battlegrounds Mobile India Series/2024/The Grind",
+      "page_id": 89892,
+      "revision_id": 660043,
+      "revision_parent_id": 644854,
+      "revision_timestamp": "2025-03-29T09:13:27Z",
+      "years": [
+        2024
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/Battlegrounds_Mobile_India_Series/2024/The_Grind",
+      "retrieved_at": "2026-07-17T09:32:10.765Z"
+    },
+    {
+      "title": "Battlegrounds Mobile India Series/2025",
+      "page_id": 92322,
+      "revision_id": 711331,
+      "revision_parent_id": 711330,
+      "revision_timestamp": "2026-07-02T09:04:11Z",
+      "years": [
+        2025
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/Battlegrounds_Mobile_India_Series/2025",
+      "retrieved_at": "2026-07-17T09:32:10.769Z"
+    },
+    {
+      "title": "Battlegrounds Mobile India Series/2025/The Grind",
+      "page_id": 92411,
+      "revision_id": 690065,
+      "revision_parent_id": 660046,
+      "revision_timestamp": "2025-12-14T18:48:38Z",
+      "years": [
+        2025
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/Battlegrounds_Mobile_India_Series/2025/The_Grind",
+      "retrieved_at": "2026-07-17T09:32:10.771Z"
+    },
+    {
+      "title": "Battlegrounds Mobile India Series/2026",
+      "page_id": 94600,
+      "revision_id": 713223,
+      "revision_parent_id": 713010,
+      "revision_timestamp": "2026-07-17T07:32:28Z",
+      "years": [
+        2025,
+        2026
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/Battlegrounds_Mobile_India_Series/2026",
+      "retrieved_at": "2026-07-17T09:32:10.791Z"
+    },
+    {
+      "title": "Battlegrounds Mobile India Series/2026/The Grind",
+      "page_id": 94754,
+      "revision_id": 694567,
+      "revision_parent_id": 692552,
+      "revision_timestamp": "2026-02-18T12:33:28Z",
+      "years": [
+        2026
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/Battlegrounds_Mobile_India_Series/2026/The_Grind",
+      "retrieved_at": "2026-07-17T09:32:10.793Z"
+    },
+    {
+      "title": "Battlegrounds Mobile India Showdown/2022",
+      "page_id": 83142,
+      "revision_id": 707023,
+      "revision_parent_id": 680618,
+      "revision_timestamp": "2026-06-03T11:00:13Z",
+      "years": [
+        2022
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/Battlegrounds_Mobile_India_Showdown/2022",
+      "retrieved_at": "2026-07-17T09:32:10.781Z"
+    },
+    {
+      "title": "Battlegrounds Mobile India Showdown/2025",
+      "page_id": 94163,
+      "revision_id": 712446,
+      "revision_parent_id": 711582,
+      "revision_timestamp": "2026-07-11T13:31:08Z",
+      "years": [
+        2025
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/Battlegrounds_Mobile_India_Showdown/2025",
+      "retrieved_at": "2026-07-17T09:32:10.790Z"
+    },
+    {
+      "title": "Battlegrounds Mobile India Showdown/2026",
+      "page_id": 94602,
+      "revision_id": 711936,
+      "revision_parent_id": 710848,
+      "revision_timestamp": "2026-07-08T08:16:14Z",
+      "years": [
+        2026
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/Battlegrounds_Mobile_India_Showdown/2026",
+      "retrieved_at": "2026-07-17T09:32:10.792Z"
+    },
+    {
+      "title": "BGMI Challengers Series",
+      "page_id": 88127,
+      "revision_id": 707455,
+      "revision_parent_id": 700966,
+      "revision_timestamp": "2026-06-03T11:50:24Z",
+      "years": [
+        2025
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/BGMI_Challengers_Series",
+      "retrieved_at": "2026-07-17T09:32:10.784Z"
+    },
+    {
+      "title": "BGMI EWar Mahayudh/Season 2",
+      "page_id": 76043,
+      "revision_id": 706603,
+      "revision_parent_id": 647905,
+      "revision_timestamp": "2026-06-03T10:09:55Z",
+      "years": [
+        2021
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/BGMI_EWar_Mahayudh/Season_2",
+      "retrieved_at": "2026-07-17T09:32:10.777Z"
+    },
+    {
+      "title": "BGMI Masters Series",
+      "page_id": 82815,
+      "revision_id": 706971,
+      "revision_parent_id": 660012,
+      "revision_timestamp": "2026-06-03T10:53:23Z",
+      "years": [
+        2022
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/BGMI_Masters_Series",
+      "retrieved_at": "2026-07-17T09:32:10.780Z"
+    },
+    {
+      "title": "BGMI Masters Series/Season 2",
+      "page_id": 87263,
+      "revision_id": 707393,
+      "revision_parent_id": 705738,
+      "revision_timestamp": "2026-06-03T11:44:07Z",
+      "years": [
+        2023
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/BGMI_Masters_Series/Season_2",
+      "retrieved_at": "2026-07-17T09:32:10.783Z"
+    },
+    {
+      "title": "BGMI Masters Series/Season 3",
+      "page_id": 91008,
+      "revision_id": 712353,
+      "revision_parent_id": 707737,
+      "revision_timestamp": "2026-07-10T08:49:13Z",
+      "years": [
+        2024
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/BGMI_Masters_Series/Season_3",
+      "retrieved_at": "2026-07-17T09:32:10.785Z"
+    },
+    {
+      "title": "BGMI Masters Series/Season 4",
+      "page_id": 93988,
+      "revision_id": 712961,
+      "revision_parent_id": 712447,
+      "revision_timestamp": "2026-07-14T08:00:26Z",
+      "years": [
+        2025
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/BGMI_Masters_Series/Season_4",
+      "retrieved_at": "2026-07-17T09:32:10.789Z"
+    },
+    {
+      "title": "BGMI Masters Series/Season 5",
+      "page_id": 96288,
+      "revision_id": 712383,
+      "revision_parent_id": 712382,
+      "revision_timestamp": "2026-07-10T16:45:35Z",
+      "years": [
+        2026
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/BGMI_Masters_Series/Season_5",
+      "retrieved_at": "2026-07-17T09:32:10.796Z"
+    },
+    {
+      "title": "BGMI Naye Khiladi",
+      "page_id": 96044,
+      "revision_id": 711202,
+      "revision_parent_id": 711200,
+      "revision_timestamp": "2026-07-01T08:54:37Z",
+      "years": [
+        2026
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/BGMI_Naye_Khiladi",
+      "retrieved_at": "2026-07-17T09:32:10.795Z"
+    },
+    {
+      "title": "BGMI Pro Scrims/2023",
+      "page_id": 86892,
+      "revision_id": 707348,
+      "revision_parent_id": 650916,
+      "revision_timestamp": "2026-06-03T11:39:30Z",
+      "years": [
+        2023
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/BGMI_Pro_Scrims/2023",
+      "retrieved_at": "2026-07-17T09:32:10.782Z"
+    },
+    {
+      "title": "BGMI Rising/2023",
+      "page_id": 86805,
+      "revision_id": 707330,
+      "revision_parent_id": 705191,
+      "revision_timestamp": "2026-06-03T11:37:42Z",
+      "years": [
+        2023
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/BGMI_Rising/2023",
+      "retrieved_at": "2026-07-17T09:32:10.782Z"
+    },
+    {
+      "title": "Bhains Ki Tait TDM Battle",
+      "page_id": 77491,
+      "revision_id": 706660,
+      "revision_parent_id": 648750,
+      "revision_timestamp": "2026-06-03T10:16:23Z",
+      "years": [
+        2021
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/Bhains_Ki_Tait_TDM_Battle",
+      "retrieved_at": "2026-07-17T09:32:10.778Z"
+    },
+    {
+      "title": "Bingo Nachos/GAMEON CUP",
+      "page_id": 89095,
+      "revision_id": 707577,
+      "revision_parent_id": 687971,
+      "revision_timestamp": "2026-06-03T12:02:25Z",
+      "years": [
+        2024
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/Bingo_Nachos/GAMEON_CUP",
+      "retrieved_at": "2026-07-17T09:32:10.785Z"
+    },
+    {
+      "title": "Blizzard Battlegrounds/2026",
+      "page_id": 94814,
+      "revision_id": 708183,
+      "revision_parent_id": 705750,
+      "revision_timestamp": "2026-06-03T13:05:06Z",
+      "years": [
+        2026
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/Blizzard_Battlegrounds/2026",
+      "retrieved_at": "2026-07-17T09:32:10.794Z"
+    },
+    {
+      "title": "Caribbean Clash",
+      "page_id": 93046,
+      "revision_id": 711348,
+      "revision_parent_id": 707960,
+      "revision_timestamp": "2026-07-02T09:27:54Z",
+      "years": [
+        2025
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/Caribbean_Clash",
+      "retrieved_at": "2026-07-17T09:32:10.787Z"
+    },
+    {
+      "title": "Chemin Esports Ultimate Showdown",
+      "page_id": 77040,
+      "revision_id": 706643,
+      "revision_parent_id": 647918,
+      "revision_timestamp": "2026-06-03T10:14:28Z",
+      "years": [
+        2021
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/Chemin_Esports_Ultimate_Showdown",
+      "retrieved_at": "2026-07-17T09:32:10.778Z"
+    },
+    {
+      "title": "Chennai Esports Global Championship/2025",
+      "page_id": 94508,
+      "revision_id": 712963,
+      "revision_parent_id": 710284,
+      "revision_timestamp": "2026-07-14T08:02:43Z",
+      "years": [
+        2025
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/Chennai_Esports_Global_Championship/2025",
+      "retrieved_at": "2026-07-17T09:32:10.790Z"
+    },
+    {
+      "title": "Clash of Champions/Season 2",
+      "page_id": 93788,
+      "revision_id": 712448,
+      "revision_parent_id": 708066,
+      "revision_timestamp": "2026-07-11T13:41:46Z",
+      "years": [
+        2025
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/Clash_of_Champions/Season_2",
+      "retrieved_at": "2026-07-17T09:32:10.788Z"
+    },
+    {
+      "title": "Clutch Invitational",
+      "page_id": 78103,
+      "revision_id": 706685,
+      "revision_parent_id": 647938,
+      "revision_timestamp": "2026-06-03T10:19:17Z",
+      "years": [
+        2021
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/Clutch_Invitational",
+      "retrieved_at": "2026-07-17T09:32:10.779Z"
+    },
+    {
+      "title": "College Campus Tour/2026",
+      "page_id": 95522,
+      "revision_id": 702602,
+      "revision_parent_id": 702585,
+      "revision_timestamp": "2026-05-03T08:16:42Z",
+      "years": [
+        2026
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/College_Campus_Tour/2026",
+      "retrieved_at": "2026-07-17T09:32:10.794Z"
+    },
+    {
+      "title": "Cosmic Byte God Mode",
+      "page_id": 78218,
+      "revision_id": 706688,
+      "revision_parent_id": 705619,
+      "revision_timestamp": "2026-06-03T10:19:34Z",
+      "years": [
+        2021
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/Cosmic_Byte_God_Mode",
+      "retrieved_at": "2026-07-17T09:32:10.780Z"
+    },
+    {
+      "title": "Creators Unite/Rondo Rampage",
+      "page_id": 93165,
+      "revision_id": 707965,
+      "revision_parent_id": 676651,
+      "revision_timestamp": "2026-06-03T12:43:02Z",
+      "years": [
+        2025
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/Creators_Unite/Rondo_Rampage",
+      "retrieved_at": "2026-07-17T09:32:10.787Z"
+    },
+    {
+      "title": "Deepavali BattleMania/2024",
+      "page_id": 92103,
+      "revision_id": 708422,
+      "revision_parent_id": 707841,
+      "revision_timestamp": "2026-06-03T14:03:45Z",
+      "years": [
+        2024
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/Deepavali_BattleMania/2024",
+      "retrieved_at": "2026-07-17T09:32:10.786Z"
+    },
+    {
+      "title": "Domination Arena/Season 1",
+      "page_id": 96222,
+      "revision_id": 713131,
+      "revision_parent_id": 713009,
+      "revision_timestamp": "2026-07-15T13:00:29Z",
+      "years": [
+        2026
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/Domination_Arena/Season_1",
+      "retrieved_at": "2026-07-17T09:32:10.809Z"
+    },
+    {
+      "title": "EGI Revamp Battle",
+      "page_id": 75727,
+      "revision_id": 709779,
+      "revision_parent_id": 709778,
+      "revision_timestamp": "2026-06-18T04:18:45Z",
+      "years": [
+        2021
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/EGI_Revamp_Battle",
+      "retrieved_at": "2026-07-17T09:32:10.797Z"
+    },
+    {
+      "title": "ESL/Snapdragon Pro Series/2024/BGMI",
+      "page_id": 88609,
+      "revision_id": 707523,
+      "revision_parent_id": 705745,
+      "revision_timestamp": "2026-06-03T11:57:05Z",
+      "years": [
+        2024
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/ESL/Snapdragon_Pro_Series/2024/BGMI",
+      "retrieved_at": "2026-07-17T09:32:10.802Z"
+    },
+    {
+      "title": "ESL/Snapdragon Pro Series/2024/BGMI/Conquest Open Finals",
+      "page_id": 88976,
+      "revision_id": 707560,
+      "revision_parent_id": 705744,
+      "revision_timestamp": "2026-06-03T12:00:41Z",
+      "years": [
+        2024
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/ESL/Snapdragon_Pro_Series/2024/BGMI/Conquest_Open_Finals",
+      "retrieved_at": "2026-07-17T09:32:10.803Z"
+    },
+    {
+      "title": "ESL/Snapdragon Pro Series/Season 6/BGMI",
+      "page_id": 92171,
+      "revision_id": 712449,
+      "revision_parent_id": 707847,
+      "revision_timestamp": "2026-07-11T13:45:48Z",
+      "years": [
+        2024
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/ESL/Snapdragon_Pro_Series/Season_6/BGMI",
+      "retrieved_at": "2026-07-17T09:32:10.807Z"
+    },
+    {
+      "title": "Esports XO/Pro Cup",
+      "page_id": 86979,
+      "revision_id": 707354,
+      "revision_parent_id": 660122,
+      "revision_timestamp": "2026-06-03T11:40:11Z",
+      "years": [
+        2023
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/Esports_XO/Pro_Cup",
+      "retrieved_at": "2026-07-17T09:32:10.800Z"
+    },
+    {
+      "title": "Esportswala Elite Invitational Battle/Season 2",
+      "page_id": 76840,
+      "revision_id": 706637,
+      "revision_parent_id": 647915,
+      "revision_timestamp": "2026-06-03T10:13:48Z",
+      "years": [
+        2021
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/Esportswala_Elite_Invitational_Battle/Season_2",
+      "retrieved_at": "2026-07-17T09:32:10.798Z"
+    },
+    {
+      "title": "Espotz Pro League/2026",
+      "page_id": 95921,
+      "revision_id": 710378,
+      "revision_parent_id": 710377,
+      "revision_timestamp": "2026-06-23T05:08:41Z",
+      "years": [
+        2026
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/Espotz_Pro_League/2026",
+      "retrieved_at": "2026-07-17T09:32:10.808Z"
+    },
+    {
+      "title": "Fearless Championship Series/Season 1",
+      "page_id": 90885,
+      "revision_id": 708463,
+      "revision_parent_id": 707724,
+      "revision_timestamp": "2026-06-04T11:30:02Z",
+      "years": [
+        2024
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/Fearless_Championship_Series/Season_1",
+      "retrieved_at": "2026-07-17T09:32:10.804Z"
+    },
+    {
+      "title": "Fight Night/Pro Scrims",
+      "page_id": 86985,
+      "revision_id": 707357,
+      "revision_parent_id": 680173,
+      "revision_timestamp": "2026-06-03T11:40:31Z",
+      "years": [
+        2023
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/Fight_Night/Pro_Scrims",
+      "retrieved_at": "2026-07-17T09:32:10.800Z"
+    },
+    {
+      "title": "Fight Night/Season 5",
+      "page_id": 87182,
+      "revision_id": 708465,
+      "revision_parent_id": 707380,
+      "revision_timestamp": "2026-06-04T11:35:15Z",
+      "years": [
+        2023
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/Fight_Night/Season_5",
+      "retrieved_at": "2026-07-17T09:32:10.801Z"
+    },
+    {
+      "title": "Freedom Face-Off/2021",
+      "page_id": 76041,
+      "revision_id": 706602,
+      "revision_parent_id": 675950,
+      "revision_timestamp": "2026-06-03T10:09:48Z",
+      "years": [
+        2021
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/Freedom_Face-Off/2021",
+      "retrieved_at": "2026-07-17T09:32:10.798Z"
+    },
+    {
+      "title": "Freedom Face-Off/2024",
+      "page_id": 91501,
+      "revision_id": 707787,
+      "revision_parent_id": 703690,
+      "revision_timestamp": "2026-06-03T12:24:16Z",
+      "years": [
+        2024
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/Freedom_Face-Off/2024",
+      "retrieved_at": "2026-07-17T09:32:10.805Z"
+    },
+    {
+      "title": "G-League/2025",
+      "page_id": 93774,
+      "revision_id": 708394,
+      "revision_parent_id": 708064,
+      "revision_timestamp": "2026-06-03T13:38:28Z",
+      "years": [
+        2025
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/G-League/2025",
+      "retrieved_at": "2026-07-17T09:32:10.807Z"
+    },
+    {
+      "title": "Game.tv Weekly Wars/Season 1",
+      "page_id": 77112,
+      "revision_id": 706644,
+      "revision_parent_id": 647919,
+      "revision_timestamp": "2026-06-03T10:14:34Z",
+      "years": [
+        2021
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/Game.tv_Weekly_Wars/Season_1",
+      "retrieved_at": "2026-07-17T09:32:10.799Z"
+    },
+    {
+      "title": "Gauntlet/Season 1",
+      "page_id": 91530,
+      "revision_id": 707790,
+      "revision_parent_id": 695935,
+      "revision_timestamp": "2026-06-03T12:24:36Z",
+      "years": [
+        2024
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/Gauntlet/Season_1",
+      "retrieved_at": "2026-07-17T09:32:10.806Z"
+    },
+    {
+      "title": "Gauntlet/Season 2",
+      "page_id": 91794,
+      "revision_id": 711320,
+      "revision_parent_id": 709725,
+      "revision_timestamp": "2026-07-02T08:53:56Z",
+      "years": [
+        2024
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/Gauntlet/Season_2",
+      "retrieved_at": "2026-07-17T09:32:10.806Z"
+    },
+    {
+      "title": "Grand Masters Invitational",
+      "page_id": 88159,
+      "revision_id": 660168,
+      "revision_parent_id": 545495,
+      "revision_timestamp": "2025-03-29T10:33:31Z",
+      "years": [
+        2023
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/Grand_Masters_Invitational",
+      "retrieved_at": "2026-07-17T09:32:10.801Z"
+    },
+    {
+      "title": "Holi Face-Off",
+      "page_id": 89894,
+      "revision_id": 707657,
+      "revision_parent_id": 660179,
+      "revision_timestamp": "2026-06-03T12:11:30Z",
+      "years": [
+        2024
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/Holi_Face-Off",
+      "retrieved_at": "2026-07-17T09:32:10.823Z"
+    },
+    {
+      "title": "India Korea Invitational/2023",
+      "page_id": 88200,
+      "revision_id": 707467,
+      "revision_parent_id": 687747,
+      "revision_timestamp": "2026-06-03T11:51:34Z",
+      "years": [
+        2023
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/India_Korea_Invitational/2023",
+      "retrieved_at": "2026-07-17T09:32:10.819Z"
+    },
+    {
+      "title": "India Today's Dangal",
+      "page_id": 78251,
+      "revision_id": 706691,
+      "revision_parent_id": 647942,
+      "revision_timestamp": "2026-06-03T10:19:48Z",
+      "years": [
+        2021
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/India_Today's_Dangal",
+      "retrieved_at": "2026-07-17T09:32:10.814Z"
+    },
+    {
+      "title": "India Today/League Invitationals",
+      "page_id": 87192,
+      "revision_id": 707382,
+      "revision_parent_id": 689276,
+      "revision_timestamp": "2026-06-03T11:43:04Z",
+      "years": [
+        2023
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/India_Today/League_Invitationals",
+      "retrieved_at": "2026-07-17T09:32:10.819Z"
+    },
+    {
+      "title": "Insane Summer Split",
+      "page_id": 77334,
+      "revision_id": 706653,
+      "revision_parent_id": 647925,
+      "revision_timestamp": "2026-06-03T10:15:37Z",
+      "years": [
+        2021
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/Insane_Summer_Split",
+      "retrieved_at": "2026-07-17T09:32:10.811Z"
+    },
+    {
+      "title": "IQOO All Stars Cup",
+      "page_id": 76356,
+      "revision_id": 706626,
+      "revision_parent_id": 647913,
+      "revision_timestamp": "2026-06-03T10:12:38Z",
+      "years": [
+        2021
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/IQOO_All_Stars_Cup",
+      "retrieved_at": "2026-07-17T09:32:10.810Z"
+    },
+    {
+      "title": "IQOO All Stars Cup/Season 4",
+      "page_id": 89141,
+      "revision_id": 707588,
+      "revision_parent_id": 689851,
+      "revision_timestamp": "2026-06-03T12:03:30Z",
+      "years": [
+        2024
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/IQOO_All_Stars_Cup/Season_4",
+      "retrieved_at": "2026-07-17T09:32:10.820Z"
+    },
+    {
+      "title": "IQOO Battlegrounds Series",
+      "page_id": 93772,
+      "revision_id": 712965,
+      "revision_parent_id": 712959,
+      "revision_timestamp": "2026-07-14T08:06:14Z",
+      "years": [
+        2025
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/IQOO_Battlegrounds_Series",
+      "retrieved_at": "2026-07-17T09:32:10.824Z"
+    },
+    {
+      "title": "IQOO India League/2024",
+      "page_id": 89330,
+      "revision_id": 709308,
+      "revision_parent_id": 709307,
+      "revision_timestamp": "2026-06-12T09:38:43Z",
+      "years": [
+        2024
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/IQOO_India_League/2024",
+      "retrieved_at": "2026-07-17T09:32:10.821Z"
+    },
+    {
+      "title": "IQOO Pro Series/2023",
+      "page_id": 87068,
+      "revision_id": 707368,
+      "revision_parent_id": 705712,
+      "revision_timestamp": "2026-06-03T11:41:38Z",
+      "years": [
+        2023
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/IQOO_Pro_Series/2023",
+      "retrieved_at": "2026-07-17T09:32:10.818Z"
+    },
+    {
+      "title": "IQOO Pro Series/2024",
+      "page_id": 89199,
+      "revision_id": 707596,
+      "revision_parent_id": 692335,
+      "revision_timestamp": "2026-06-03T12:04:27Z",
+      "years": [
+        2024
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/IQOO_Pro_Series/2024",
+      "retrieved_at": "2026-07-17T09:32:10.821Z"
+    },
+    {
+      "title": "Lidoma/Battleground Invitational",
+      "page_id": 87051,
+      "revision_id": 707365,
+      "revision_parent_id": 705711,
+      "revision_timestamp": "2026-06-03T11:41:23Z",
+      "years": [
+        2023
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/Lidoma/Battleground_Invitational",
+      "retrieved_at": "2026-07-17T09:32:10.817Z"
+    },
+    {
+      "title": "Lidoma/Masters Showdown",
+      "page_id": 89765,
+      "revision_id": 707648,
+      "revision_parent_id": 689853,
+      "revision_timestamp": "2026-06-03T12:10:28Z",
+      "years": [
+        2024
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/Lidoma/Masters_Showdown",
+      "retrieved_at": "2026-07-17T09:32:10.822Z"
+    },
+    {
+      "title": "Lockdown Warriors Cup/Phase 1",
+      "page_id": 77129,
+      "revision_id": 709832,
+      "revision_parent_id": 706645,
+      "revision_timestamp": "2026-06-18T11:53:07Z",
+      "years": [
+        2021
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/Lockdown_Warriors_Cup/Phase_1",
+      "retrieved_at": "2026-07-17T09:32:10.810Z"
+    },
+    {
+      "title": "LOCO Diwali Battle/Grand Finals",
+      "page_id": 78479,
+      "revision_id": 706698,
+      "revision_parent_id": 705621,
+      "revision_timestamp": "2026-06-03T10:20:36Z",
+      "years": [
+        2021
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/LOCO_Diwali_Battle/Grand_Finals",
+      "retrieved_at": "2026-07-17T09:32:10.817Z"
+    },
+    {
+      "title": "LOCO Diwali Battle/League Stage",
+      "page_id": 78476,
+      "revision_id": 706697,
+      "revision_parent_id": 705620,
+      "revision_timestamp": "2026-06-03T10:20:26Z",
+      "years": [
+        2021
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/LOCO_Diwali_Battle/League_Stage",
+      "retrieved_at": "2026-07-17T09:32:10.815Z"
+    },
+    {
+      "title": "LOCO War of Glory/Grand Finals",
+      "page_id": 77660,
+      "revision_id": 706670,
+      "revision_parent_id": 647934,
+      "revision_timestamp": "2026-06-03T10:17:45Z",
+      "years": [
+        2021
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/LOCO_War_of_Glory/Grand_Finals",
+      "retrieved_at": "2026-07-17T09:32:10.812Z"
+    },
+    {
+      "title": "LOCO War of Glory/League Stage",
+      "page_id": 77559,
+      "revision_id": 706662,
+      "revision_parent_id": 647933,
+      "revision_timestamp": "2026-06-03T10:16:48Z",
+      "years": [
+        2021
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/LOCO_War_of_Glory/League_Stage",
+      "retrieved_at": "2026-07-17T09:32:10.811Z"
+    },
+    {
+      "title": "Mother Dairy/Chillz Cup",
+      "page_id": 93217,
+      "revision_id": 708427,
+      "revision_parent_id": 708426,
+      "revision_timestamp": "2026-06-03T14:12:07Z",
+      "years": [
+        2025
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/Mother_Dairy/Chillz_Cup",
+      "retrieved_at": "2026-07-17T09:32:10.823Z"
+    },
+    {
+      "title": "Nodwin x Loco All Stars Invitational",
+      "page_id": 82077,
+      "revision_id": 709233,
+      "revision_parent_id": 706897,
+      "revision_timestamp": "2026-06-11T13:11:34Z",
+      "years": [
+        2022
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/Nodwin_x_Loco_All_Stars_Invitational",
+      "retrieved_at": "2026-07-17T09:32:10.831Z"
+    },
+    {
+      "title": "Nodwin/BGMI/Champions Cup",
+      "page_id": 86981,
+      "revision_id": 707356,
+      "revision_parent_id": 690292,
+      "revision_timestamp": "2026-06-03T11:40:22Z",
+      "years": [
+        2023
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/Nodwin/BGMI/Champions_Cup",
+      "retrieved_at": "2026-07-17T09:32:10.833Z"
+    },
+    {
+      "title": "Novum Esports/Overpower Series/Season 1",
+      "page_id": 86960,
+      "revision_id": 707352,
+      "revision_parent_id": 660329,
+      "revision_timestamp": "2026-06-03T11:39:58Z",
+      "years": [
+        2023
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/Novum_Esports/Overpower_Series/Season_1",
+      "retrieved_at": "2026-07-17T09:32:10.832Z"
+    },
+    {
+      "title": "OG Starter Cup",
+      "page_id": 77408,
+      "revision_id": 706656,
+      "revision_parent_id": 679128,
+      "revision_timestamp": "2026-06-03T10:15:56Z",
+      "years": [
+        2021
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/OG_Starter_Cup",
+      "retrieved_at": "2026-07-17T09:32:10.826Z"
+    },
+    {
+      "title": "OG vs NG/Legacies Clash",
+      "page_id": 94057,
+      "revision_id": 712960,
+      "revision_parent_id": 708126,
+      "revision_timestamp": "2026-07-14T07:59:56Z",
+      "years": [
+        2025
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/OG_vs_NG/Legacies_Clash",
+      "retrieved_at": "2026-07-17T09:32:10.843Z"
+    },
+    {
+      "title": "OneGame/Championship Fall Season/2026",
+      "page_id": 96261,
+      "revision_id": 711930,
+      "revision_parent_id": 0,
+      "revision_timestamp": "2026-07-08T07:04:51Z",
+      "years": [
+        2026
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/OneGame/Championship_Fall_Season/2026",
+      "retrieved_at": "2026-07-17T09:32:10.846Z"
+    },
+    {
+      "title": "OneGame/Championship Summer Series/2026",
+      "page_id": 95451,
+      "revision_id": 713012,
+      "revision_parent_id": 712442,
+      "revision_timestamp": "2026-07-14T12:17:07Z",
+      "years": [
+        2026
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/OneGame/Championship_Summer_Series/2026",
+      "retrieved_at": "2026-07-17T09:32:10.845Z"
+    },
+    {
+      "title": "OneGame/Pro Championship/Season 1",
+      "page_id": 89855,
+      "revision_id": 707651,
+      "revision_parent_id": 687974,
+      "revision_timestamp": "2026-06-03T12:10:48Z",
+      "years": [
+        2024
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/OneGame/Pro_Championship/Season_1",
+      "retrieved_at": "2026-07-17T09:32:10.838Z"
+    },
+    {
+      "title": "OneGame/Pro Championship/Season 2",
+      "page_id": 92634,
+      "revision_id": 711347,
+      "revision_parent_id": 707893,
+      "revision_timestamp": "2026-07-02T09:26:14Z",
+      "years": [
+        2025
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/OneGame/Pro_Championship/Season_2",
+      "retrieved_at": "2026-07-17T09:32:10.843Z"
+    },
+    {
+      "title": "OneGame/Pro Championship/Season 3",
+      "page_id": 94713,
+      "revision_id": 708175,
+      "revision_parent_id": 705729,
+      "revision_timestamp": "2026-06-03T13:04:29Z",
+      "years": [
+        2025
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/OneGame/Pro_Championship/Season_3",
+      "retrieved_at": "2026-07-17T09:32:10.844Z"
+    },
+    {
+      "title": "OnePlus/Dominate Arena/2023/December",
+      "page_id": 88837,
+      "revision_id": 707550,
+      "revision_parent_id": 704570,
+      "revision_timestamp": "2026-06-03T11:59:48Z",
+      "years": [
+        2023
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/OnePlus/Dominate_Arena/2023/December",
+      "retrieved_at": "2026-07-17T09:32:10.835Z"
+    },
+    {
+      "title": "OnePlus/Dominate Arena/2024/April",
+      "page_id": 90531,
+      "revision_id": 712452,
+      "revision_parent_id": 709868,
+      "revision_timestamp": "2026-07-11T14:08:53Z",
+      "years": [
+        2024
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/OnePlus/Dominate_Arena/2024/April",
+      "retrieved_at": "2026-07-17T09:32:10.841Z"
+    },
+    {
+      "title": "OnePlus/Dominate Arena/2024/February",
+      "page_id": 89473,
+      "revision_id": 707629,
+      "revision_parent_id": 687559,
+      "revision_timestamp": "2026-06-03T12:08:25Z",
+      "years": [
+        2024
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/OnePlus/Dominate_Arena/2024/February",
+      "retrieved_at": "2026-07-17T09:32:10.837Z"
+    },
+    {
+      "title": "OnePlus/Dominate Arena/2024/January",
+      "page_id": 88842,
+      "revision_id": 710303,
+      "revision_parent_id": 708479,
+      "revision_timestamp": "2026-06-22T14:41:08Z",
+      "years": [
+        2024
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/OnePlus/Dominate_Arena/2024/January",
+      "retrieved_at": "2026-07-17T09:32:10.835Z"
+    },
+    {
+      "title": "OnePlus/Dominate Arena/2024/March",
+      "page_id": 89856,
+      "revision_id": 707652,
+      "revision_parent_id": 689855,
+      "revision_timestamp": "2026-06-03T12:10:58Z",
+      "years": [
+        2024
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/OnePlus/Dominate_Arena/2024/March",
+      "retrieved_at": "2026-07-17T09:32:10.838Z"
+    },
+    {
+      "title": "OneShot Showdown/Season 2",
+      "page_id": 78724,
+      "revision_id": 706709,
+      "revision_parent_id": 705638,
+      "revision_timestamp": "2026-06-03T10:21:50Z",
+      "years": [
+        2021
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/OneShot_Showdown/Season_2",
+      "retrieved_at": "2026-07-17T09:32:10.828Z"
+    },
+    {
+      "title": "OR Championship/Legends Rise/2021",
+      "page_id": 76120,
+      "revision_id": 706607,
+      "revision_parent_id": 697365,
+      "revision_timestamp": "2026-06-03T10:10:20Z",
+      "years": [
+        2021
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/OR_Championship/Legends_Rise/2021",
+      "retrieved_at": "2026-07-17T09:32:10.825Z"
+    },
+    {
+      "title": "OR Championship/Legends Rise/2022",
+      "page_id": 80731,
+      "revision_id": 706802,
+      "revision_parent_id": 697363,
+      "revision_timestamp": "2026-06-03T10:32:39Z",
+      "years": [
+        2022
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/OR_Championship/Legends_Rise/2022",
+      "retrieved_at": "2026-07-17T09:32:10.829Z"
+    },
+    {
+      "title": "Orion Conquest Series/2026",
+      "page_id": 95437,
+      "revision_id": 713011,
+      "revision_parent_id": 712443,
+      "revision_timestamp": "2026-07-14T12:16:39Z",
+      "years": [
+        2026
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/Orion_Conquest_Series/2026",
+      "retrieved_at": "2026-07-17T09:32:10.845Z"
+    },
+    {
+      "title": "OS Esports/Clash Of Warriors/Season 2",
+      "page_id": 90329,
+      "revision_id": 707684,
+      "revision_parent_id": 704576,
+      "revision_timestamp": "2026-06-03T12:14:07Z",
+      "years": [
+        2024
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/OS_Esports/Clash_Of_Warriors/Season_2",
+      "retrieved_at": "2026-07-17T09:32:10.840Z"
+    },
+    {
+      "title": "OS Invitational/Season 1",
+      "page_id": 87814,
+      "revision_id": 707427,
+      "revision_parent_id": 689277,
+      "revision_timestamp": "2026-06-03T11:47:34Z",
+      "years": [
+        2023
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/OS_Invitational/Season_1",
+      "retrieved_at": "2026-07-17T09:32:10.834Z"
+    },
+    {
+      "title": "Philips OneBlade Cup",
+      "page_id": 91011,
+      "revision_id": 707738,
+      "revision_parent_id": 661131,
+      "revision_timestamp": "2026-06-03T12:19:15Z",
+      "years": [
+        2024
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/Philips_OneBlade_Cup",
+      "retrieved_at": "2026-07-17T09:32:10.842Z"
+    },
+    {
+      "title": "Pro Warrior Cup/Season 1",
+      "page_id": 80585,
+      "revision_id": 706800,
+      "revision_parent_id": 705136,
+      "revision_timestamp": "2026-06-03T10:32:25Z",
+      "years": [
+        2022
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/Pro_Warrior_Cup/Season_1",
+      "retrieved_at": "2026-07-17T09:32:10.828Z"
+    },
+    {
+      "title": "Pro Warrior Cup/Season 2/Conquest Round",
+      "page_id": 81867,
+      "revision_id": 706879,
+      "revision_parent_id": 661137,
+      "revision_timestamp": "2026-06-03T10:43:16Z",
+      "years": [
+        2022
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/Pro_Warrior_Cup/Season_2/Conquest_Round",
+      "retrieved_at": "2026-07-17T09:32:10.830Z"
+    },
+    {
+      "title": "Pro Warrior Cup/Season 2/Ultimate Round",
+      "page_id": 81871,
+      "revision_id": 706880,
+      "revision_parent_id": 638587,
+      "revision_timestamp": "2026-06-03T10:43:22Z",
+      "years": [
+        2022
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/Pro_Warrior_Cup/Season_2/Ultimate_Round",
+      "retrieved_at": "2026-07-17T09:32:10.831Z"
+    },
+    {
+      "title": "Quantum Cup",
+      "page_id": 76268,
+      "revision_id": 706618,
+      "revision_parent_id": 647909,
+      "revision_timestamp": "2026-06-03T10:11:43Z",
+      "years": [
+        2021
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/Quantum_Cup",
+      "retrieved_at": "2026-07-17T09:32:10.826Z"
+    },
+    {
+      "title": "RA Esports/Battle For Swaraj/Season 1",
+      "page_id": 90623,
+      "revision_id": 708393,
+      "revision_parent_id": 707699,
+      "revision_timestamp": "2026-06-03T13:38:08Z",
+      "years": [
+        2024
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/RA_Esports/Battle_For_Swaraj/Season_1",
+      "retrieved_at": "2026-07-17T09:32:10.841Z"
+    },
+    {
+      "title": "RA Esports/Champions Gala/Season 1",
+      "page_id": 90155,
+      "revision_id": 710304,
+      "revision_parent_id": 708480,
+      "revision_timestamp": "2026-06-22T14:41:42Z",
+      "years": [
+        2024
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/RA_Esports/Champions_Gala/Season_1",
+      "retrieved_at": "2026-07-17T09:32:10.839Z"
+    },
+    {
+      "title": "RA Esports/Rising Star Showdown/Season 3",
+      "page_id": 89213,
+      "revision_id": 707599,
+      "revision_parent_id": 687972,
+      "revision_timestamp": "2026-06-03T12:04:45Z",
+      "years": [
+        2024
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/RA_Esports/Rising_Star_Showdown/Season_3",
+      "retrieved_at": "2026-07-17T09:32:10.836Z"
+    },
+    {
+      "title": "Ranbhoomi/Season 1",
+      "page_id": 77851,
+      "revision_id": 706675,
+      "revision_parent_id": 693994,
+      "revision_timestamp": "2026-06-03T10:18:18Z",
+      "years": [
+        2021
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/Ranbhoomi/Season_1",
+      "retrieved_at": "2026-07-17T09:32:10.827Z"
+    },
+    {
+      "title": "Ranbhoomi/Season 2",
+      "page_id": 87158,
+      "revision_id": 707378,
+      "revision_parent_id": 697430,
+      "revision_timestamp": "2026-06-03T11:42:40Z",
+      "years": [
+        2023
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/Ranbhoomi/Season_2",
+      "retrieved_at": "2026-07-17T09:32:10.833Z"
+    },
+    {
+      "title": "Red Bull M.E.O./2024/India",
+      "page_id": 91986,
+      "revision_id": 712956,
+      "revision_parent_id": 711361,
+      "revision_timestamp": "2026-07-14T07:53:11Z",
+      "years": [
+        2024
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/Red_Bull_M.E.O./2024/India",
+      "retrieved_at": "2026-07-17T09:32:10.868Z"
+    },
+    {
+      "title": "Red Bull M.E.O./Season 4/India",
+      "page_id": 78997,
+      "revision_id": 706719,
+      "revision_parent_id": 647953,
+      "revision_timestamp": "2026-06-03T10:22:53Z",
+      "years": [
+        2021
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/Red_Bull_M.E.O./Season_4/India",
+      "retrieved_at": "2026-07-17T09:32:10.849Z"
+    },
+    {
+      "title": "Red Bull M.E.O./Season 6/India",
+      "page_id": 88396,
+      "revision_id": 707486,
+      "revision_parent_id": 639889,
+      "revision_timestamp": "2026-06-03T11:53:25Z",
+      "years": [
+        2023
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/Red_Bull_M.E.O./Season_6/India",
+      "retrieved_at": "2026-07-17T09:32:10.862Z"
+    },
+    {
+      "title": "RekRoom Reload Arena/2025",
+      "page_id": 94683,
+      "revision_id": 713222,
+      "revision_parent_id": 710742,
+      "revision_timestamp": "2026-07-17T07:27:50Z",
+      "years": [
+        2025
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/RekRoom_Reload_Arena/2025",
+      "retrieved_at": "2026-07-17T09:32:10.870Z"
+    },
+    {
+      "title": "RekRoom Revamp Master Series/2026",
+      "page_id": 96188,
+      "revision_id": 713130,
+      "revision_parent_id": 713129,
+      "revision_timestamp": "2026-07-15T12:47:13Z",
+      "years": [
+        2026
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/RekRoom_Revamp_Master_Series/2026",
+      "retrieved_at": "2026-07-17T09:32:10.874Z"
+    },
+    {
+      "title": "Revenant Invitational Showdown",
+      "page_id": 87205,
+      "revision_id": 707387,
+      "revision_parent_id": 644105,
+      "revision_timestamp": "2026-06-03T11:43:26Z",
+      "years": [
+        2023
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/Revenant_Invitational_Showdown",
+      "retrieved_at": "2026-07-17T09:32:10.861Z"
+    },
+    {
+      "title": "Rising Championship/Season 1",
+      "page_id": 94715,
+      "revision_id": 713015,
+      "revision_parent_id": 710313,
+      "revision_timestamp": "2026-07-14T12:21:24Z",
+      "years": [
+        2025
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/Rising_Championship/Season_1",
+      "retrieved_at": "2026-07-17T09:32:10.871Z"
+    },
+    {
+      "title": "Rising Championship/Season 2",
+      "page_id": 95459,
+      "revision_id": 708198,
+      "revision_parent_id": 705732,
+      "revision_timestamp": "2026-06-03T13:06:26Z",
+      "years": [
+        2026
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/Rising_Championship/Season_2",
+      "retrieved_at": "2026-07-17T09:32:10.872Z"
+    },
+    {
+      "title": "Rising Star Invitational/2026",
+      "page_id": 96161,
+      "revision_id": 711680,
+      "revision_parent_id": 711439,
+      "revision_timestamp": "2026-07-05T14:14:49Z",
+      "years": [
+        2026
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/Rising_Star_Invitational/2026",
+      "retrieved_at": "2026-07-17T09:32:10.873Z"
+    },
+    {
+      "title": "Rooter Invitational Series",
+      "page_id": 84197,
+      "revision_id": 711591,
+      "revision_parent_id": 707114,
+      "revision_timestamp": "2026-07-04T08:50:56Z",
+      "years": [
+        2022
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/Rooter_Invitational_Series",
+      "retrieved_at": "2026-07-17T09:32:10.858Z"
+    },
+    {
+      "title": "Rooter Invitational Series/2024",
+      "page_id": 91101,
+      "revision_id": 708485,
+      "revision_parent_id": 707747,
+      "revision_timestamp": "2026-06-04T12:10:05Z",
+      "years": [
+        2024
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/Rooter_Invitational_Series/2024",
+      "retrieved_at": "2026-07-17T09:32:10.867Z"
+    },
+    {
+      "title": "Rooter Pro Scrims/Conqueror Phase",
+      "page_id": 76333,
+      "revision_id": 709752,
+      "revision_parent_id": 706623,
+      "revision_timestamp": "2026-06-17T18:12:11Z",
+      "years": [
+        2021
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/Rooter_Pro_Scrims/Conqueror_Phase",
+      "retrieved_at": "2026-07-17T09:32:10.849Z"
+    },
+    {
+      "title": "Rooter Pro Scrims/Initial Phase",
+      "page_id": 76331,
+      "revision_id": 706622,
+      "revision_parent_id": 647911,
+      "revision_timestamp": "2026-06-03T10:12:08Z",
+      "years": [
+        2021
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/Rooter_Pro_Scrims/Initial_Phase",
+      "retrieved_at": "2026-07-17T09:32:10.848Z"
+    },
+    {
+      "title": "Ruthless Invitational Showdown India",
+      "page_id": 80905,
+      "revision_id": 706811,
+      "revision_parent_id": 643192,
+      "revision_timestamp": "2026-06-03T10:33:50Z",
+      "years": [
+        2022
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/Ruthless_Invitational_Showdown_India",
+      "retrieved_at": "2026-07-17T09:32:10.854Z"
+    },
+    {
+      "title": "Samatva/Elite Series/2024",
+      "page_id": 92240,
+      "revision_id": 710316,
+      "revision_parent_id": 707858,
+      "revision_timestamp": "2026-06-22T15:14:49Z",
+      "years": [
+        2024
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/Samatva/Elite_Series/2024",
+      "retrieved_at": "2026-07-17T09:32:10.869Z"
+    },
+    {
+      "title": "Skyesports Grand Slam/2022",
+      "page_id": 79875,
+      "revision_id": 708299,
+      "revision_parent_id": 706762,
+      "revision_timestamp": "2026-06-03T13:21:04Z",
+      "years": [
+        2022
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/Skyesports_Grand_Slam/2022",
+      "retrieved_at": "2026-07-17T09:32:10.853Z"
+    },
+    {
+      "title": "Skyesports League/2022",
+      "page_id": 83192,
+      "revision_id": 708655,
+      "revision_parent_id": 708614,
+      "revision_timestamp": "2026-06-05T09:28:51Z",
+      "years": [
+        2022
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/Skyesports_League/2022",
+      "retrieved_at": "2026-07-17T09:32:10.857Z"
+    },
+    {
+      "title": "Skyesports Mobile Open",
+      "page_id": 79255,
+      "revision_id": 706727,
+      "revision_parent_id": 638507,
+      "revision_timestamp": "2026-06-03T10:23:41Z",
+      "years": [
+        2021
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/Skyesports_Mobile_Open",
+      "retrieved_at": "2026-07-17T09:32:10.850Z"
+    },
+    {
+      "title": "Skyesports Mobile Open/2024",
+      "page_id": 89633,
+      "revision_id": 710285,
+      "revision_parent_id": 707637,
+      "revision_timestamp": "2026-06-22T13:41:53Z",
+      "years": [
+        2024
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/Skyesports_Mobile_Open/2024",
+      "retrieved_at": "2026-07-17T09:32:10.865Z"
+    },
+    {
+      "title": "Skyesports/Champions Series",
+      "page_id": 86847,
+      "revision_id": 707334,
+      "revision_parent_id": 697428,
+      "revision_timestamp": "2026-06-03T11:38:11Z",
+      "years": [
+        2023
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/Skyesports/Champions_Series",
+      "retrieved_at": "2026-07-17T09:32:10.859Z"
+    },
+    {
+      "title": "Skyesports/Champions Series/2024",
+      "page_id": 89272,
+      "revision_id": 707607,
+      "revision_parent_id": 674850,
+      "revision_timestamp": "2026-06-03T12:05:52Z",
+      "years": [
+        2024
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/Skyesports/Champions_Series/2024",
+      "retrieved_at": "2026-07-17T09:32:10.863Z"
+    },
+    {
+      "title": "Skyesports/Championship/2024",
+      "page_id": 92139,
+      "revision_id": 711350,
+      "revision_parent_id": 711349,
+      "revision_timestamp": "2026-07-02T09:30:05Z",
+      "years": [
+        2024
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/Skyesports/Championship/2024",
+      "retrieved_at": "2026-07-17T09:32:10.868Z"
+    },
+    {
+      "title": "Skyesports/Championship/3.0",
+      "page_id": 76037,
+      "revision_id": 706601,
+      "revision_parent_id": 705344,
+      "revision_timestamp": "2026-06-03T10:09:41Z",
+      "years": [
+        2021
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/Skyesports/Championship/3.0",
+      "retrieved_at": "2026-07-17T09:32:10.847Z"
+    },
+    {
+      "title": "Skyesports/Championship/5.0",
+      "page_id": 88162,
+      "revision_id": 707461,
+      "revision_parent_id": 651961,
+      "revision_timestamp": "2026-06-03T11:50:59Z",
+      "years": [
+        2023
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/Skyesports/Championship/5.0",
+      "retrieved_at": "2026-07-17T09:32:10.862Z"
+    },
+    {
+      "title": "Skyesports/Pro League",
+      "page_id": 81537,
+      "revision_id": 708121,
+      "revision_parent_id": 706834,
+      "revision_timestamp": "2026-06-03T12:59:31Z",
+      "years": [
+        2022
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/Skyesports/Pro_League",
+      "retrieved_at": "2026-07-17T09:32:10.855Z"
+    },
+    {
+      "title": "Skyesports/Skirmish Series/2025",
+      "page_id": 94758,
+      "revision_id": 708180,
+      "revision_parent_id": 705632,
+      "revision_timestamp": "2026-06-03T13:04:49Z",
+      "years": [
+        2025
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/Skyesports/Skirmish_Series/2025",
+      "retrieved_at": "2026-07-17T09:32:10.872Z"
+    },
+    {
+      "title": "Skyesports/Skirmish Series/Season 2",
+      "page_id": 87200,
+      "revision_id": 708467,
+      "revision_parent_id": 707383,
+      "revision_timestamp": "2026-06-04T11:36:00Z",
+      "years": [
+        2023
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/Skyesports/Skirmish_Series/Season_2",
+      "retrieved_at": "2026-07-17T09:32:10.860Z"
+    },
+    {
+      "title": "Skyesports/Streamers Showdown",
+      "page_id": 83040,
+      "revision_id": 707005,
+      "revision_parent_id": 692975,
+      "revision_timestamp": "2026-06-03T10:57:49Z",
+      "years": [
+        2022
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/Skyesports/Streamers_Showdown",
+      "retrieved_at": "2026-07-17T09:32:10.856Z"
+    },
+    {
+      "title": "SL4Y Esports/Glacial Glow",
+      "page_id": 92545,
+      "revision_id": 710317,
+      "revision_parent_id": 707888,
+      "revision_timestamp": "2026-06-22T15:15:24Z",
+      "years": [
+        2025
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/SL4Y_Esports/Glacial_Glow",
+      "retrieved_at": "2026-07-17T09:32:10.882Z"
+    },
+    {
+      "title": "Snapdragon Conquest Mobile Open",
+      "page_id": 83154,
+      "revision_id": 708654,
+      "revision_parent_id": 708613,
+      "revision_timestamp": "2026-06-05T09:28:49Z",
+      "years": [
+        2022
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/Snapdragon_Conquest_Mobile_Open",
+      "retrieved_at": "2026-07-17T09:32:10.881Z"
+    },
+    {
+      "title": "Survival Surge/Chapter 1",
+      "page_id": 93941,
+      "revision_id": 712966,
+      "revision_parent_id": 712957,
+      "revision_timestamp": "2026-07-14T08:06:52Z",
+      "years": [
+        2025
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/Survival_Surge/Chapter_1",
+      "retrieved_at": "2026-07-17T09:32:10.883Z"
+    },
+    {
+      "title": "Survivors Throne/Season 2",
+      "page_id": 81018,
+      "revision_id": 710952,
+      "revision_parent_id": 710951,
+      "revision_timestamp": "2026-06-30T05:06:23Z",
+      "years": [
+        2022
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/Survivors_Throne/Season_2",
+      "retrieved_at": "2026-07-17T09:32:10.878Z"
+    },
+    {
+      "title": "The Esports Club/BGMI Invitational/Season 1",
+      "page_id": 76148,
+      "revision_id": 706613,
+      "revision_parent_id": 697359,
+      "revision_timestamp": "2026-06-03T10:11:12Z",
+      "years": [
+        2021
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/The_Esports_Club/BGMI_Invitational/Season_1",
+      "retrieved_at": "2026-07-17T09:32:10.876Z"
+    },
+    {
+      "title": "The Esports Club/BGMI Invitational/Season 2",
+      "page_id": 76693,
+      "revision_id": 706631,
+      "revision_parent_id": 647914,
+      "revision_timestamp": "2026-06-03T10:13:13Z",
+      "years": [
+        2021
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/The_Esports_Club/BGMI_Invitational/Season_2",
+      "retrieved_at": "2026-07-17T09:32:10.877Z"
+    },
+    {
+      "title": "The Esports Club/BGMI Invitational/Season 3",
+      "page_id": 81788,
+      "revision_id": 706859,
+      "revision_parent_id": 705622,
+      "revision_timestamp": "2026-06-03T10:40:27Z",
+      "years": [
+        2022
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/The_Esports_Club/BGMI_Invitational/Season_3",
+      "retrieved_at": "2026-07-17T09:32:10.879Z"
+    },
+    {
+      "title": "The Esports Club/BGMI Invitational/Season 4",
+      "page_id": 82765,
+      "revision_id": 706956,
+      "revision_parent_id": 567363,
+      "revision_timestamp": "2026-06-03T10:51:38Z",
+      "years": [
+        2022
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/The_Esports_Club/BGMI_Invitational/Season_4",
+      "retrieved_at": "2026-07-17T09:32:10.880Z"
+    },
+    {
+      "title": "The Esports Club/Streamer Quest/Season/2",
+      "page_id": 83045,
+      "revision_id": 707007,
+      "revision_parent_id": 705190,
+      "revision_timestamp": "2026-06-03T10:58:07Z",
+      "years": [
+        2022
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/The_Esports_Club/Streamer_Quest/Season/2",
+      "retrieved_at": "2026-07-17T09:32:10.890Z"
+    },
+    {
+      "title": "The Fall Season Face-Off",
+      "page_id": 78641,
+      "revision_id": 708401,
+      "revision_parent_id": 708063,
+      "revision_timestamp": "2026-06-03T13:39:59Z",
+      "years": [
+        2021
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/The_Fall_Season_Face-Off",
+      "retrieved_at": "2026-07-17T09:32:10.886Z"
+    },
+    {
+      "title": "The Launch Party",
+      "page_id": 75140,
+      "revision_id": 706551,
+      "revision_parent_id": 647893,
+      "revision_timestamp": "2026-06-03T10:04:03Z",
+      "years": [
+        2021
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/The_Launch_Party",
+      "retrieved_at": "2026-07-17T09:32:10.884Z"
+    },
+    {
+      "title": "The World Of Battle/Winter Invitational",
+      "page_id": 88577,
+      "revision_id": 707517,
+      "revision_parent_id": 695603,
+      "revision_timestamp": "2026-06-03T11:56:29Z",
+      "years": [
+        2023
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/The_World_Of_Battle/Winter_Invitational",
+      "retrieved_at": "2026-07-17T09:32:10.896Z"
+    },
+    {
+      "title": "THUG Invitational",
+      "page_id": 76050,
+      "revision_id": 706605,
+      "revision_parent_id": 647906,
+      "revision_timestamp": "2026-06-03T10:10:07Z",
+      "years": [
+        2021
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/THUG_Invitational",
+      "retrieved_at": "2026-07-17T09:32:10.885Z"
+    },
+    {
+      "title": "THUG Invitational/2024",
+      "page_id": 91893,
+      "revision_id": 707826,
+      "revision_parent_id": 705741,
+      "revision_timestamp": "2026-06-03T12:28:11Z",
+      "years": [
+        2024
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/THUG_Invitational/2024",
+      "retrieved_at": "2026-07-17T09:32:10.904Z"
+    },
+    {
+      "title": "THUG Invitational/Season 3",
+      "page_id": 77342,
+      "revision_id": 706655,
+      "revision_parent_id": 647927,
+      "revision_timestamp": "2026-06-03T10:15:50Z",
+      "years": [
+        2021
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/THUG_Invitational/Season_3",
+      "retrieved_at": "2026-07-17T09:32:10.885Z"
+    },
+    {
+      "title": "THUG Invitational/Season 4",
+      "page_id": 80193,
+      "revision_id": 706778,
+      "revision_parent_id": 647969,
+      "revision_timestamp": "2026-06-03T10:29:31Z",
+      "years": [
+        2022
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/THUG_Invitational/Season_4",
+      "retrieved_at": "2026-07-17T09:32:10.887Z"
+    },
+    {
+      "title": "THUG Invitational/Season 5",
+      "page_id": 82358,
+      "revision_id": 706930,
+      "revision_parent_id": 637292,
+      "revision_timestamp": "2026-06-03T10:48:09Z",
+      "years": [
+        2022
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/THUG_Invitational/Season_5",
+      "retrieved_at": "2026-07-17T09:32:10.889Z"
+    },
+    {
+      "title": "Titans Rising",
+      "page_id": 91860,
+      "revision_id": 711322,
+      "revision_parent_id": 707821,
+      "revision_timestamp": "2026-07-02T08:55:52Z",
+      "years": [
+        2024
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/Titans_Rising",
+      "retrieved_at": "2026-07-17T09:32:10.903Z"
+    },
+    {
+      "title": "Trident Ignite/2026/Challengers vs Masters",
+      "page_id": 96330,
+      "revision_id": 712888,
+      "revision_parent_id": 712883,
+      "revision_timestamp": "2026-07-13T18:58:02Z",
+      "years": [
+        2026
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/Trident_Ignite/2026/Challengers_vs_Masters",
+      "retrieved_at": "2026-07-17T09:32:10.910Z"
+    },
+    {
+      "title": "Trident Ignite/2026/Road to Masters",
+      "page_id": 96329,
+      "revision_id": 712886,
+      "revision_parent_id": 712881,
+      "revision_timestamp": "2026-07-13T18:55:17Z",
+      "years": [
+        2026
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/Trident_Ignite/2026/Road_to_Masters",
+      "retrieved_at": "2026-07-17T09:32:10.909Z"
+    },
+    {
+      "title": "TVS Wicked Battles",
+      "page_id": 91088,
+      "revision_id": 711204,
+      "revision_parent_id": 707746,
+      "revision_timestamp": "2026-07-01T08:57:13Z",
+      "years": [
+        2024
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/TVS_Wicked_Battles",
+      "retrieved_at": "2026-07-17T09:32:10.902Z"
+    },
+    {
+      "title": "TVS Wicked Battles/2025",
+      "page_id": 93984,
+      "revision_id": 708117,
+      "revision_parent_id": 696750,
+      "revision_timestamp": "2026-06-03T12:59:06Z",
+      "years": [
+        2025
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/TVS_Wicked_Battles/2025",
+      "retrieved_at": "2026-07-17T09:32:10.905Z"
+    },
+    {
+      "title": "Ultimate Regional Rivalry/Season 2",
+      "page_id": 91083,
+      "revision_id": 708346,
+      "revision_parent_id": 707744,
+      "revision_timestamp": "2026-06-03T13:26:57Z",
+      "years": [
+        2024
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/Ultimate_Regional_Rivalry/Season_2",
+      "retrieved_at": "2026-07-17T09:32:10.902Z"
+    },
+    {
+      "title": "UNIV Premiership/Season One",
+      "page_id": 94808,
+      "revision_id": 708181,
+      "revision_parent_id": 705751,
+      "revision_timestamp": "2026-06-03T13:04:54Z",
+      "years": [
+        2026
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/UNIV_Premiership/Season_One",
+      "retrieved_at": "2026-07-17T09:32:10.907Z"
+    },
+    {
+      "title": "Upthrust Esports India Rising/2022",
+      "page_id": 81606,
+      "revision_id": 706839,
+      "revision_parent_id": 643184,
+      "revision_timestamp": "2026-06-03T10:38:04Z",
+      "years": [
+        2022
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/Upthrust_Esports_India_Rising/2022",
+      "retrieved_at": "2026-07-17T09:32:10.888Z"
+    },
+    {
+      "title": "Upthrust Esports India Rising/2024",
+      "page_id": 89682,
+      "revision_id": 707642,
+      "revision_parent_id": 696678,
+      "revision_timestamp": "2026-06-03T12:09:38Z",
+      "years": [
+        2024
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/Upthrust_Esports_India_Rising/2024",
+      "retrieved_at": "2026-07-17T09:32:10.900Z"
+    },
+    {
+      "title": "Upthrust Esports India Rising/2026",
+      "page_id": 95325,
+      "revision_id": 710315,
+      "revision_parent_id": 705604,
+      "revision_timestamp": "2026-06-22T15:13:32Z",
+      "years": [
+        2026
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/Upthrust_Esports_India_Rising/2026",
+      "retrieved_at": "2026-07-17T09:32:10.908Z"
+    },
+    {
+      "title": "Upthrust Esports/Challengers Showdown",
+      "page_id": 86994,
+      "revision_id": 709234,
+      "revision_parent_id": 707358,
+      "revision_timestamp": "2026-06-11T13:11:38Z",
+      "years": [
+        2023
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/Upthrust_Esports/Challengers_Showdown",
+      "retrieved_at": "2026-07-17T09:32:10.892Z"
+    },
+    {
+      "title": "Upthrust Esports/Challengers Showdown/Season 2",
+      "page_id": 90489,
+      "revision_id": 707689,
+      "revision_parent_id": 692339,
+      "revision_timestamp": "2026-06-03T12:14:33Z",
+      "years": [
+        2024
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/Upthrust_Esports/Challengers_Showdown/Season_2",
+      "retrieved_at": "2026-07-17T09:32:10.901Z"
+    },
+    {
+      "title": "Upthrust Esports/Diwali Battle/2023",
+      "page_id": 88222,
+      "revision_id": 707470,
+      "revision_parent_id": 705739,
+      "revision_timestamp": "2026-06-03T11:51:52Z",
+      "years": [
+        2023
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/Upthrust_Esports/Diwali_Battle/2023",
+      "retrieved_at": "2026-07-17T09:32:10.895Z"
+    },
+    {
+      "title": "Upthrust Esports/Pro Showdown/2026",
+      "page_id": 94714,
+      "revision_id": 712444,
+      "revision_parent_id": 708176,
+      "revision_timestamp": "2026-07-11T13:25:21Z",
+      "years": [
+        2026
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/Upthrust_Esports/Pro_Showdown/2026",
+      "retrieved_at": "2026-07-17T09:32:10.906Z"
+    },
+    {
+      "title": "Upthrust Esports/Pro Showdown/Season 2",
+      "page_id": 87813,
+      "revision_id": 707426,
+      "revision_parent_id": 690301,
+      "revision_timestamp": "2026-06-03T11:47:29Z",
+      "years": [
+        2023
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/Upthrust_Esports/Pro_Showdown/Season_2",
+      "retrieved_at": "2026-07-17T09:32:10.894Z"
+    },
+    {
+      "title": "Upthrust Esports/Survivors Saga/Season 2",
+      "page_id": 86926,
+      "revision_id": 707350,
+      "revision_parent_id": 690287,
+      "revision_timestamp": "2026-06-03T11:39:45Z",
+      "years": [
+        2023
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/Upthrust_Esports/Survivors_Saga/Season_2",
+      "retrieved_at": "2026-07-17T09:32:10.891Z"
+    },
+    {
+      "title": "Upthrust Esports/Survivors Saga/Season 3",
+      "page_id": 88853,
+      "revision_id": 710302,
+      "revision_parent_id": 708477,
+      "revision_timestamp": "2026-06-22T14:40:16Z",
+      "years": [
+        2023
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/Upthrust_Esports/Survivors_Saga/Season_3",
+      "retrieved_at": "2026-07-17T09:32:10.897Z"
+    },
+    {
+      "title": "Upthrust Esports/Survivors Throne/Season 4",
+      "page_id": 87416,
+      "revision_id": 707414,
+      "revision_parent_id": 661283,
+      "revision_timestamp": "2026-06-03T11:46:17Z",
+      "years": [
+        2023
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/Upthrust_Esports/Survivors_Throne/Season_4",
+      "retrieved_at": "2026-07-17T09:32:10.893Z"
+    },
+    {
+      "title": "Upthrust Esports/The Multiverse Series/2024",
+      "page_id": 88982,
+      "revision_id": 707563,
+      "revision_parent_id": 689848,
+      "revision_timestamp": "2026-06-03T12:00:57Z",
+      "years": [
+        2024
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/Upthrust_Esports/The_Multiverse_Series/2024",
+      "retrieved_at": "2026-07-17T09:32:10.898Z"
+    },
+    {
+      "title": "Upthrust Esports/The Multiverse Series/2024/The Final Showdown",
+      "page_id": 89128,
+      "revision_id": 707584,
+      "revision_parent_id": 675627,
+      "revision_timestamp": "2026-06-03T12:03:07Z",
+      "years": [
+        2024
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/Upthrust_Esports/The_Multiverse_Series/2024/The_Final_Showdown",
+      "retrieved_at": "2026-07-17T09:32:10.898Z"
+    },
+    {
+      "title": "Upthrust Esports/The Multiverse Series/2025",
+      "page_id": 92429,
+      "revision_id": 712450,
+      "revision_parent_id": 708425,
+      "revision_timestamp": "2026-07-11T13:46:44Z",
+      "years": [
+        2025
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/Upthrust_Esports/The_Multiverse_Series/2025",
+      "retrieved_at": "2026-07-17T09:32:10.905Z"
+    },
+    {
+      "title": "Upthrust Esports/The Patriot Cup",
+      "page_id": 89161,
+      "revision_id": 707590,
+      "revision_parent_id": 695605,
+      "revision_timestamp": "2026-06-03T12:03:43Z",
+      "years": [
+        2024
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/Upthrust_Esports/The_Patriot_Cup",
+      "retrieved_at": "2026-07-17T09:32:10.899Z"
+    },
+    {
+      "title": "Vanquishers Cup/Season 1",
+      "page_id": 87190,
+      "revision_id": 671002,
+      "revision_parent_id": 536635,
+      "revision_timestamp": "2025-06-16T04:58:01Z",
+      "years": [
+        2023
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/Vanquishers_Cup/Season_1",
+      "retrieved_at": "2026-07-17T09:32:10.892Z"
+    },
+    {
+      "title": "Villager Esports Pro Invitational/2021/Grand Finals",
+      "page_id": 77255,
+      "revision_id": 706651,
+      "revision_parent_id": 697362,
+      "revision_timestamp": "2026-06-03T10:15:24Z",
+      "years": [
+        2021
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/Villager_Esports_Pro_Invitational/2021/Grand_Finals",
+      "retrieved_at": "2026-07-17T09:32:10.912Z"
+    },
+    {
+      "title": "Villager Esports Pro Invitational/2021/Group Stage",
+      "page_id": 77195,
+      "revision_id": 706650,
+      "revision_parent_id": 697358,
+      "revision_timestamp": "2026-06-03T10:15:18Z",
+      "years": [
+        2021
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/Villager_Esports_Pro_Invitational/2021/Group_Stage",
+      "retrieved_at": "2026-07-17T09:32:10.911Z"
+    },
+    {
+      "title": "Villager Esports Pro Invitational/2023",
+      "page_id": 87148,
+      "revision_id": 707377,
+      "revision_parent_id": 701862,
+      "revision_timestamp": "2026-06-03T11:42:32Z",
+      "years": [
+        2023
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/Villager_Esports_Pro_Invitational/2023",
+      "retrieved_at": "2026-07-17T09:32:10.916Z"
+    },
+    {
+      "title": "Villager Esports/DOMIN8R",
+      "page_id": 86851,
+      "revision_id": 707338,
+      "revision_parent_id": 705709,
+      "revision_timestamp": "2026-06-03T11:38:33Z",
+      "years": [
+        2023
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/Villager_Esports/DOMIN8R",
+      "retrieved_at": "2026-07-17T09:32:10.915Z"
+    },
+    {
+      "title": "Villager Esports/Winter Masters/2022",
+      "page_id": 80752,
+      "revision_id": 708093,
+      "revision_parent_id": 706805,
+      "revision_timestamp": "2026-06-03T12:55:59Z",
+      "years": [
+        2022
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/Villager_Esports/Winter_Masters/2022",
+      "retrieved_at": "2026-07-17T09:32:10.914Z"
+    },
+    {
+      "title": "WD Black Cup/Season 2",
+      "page_id": 79060,
+      "revision_id": 706721,
+      "revision_parent_id": 647954,
+      "revision_timestamp": "2026-06-03T10:23:06Z",
+      "years": [
+        2021
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/WD_Black_Cup/Season_2",
+      "retrieved_at": "2026-07-17T09:32:10.913Z"
+    },
+    {
+      "title": "Weltify Pro Clash/2025",
+      "page_id": 95033,
+      "revision_id": 708192,
+      "revision_parent_id": 701543,
+      "revision_timestamp": "2026-06-03T13:05:56Z",
+      "years": [
+        2025
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/Weltify_Pro_Clash/2025",
+      "retrieved_at": "2026-07-17T09:32:10.918Z"
+    },
+    {
+      "title": "Weltify Pro Clash/Season 2",
+      "page_id": 95046,
+      "revision_id": 708194,
+      "revision_parent_id": 705752,
+      "revision_timestamp": "2026-06-03T13:06:07Z",
+      "years": [
+        2026
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/Weltify_Pro_Clash/Season_2",
+      "retrieved_at": "2026-07-17T09:32:10.918Z"
+    },
+    {
+      "title": "Wings BattleFest",
+      "page_id": 77411,
+      "revision_id": 706657,
+      "revision_parent_id": 647929,
+      "revision_timestamp": "2026-06-03T10:16:03Z",
+      "years": [
+        2021
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/Wings_BattleFest",
+      "retrieved_at": "2026-07-17T09:32:10.913Z"
+    },
+    {
+      "title": "Winter Premier League/2025",
+      "page_id": 94717,
+      "revision_id": 712445,
+      "revision_parent_id": 710312,
+      "revision_timestamp": "2026-07-11T13:27:17Z",
+      "years": [
+        2025
+      ],
+      "source_url": "https://liquipedia.net/pubgmobile/Winter_Premier_League/2025",
+      "retrieved_at": "2026-07-17T09:32:10.917Z"
+    }
+  ]
+}
