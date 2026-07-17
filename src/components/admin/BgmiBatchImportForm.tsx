@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useState } from "react";
+import Link from "next/link";
 import { AlertTriangle, CheckCircle2, FileUp, LoaderCircle } from "lucide-react";
 
 type Result = {
@@ -67,14 +68,21 @@ export default function BgmiBatchImportForm() {
             <p className="font-black text-white">{result.ok ? "Batch staged successfully" : "Import failed"}</p>
           </div>
           {result.ok ? (
-            <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
-              {[["Rows", result.total_rows], ["Matched", result.matched_rows], ["Unresolved", result.unresolved_rows], ["Invalid", result.invalid_rows]].map(([label, count]) => (
-                <div key={String(label)} className="border border-white/10 bg-black/20 p-3">
-                  <p className="text-[10px] uppercase tracking-widest text-white/35">{label}</p>
-                  <p className="mt-1 text-2xl font-black text-white">{count}</p>
-                </div>
-              ))}
-            </div>
+            <>
+              <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
+                {[["Rows", result.total_rows ?? 0], ["Matched", result.matched_rows ?? 0], ["Unresolved", result.unresolved_rows ?? 0], ["Invalid", result.invalid_rows ?? 0]].map(([label, count]) => (
+                  <div key={String(label)} className="border border-white/10 bg-black/20 p-3">
+                    <span className="block text-[10px] uppercase tracking-widest text-white/35">{label}</span>
+                    <strong className="mt-2 block text-2xl font-black text-white">{String(count)}</strong>
+                  </div>
+                ))}
+              </div>
+              {result.batch_id && (
+                <Link href={"/admin/bgmi/imports/" + result.batch_id} className="mt-4 inline-flex bg-white px-4 py-3 text-xs font-black uppercase tracking-widest text-black">
+                  Review unresolved records
+                </Link>
+              )}
+            </>
           ) : (
             <p className="mt-3 text-sm text-red-100/70">{result.error}</p>
           )}
