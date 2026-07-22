@@ -23,9 +23,7 @@ export default function RootLayout({
         <div className="min-h-screen bg-[var(--background)] text-[var(--text-primary)]">
           <Navbar />
 
-          <main id="main-content">
-            {children}
-          </main>
+          <main id="main-content">{children}</main>
 
           <Footer />
         </div>

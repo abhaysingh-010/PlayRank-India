@@ -3,12 +3,7 @@
 import Link from "next/link";
 import { Search, X } from "lucide-react";
 import { createPortal } from "react-dom";
-import {
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 type Result = {
   id: string;
@@ -76,10 +71,7 @@ export default function GlobalSearch({
 
   useEffect(() => {
     function onKeyDown(event: KeyboardEvent) {
-      if (
-        (event.ctrlKey || event.metaKey) &&
-        event.key.toLowerCase() === "k"
-      ) {
+      if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "k") {
         event.preventDefault();
         openSearch();
       }
@@ -127,7 +119,7 @@ export default function GlobalSearch({
           `/api/search?q=${encodeURIComponent(trimmedQuery)}`,
           {
             signal: controller.signal,
-          }
+          },
         );
 
         if (!response.ok) {
@@ -171,10 +163,7 @@ export default function GlobalSearch({
           aria-label="Search PlayRank"
         >
           <span className="flex min-w-0 items-center gap-2.5">
-            <Search
-              size={16}
-              className="shrink-0 text-[var(--text-muted)]"
-            />
+            <Search size={16} className="shrink-0 text-[var(--text-muted)]" />
 
             <span className="truncate text-sm text-[var(--text-muted)]">
               Search PlayRank
@@ -187,151 +176,157 @@ export default function GlobalSearch({
         </button>
       ) : null}
 
-      {open && typeof document !== "undefined" ? createPortal((
-        <div
-          className="pr-search-overlay fixed inset-0 z-[10000] flex items-start justify-center bg-black/35 px-3 pt-3 backdrop-blur-[64px] backdrop-saturate-0 sm:px-5 sm:pt-[10vh]"
-          onMouseDown={(event) => {
-            if (event.target === event.currentTarget) {
-              closeSearch();
-            }
-          }}
-        >
-          <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
-            <div className="absolute inset-0 opacity-25 [background-image:linear-gradient(rgba(255,255,255,.08)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.08)_1px,transparent_1px)] [background-size:96px_96px] [mask-image:radial-gradient(circle_at_center,black,transparent_78%)]" />
-            <div className="pr-search-orb pr-search-orb-red absolute -right-[12vw] -top-[24vh] h-[70vh] w-[70vh] rounded-full bg-[#f4473b]/20 blur-[140px]" />
-            <div className="pr-search-orb pr-search-orb-gold absolute -bottom-[30vh] -left-[14vw] h-[78vh] w-[78vh] rounded-full bg-[#ffd21a]/10 blur-[160px]" />
-            <p className="pr-search-backdrop-title absolute left-[4vw] top-[24vh] select-none text-[clamp(6rem,17vw,18rem)] font-black uppercase leading-[.72] tracking-[-.09em] text-white/[.035]">
-              Find the
-              <br />
-              signal.
-            </p>
-            <p className="absolute bottom-8 right-8 hidden font-mono text-[9px] uppercase tracking-[.28em] text-white/15 sm:block">
-              Players / Teams / Events / Intelligence
-            </p>
-          </div>
-          <section
-            role="dialog"
-            aria-modal="true"
-            aria-label="Search PlayRank"
-            className="pr-search-panel relative z-10 w-full max-w-[900px] overflow-hidden border border-white/20 bg-[#080808]/95 shadow-[0_35px_140px_rgba(0,0,0,.78),inset_0_1px_0_rgba(255,255,255,.08)] backdrop-blur-[40px] backdrop-saturate-150 before:pointer-events-none before:absolute before:inset-0 before:bg-[linear-gradient(135deg,rgba(255,255,255,.055),transparent_35%,rgba(244,71,59,.025))]"
-          >
-            <div className="relative flex items-center justify-between border-b border-white/10 bg-white/[0.025] px-5 py-3">
-              <p className="text-[9px] font-black uppercase tracking-[.22em] text-white/30">
-                Search PlayRank
-              </p>
-              <button
-                type="button"
-                onClick={closeSearch}
-                className="inline-flex h-8 w-8 shrink-0 items-center justify-center text-white/35 transition hover:bg-white/[0.05] hover:text-white"
-                aria-label="Close search"
+      {open && typeof document !== "undefined"
+        ? createPortal(
+            <div
+              className="pr-search-overlay fixed inset-0 z-[10000] flex items-start justify-center bg-black/35 px-3 pt-3 backdrop-blur-[64px] backdrop-saturate-0 sm:px-5 sm:pt-[10vh]"
+              onMouseDown={(event) => {
+                if (event.target === event.currentTarget) {
+                  closeSearch();
+                }
+              }}
+            >
+              <div
+                aria-hidden="true"
+                className="pointer-events-none absolute inset-0 overflow-hidden"
               >
-                <X size={16} />
-              </button>
-            </div>
-
-            <div className="relative flex items-center gap-4 border-b border-white/15 bg-black/10 px-5">
-              <Search
-                size={20}
-                className="pr-search-icon shrink-0 text-[#f4473b]"
-              />
-
-              <input
-                ref={inputRef}
-                value={query}
-                onChange={(event) => handleQueryChange(event.target.value)}
-                placeholder="Player, team or tournament…"
-                className="h-[72px] min-w-0 flex-1 !border-0 !bg-transparent px-0 text-lg font-medium text-white !shadow-none !outline-none placeholder:text-white/20 focus:!border-0 focus:!bg-transparent focus:!shadow-none"
-                aria-label="Search query"
-              />
-            </div>
-
-            <div className="relative max-h-[min(430px,65vh)] overflow-y-auto">
-              {!query.trim() ? (
-                <div className="p-5">
-                  <p className="mb-3 text-[9px] font-black uppercase tracking-[.2em] text-white/25">
-                    Quick access
+                <div className="absolute inset-0 opacity-25 [background-image:linear-gradient(rgba(255,255,255,.08)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.08)_1px,transparent_1px)] [background-size:96px_96px] [mask-image:radial-gradient(circle_at_center,black,transparent_78%)]" />
+                <div className="pr-search-orb pr-search-orb-red absolute -right-[12vw] -top-[24vh] h-[70vh] w-[70vh] rounded-full bg-[#f4473b]/20 blur-[140px]" />
+                <div className="pr-search-orb pr-search-orb-gold absolute -bottom-[30vh] -left-[14vw] h-[78vh] w-[78vh] rounded-full bg-[#ffd21a]/10 blur-[160px]" />
+                <p className="pr-search-backdrop-title absolute left-[4vw] top-[24vh] select-none text-[clamp(6rem,17vw,18rem)] font-black uppercase leading-[.72] tracking-[-.09em] text-white/[.035]">
+                  Find the
+                  <br />
+                  signal.
+                </p>
+                <p className="absolute bottom-8 right-8 hidden font-mono text-[9px] uppercase tracking-[.28em] text-white/15 sm:block">
+                  Players / Teams / Events / Intelligence
+                </p>
+              </div>
+              <section
+                role="dialog"
+                aria-modal="true"
+                aria-label="Search PlayRank"
+                className="pr-search-panel relative z-10 w-full max-w-[900px] overflow-hidden border border-white/20 bg-[#080808]/95 shadow-[0_35px_140px_rgba(0,0,0,.78),inset_0_1px_0_rgba(255,255,255,.08)] backdrop-blur-[40px] backdrop-saturate-150 before:pointer-events-none before:absolute before:inset-0 before:bg-[linear-gradient(135deg,rgba(255,255,255,.055),transparent_35%,rgba(244,71,59,.025))]"
+              >
+                <div className="relative flex items-center justify-between border-b border-white/10 bg-white/[0.025] px-5 py-3">
+                  <p className="text-[9px] font-black uppercase tracking-[.22em] text-white/30">
+                    Search PlayRank
                   </p>
-
-                  <div className="grid border-l border-t border-white/10 sm:grid-cols-2">
-                    {suggestedLinks.map((item, index) => (
-                      <Link
-                        key={item.href}
-                        href={item.href}
-                        onClick={closeSearch}
-                        className="pr-search-shortcut group flex items-center justify-between border-b border-r border-white/10 px-4 py-3.5 text-sm font-semibold text-white/55 transition hover:bg-white/[0.04] hover:text-white"
-                      >
-                        <span>{item.label}</span>
-                        <span className="font-mono text-[9px] text-white/15 transition group-hover:text-[#f4473b]">
-                          0{index + 1}
-                        </span>
-                      </Link>
-                    ))}
-                  </div>
+                  <button
+                    type="button"
+                    onClick={closeSearch}
+                    className="inline-flex h-8 w-8 shrink-0 items-center justify-center text-white/35 transition hover:bg-white/[0.05] hover:text-white"
+                    aria-label="Close search"
+                  >
+                    <X size={16} />
+                  </button>
                 </div>
-              ) : null}
 
-              {loading ? (
-                <div className="px-5 py-12 text-center text-sm text-white/35">
-                  Searching…
+                <div className="relative flex items-center gap-4 border-b border-white/15 bg-black/10 px-5">
+                  <Search
+                    size={20}
+                    className="pr-search-icon shrink-0 text-[#f4473b]"
+                  />
+
+                  <input
+                    ref={inputRef}
+                    value={query}
+                    onChange={(event) => handleQueryChange(event.target.value)}
+                    placeholder="Player, team or tournament…"
+                    className="h-[72px] min-w-0 flex-1 !border-0 !bg-transparent px-0 text-lg font-medium text-white !shadow-none !outline-none placeholder:text-white/20 focus:!border-0 focus:!bg-transparent focus:!shadow-none"
+                    aria-label="Search query"
+                  />
                 </div>
-              ) : null}
 
-              {error ? (
-                <div className="m-5 border border-red-400/25 bg-red-400/10 px-4 py-4 text-sm text-red-300">
-                  {error}
-                </div>
-              ) : null}
+                <div className="relative max-h-[min(430px,65vh)] overflow-y-auto">
+                  {!query.trim() ? (
+                    <div className="p-5">
+                      <p className="mb-3 text-[9px] font-black uppercase tracking-[.2em] text-white/25">
+                        Quick access
+                      </p>
 
-              {!loading && !error && results.length > 0 ? (
-                <div>
-                  {results.map((item) => (
-                    <Link
-                      key={`${item.type}-${item.id}`}
-                      href={resultHref(item)}
-                      onClick={closeSearch}
-                      className="pr-search-result group flex items-center justify-between gap-4 border-b border-white/10 px-5 py-4 transition hover:bg-white/[0.04]"
-                    >
-                      <div className="min-w-0">
-                        <p className="truncate text-sm font-semibold text-white">
-                          {item.name || item.ign || "Unnamed"}
-                        </p>
-
-                        <p className="mt-1 text-[9px] font-bold uppercase tracking-[.15em] text-white/25">
-                          {item.type}
-                        </p>
+                      <div className="grid border-l border-t border-white/10 sm:grid-cols-2">
+                        {suggestedLinks.map((item, index) => (
+                          <Link
+                            key={item.href}
+                            href={item.href}
+                            onClick={closeSearch}
+                            className="pr-search-shortcut group flex items-center justify-between border-b border-r border-white/10 px-4 py-3.5 text-sm font-semibold text-white/55 transition hover:bg-white/[0.04] hover:text-white"
+                          >
+                            <span>{item.label}</span>
+                            <span className="font-mono text-[9px] text-white/15 transition group-hover:text-[#f4473b]">
+                              0{index + 1}
+                            </span>
+                          </Link>
+                        ))}
                       </div>
+                    </div>
+                  ) : null}
 
-                      <span className="text-sm text-white/20 transition group-hover:translate-x-1 group-hover:text-[#f4473b]">
-                        →
-                      </span>
-                    </Link>
-                  ))}
+                  {loading ? (
+                    <div className="px-5 py-12 text-center text-sm text-white/35">
+                      Searching…
+                    </div>
+                  ) : null}
+
+                  {error ? (
+                    <div className="m-5 border border-red-400/25 bg-red-400/10 px-4 py-4 text-sm text-red-300">
+                      {error}
+                    </div>
+                  ) : null}
+
+                  {!loading && !error && results.length > 0 ? (
+                    <div>
+                      {results.map((item) => (
+                        <Link
+                          key={`${item.type}-${item.id}`}
+                          href={resultHref(item)}
+                          onClick={closeSearch}
+                          className="pr-search-result group flex items-center justify-between gap-4 border-b border-white/10 px-5 py-4 transition hover:bg-white/[0.04]"
+                        >
+                          <div className="min-w-0">
+                            <p className="truncate text-sm font-semibold text-white">
+                              {item.name || item.ign || "Unnamed"}
+                            </p>
+
+                            <p className="mt-1 text-[9px] font-bold uppercase tracking-[.15em] text-white/25">
+                              {item.type}
+                            </p>
+                          </div>
+
+                          <span className="text-sm text-white/20 transition group-hover:translate-x-1 group-hover:text-[#f4473b]">
+                            →
+                          </span>
+                        </Link>
+                      ))}
+                    </div>
+                  ) : null}
+
+                  {!loading &&
+                  !error &&
+                  query.trim() &&
+                  results.length === 0 ? (
+                    <div className="px-5 py-12 text-center">
+                      <p className="text-sm font-medium text-white/60">
+                        No results found
+                      </p>
+
+                      <p className="mt-2 text-xs text-white/25">
+                        Try a different player, team, or tournament name.
+                      </p>
+                    </div>
+                  ) : null}
                 </div>
-              ) : null}
 
-              {!loading &&
-              !error &&
-              query.trim() &&
-              results.length === 0 ? (
-                <div className="px-5 py-12 text-center">
-                  <p className="text-sm font-medium text-white/60">
-                    No results found
-                  </p>
-
-                  <p className="mt-2 text-xs text-white/25">
-                    Try a different player, team, or tournament name.
-                  </p>
+                <div className="relative flex items-center justify-between border-t border-white/10 bg-black/10 px-5 py-3 text-[9px] uppercase tracking-[.14em] text-white/20">
+                  <span>Esc to close</span>
+                  <span>Live records</span>
                 </div>
-              ) : null}
-            </div>
-
-            <div className="relative flex items-center justify-between border-t border-white/10 bg-black/10 px-5 py-3 text-[9px] uppercase tracking-[.14em] text-white/20">
-              <span>Esc to close</span>
-              <span>Live records</span>
-            </div>
-          </section>
-        </div>
-      ), document.body) : null}
+              </section>
+            </div>,
+            document.body,
+          )
+        : null}
     </>
   );
 }

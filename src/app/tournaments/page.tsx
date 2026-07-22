@@ -120,10 +120,16 @@ export default async function TournamentsPage({
                 : "Browse historical event records whose detailed scorecards are not yet available."}
             </p>
             <div className="mt-7 flex gap-3">
-              <Link href="/standings" className="pr-button pr-button-primary text-[10px]">
+              <Link
+                href="/standings"
+                className="pr-button pr-button-primary text-[10px]"
+              >
                 Standings
               </Link>
-              <Link href="/matches" className="pr-button pr-button-secondary text-[10px]">
+              <Link
+                href="/matches"
+                className="pr-button pr-button-secondary text-[10px]"
+              >
                 Matches
               </Link>
             </div>
@@ -143,7 +149,10 @@ export default async function TournamentsPage({
             ],
             [SIZE, "Events per page"],
           ].map(([value, label]) => (
-            <div key={label} className="border-r border-white/15 px-5 py-7 first:border-l">
+            <div
+              key={label}
+              className="border-r border-white/15 px-5 py-7 first:border-l"
+            >
               <p className="text-2xl font-semibold">{value}</p>
               <p className="mt-2 text-[9px] uppercase tracking-[.15em] text-white/25">
                 {label}
@@ -162,22 +171,44 @@ export default async function TournamentsPage({
             </h2>
           </div>
           <div className="flex flex-wrap items-center gap-3">
-          <div className="flex border border-white/15 p-1" aria-label="Tournament coverage filter">
-            <Link href={pageHref(1, sort, "covered")} aria-current={mode === "covered" ? "page" : undefined} className={`px-4 py-3 text-[9px] font-semibold uppercase tracking-[.14em] transition-colors ${mode === "covered" ? "bg-white text-black" : "text-white/40 hover:text-white"}`}>
-              Covered
-            </Link>
-            <Link href={pageHref(1, sort, "archive")} aria-current={mode === "archive" ? "page" : undefined} className={`px-4 py-3 text-[9px] font-semibold uppercase tracking-[.14em] transition-colors ${mode === "archive" ? "bg-white text-black" : "text-white/40 hover:text-white"}`}>
-              Archive
-            </Link>
-          </div>
-          <div className="flex border border-white/15 p-1" aria-label="Tournament date order">
-            <Link href={pageHref(1, "desc", mode)} aria-current={sort === "desc" ? "page" : undefined} className={`px-4 py-3 text-[9px] font-semibold uppercase tracking-[.14em] transition-colors ${sort === "desc" ? "bg-[var(--pr-red)] text-black" : "text-white/40 hover:text-white"}`}>
-              Newest
-            </Link>
-            <Link href={pageHref(1, "asc", mode)} aria-current={sort === "asc" ? "page" : undefined} className={`px-4 py-3 text-[9px] font-semibold uppercase tracking-[.14em] transition-colors ${sort === "asc" ? "bg-[var(--pr-red)] text-black" : "text-white/40 hover:text-white"}`}>
-              Oldest
-            </Link>
-          </div>
+            <div
+              className="flex border border-white/15 p-1"
+              aria-label="Tournament coverage filter"
+            >
+              <Link
+                href={pageHref(1, sort, "covered")}
+                aria-current={mode === "covered" ? "page" : undefined}
+                className={`px-4 py-3 text-[9px] font-semibold uppercase tracking-[.14em] transition-colors ${mode === "covered" ? "bg-white text-black" : "text-white/40 hover:text-white"}`}
+              >
+                Covered
+              </Link>
+              <Link
+                href={pageHref(1, sort, "archive")}
+                aria-current={mode === "archive" ? "page" : undefined}
+                className={`px-4 py-3 text-[9px] font-semibold uppercase tracking-[.14em] transition-colors ${mode === "archive" ? "bg-white text-black" : "text-white/40 hover:text-white"}`}
+              >
+                Archive
+              </Link>
+            </div>
+            <div
+              className="flex border border-white/15 p-1"
+              aria-label="Tournament date order"
+            >
+              <Link
+                href={pageHref(1, "desc", mode)}
+                aria-current={sort === "desc" ? "page" : undefined}
+                className={`px-4 py-3 text-[9px] font-semibold uppercase tracking-[.14em] transition-colors ${sort === "desc" ? "bg-[var(--pr-red)] text-black" : "text-white/40 hover:text-white"}`}
+              >
+                Newest
+              </Link>
+              <Link
+                href={pageHref(1, "asc", mode)}
+                aria-current={sort === "asc" ? "page" : undefined}
+                className={`px-4 py-3 text-[9px] font-semibold uppercase tracking-[.14em] transition-colors ${sort === "asc" ? "bg-[var(--pr-red)] text-black" : "text-white/40 hover:text-white"}`}
+              >
+                Oldest
+              </Link>
+            </div>
           </div>
         </div>
 
@@ -187,19 +218,52 @@ export default async function TournamentsPage({
               const maps = event.map_count || 0;
               const rankedTeams = event.standing_count || 0;
               return (
-                <Link key={event.id} href={mode === "covered" ? `/tournaments/${event.slug}` : event.source_url || "/tournaments"} target={mode === "archive" && event.source_url ? "_blank" : undefined} rel={mode === "archive" ? "noreferrer" : undefined} className="pr-ranking-row group grid gap-5 border-b border-white/10 py-6 md:grid-cols-[160px_1.4fr_repeat(3,.6fr)_24px] md:items-center">
+                <Link
+                  key={event.id}
+                  href={
+                    mode === "covered"
+                      ? `/tournaments/${event.slug}`
+                      : event.source_url || "/tournaments"
+                  }
+                  target={
+                    mode === "archive" && event.source_url
+                      ? "_blank"
+                      : undefined
+                  }
+                  rel={mode === "archive" ? "noreferrer" : undefined}
+                  className="pr-ranking-row group grid gap-5 border-b border-white/10 py-6 md:grid-cols-[160px_1.4fr_repeat(3,.6fr)_24px] md:items-center"
+                >
                   <div>
                     <p className="font-semibold">{date(event.start_date)}</p>
-                    <p className="mt-1 text-[9px] uppercase tracking-[.14em] text-white/25">to {date(event.end_date)}</p>
+                    <p className="mt-1 text-[9px] uppercase tracking-[.14em] text-white/25">
+                      to {date(event.end_date)}
+                    </p>
                   </div>
                   <div>
                     <p className="text-lg font-semibold">{event.name}</p>
-                    <p className="mt-1 text-[9px] uppercase tracking-[.14em] text-white/25">{event.organizer || "Organiser TBD"} · {event.location || "India"}</p>
+                    <p className="mt-1 text-[9px] uppercase tracking-[.14em] text-white/25">
+                      {event.organizer || "Organiser TBD"} ·{" "}
+                      {event.location || "India"}
+                    </p>
                   </div>
                   <Stat value={event.status || "Upcoming"} label="Status" />
                   <Stat value={money(event.prize_pool)} label="Prize pool" />
-                  <Stat value={mode === "covered" ? `${maps} maps · ${rankedTeams} ranked` : "Open source record"} label={mode === "covered" ? "Event coverage" : "Historical archive"} />
-                  <ArrowRight size={15} className="hidden text-white/20 group-hover:text-[var(--pr-red)] md:block" />
+                  <Stat
+                    value={
+                      mode === "covered"
+                        ? `${maps} maps · ${rankedTeams} ranked`
+                        : "Open source record"
+                    }
+                    label={
+                      mode === "covered"
+                        ? "Event coverage"
+                        : "Historical archive"
+                    }
+                  />
+                  <ArrowRight
+                    size={15}
+                    className="hidden text-white/20 group-hover:text-[var(--pr-red)] md:block"
+                  />
                 </Link>
               );
             })
@@ -209,10 +273,27 @@ export default async function TournamentsPage({
         </div>
 
         <nav className="mt-8 flex items-center justify-between border-t border-white/15 pt-7">
-          <p className="text-[10px] uppercase tracking-[.16em] text-white/30">Page {Math.min(page, pages)} of {pages} · {sort === "asc" ? "Oldest first" : "Newest first"}</p>
+          <p className="text-[10px] uppercase tracking-[.16em] text-white/30">
+            Page {Math.min(page, pages)} of {pages} ·{" "}
+            {sort === "asc" ? "Oldest first" : "Newest first"}
+          </p>
           <div className="flex gap-2">
-            {page > 1 ? <Link href={pageHref(page - 1, sort, mode)} className="pr-button pr-button-secondary text-[10px]">Previous 10</Link> : null}
-            {page < pages ? <Link href={pageHref(page + 1, sort, mode)} className="pr-button pr-button-primary text-[10px]">Next 10 <ArrowRight size={13} /></Link> : null}
+            {page > 1 ? (
+              <Link
+                href={pageHref(page - 1, sort, mode)}
+                className="pr-button pr-button-secondary text-[10px]"
+              >
+                Previous 10
+              </Link>
+            ) : null}
+            {page < pages ? (
+              <Link
+                href={pageHref(page + 1, sort, mode)}
+                className="pr-button pr-button-primary text-[10px]"
+              >
+                Next 10 <ArrowRight size={13} />
+              </Link>
+            ) : null}
           </div>
         </nav>
       </section>
@@ -224,7 +305,9 @@ function Stat({ value, label }: { value: string | number; label: string }) {
   return (
     <div>
       <p className="truncate text-sm font-semibold">{value}</p>
-      <p className="mt-1 text-[9px] uppercase tracking-[.14em] text-white/25">{label}</p>
+      <p className="mt-1 text-[9px] uppercase tracking-[.14em] text-white/25">
+        {label}
+      </p>
     </div>
   );
 }

@@ -1,4 +1,65 @@
 "use client";
-import {useRouter} from "next/navigation";
-type Team={id:string;name:string;slug:string};
-export default function TeamCompareSelector({teams}:{teams:Team[]}){const router=useRouter();function submit(event:React.FormEvent<HTMLFormElement>){event.preventDefault();const form=new FormData(event.currentTarget),first=String(form.get("team1")||""),second=String(form.get("team2")||"");if(!first||!second||first===second){alert("Select two different teams.");return;}router.push(`/compare/teams/${first}/${second}`);}return <form onSubmit={submit} className="grid gap-5 md:grid-cols-[1fr_auto_1fr] md:items-end"><Field label="Team one" name="team1" teams={teams}/><p className="hidden pb-4 text-[10px] font-black uppercase tracking-[.16em] text-white/25 md:block">versus</p><Field label="Team two" name="team2" teams={teams} second/><button type="submit" className="pr-button pr-button-primary md:col-span-3">Compare teams</button></form>;}function Field({label,name,teams,second=false}:{label:string;name:string;teams:Team[];second?:boolean}){return <label><span className="mb-3 block text-[10px] font-black uppercase tracking-[.16em] text-white/35">{label}</span><select name={name} defaultValue={second?teams[1]?.slug:teams[0]?.slug} className="w-full border border-white/15 bg-[var(--pr-bg)] px-4 py-4 text-white outline-none focus:border-[var(--pr-red)]">{teams.map((team)=><option key={team.id} value={team.slug}>{team.name}</option>)}</select></label>;}
+import { useRouter } from "next/navigation";
+type Team = { id: string; name: string; slug: string };
+export default function TeamCompareSelector({ teams }: { teams: Team[] }) {
+  const router = useRouter();
+  function submit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const form = new FormData(event.currentTarget),
+      first = String(form.get("team1") || ""),
+      second = String(form.get("team2") || "");
+    if (!first || !second || first === second) {
+      alert("Select two different teams.");
+      return;
+    }
+    router.push(`/compare/teams/${first}/${second}`);
+  }
+  return (
+    <form
+      onSubmit={submit}
+      className="grid gap-5 md:grid-cols-[1fr_auto_1fr] md:items-end"
+    >
+      <Field label="Team one" name="team1" teams={teams} />
+      <p className="hidden pb-4 text-[10px] font-black uppercase tracking-[.16em] text-white/25 md:block">
+        versus
+      </p>
+      <Field label="Team two" name="team2" teams={teams} second />
+      <button
+        type="submit"
+        className="pr-button pr-button-primary md:col-span-3"
+      >
+        Compare teams
+      </button>
+    </form>
+  );
+}
+function Field({
+  label,
+  name,
+  teams,
+  second = false,
+}: {
+  label: string;
+  name: string;
+  teams: Team[];
+  second?: boolean;
+}) {
+  return (
+    <label>
+      <span className="mb-3 block text-[10px] font-black uppercase tracking-[.16em] text-white/35">
+        {label}
+      </span>
+      <select
+        name={name}
+        defaultValue={second ? teams[1]?.slug : teams[0]?.slug}
+        className="w-full border border-white/15 bg-[var(--pr-bg)] px-4 py-4 text-white outline-none focus:border-[var(--pr-red)]"
+      >
+        {teams.map((team) => (
+          <option key={team.id} value={team.slug}>
+            {team.name}
+          </option>
+        ))}
+      </select>
+    </label>
+  );
+}

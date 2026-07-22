@@ -159,16 +159,17 @@ function MethodologyCard({ item }: { item: MethodItem }) {
         <DataSourceBadge label={item.badge} />
       </div>
 
-      <p className="mt-4 text-sm leading-7 text-white/55">
-        {item.description}
-      </p>
+      <p className="mt-4 text-sm leading-7 text-white/55">{item.description}</p>
 
       <ul className="mt-4 space-y-2">
         {item.points.map((point) => (
-          <li key={point} className="flex gap-3 text-sm leading-6 text-white/45">
+          <li
+            key={point}
+            className="flex gap-3 text-sm leading-6 text-white/45"
+          >
             <span
               className={`mt-2 h-1.5 w-1.5 shrink-0 rounded-full ${dotClass(
-                item.tone
+                item.tone,
               )}`}
             />
             <span>{point}</span>
@@ -280,9 +281,9 @@ export default function MethodologySection() {
 
         <p className="mt-4 max-w-5xl text-sm leading-7 text-white/55">
           If a section says a team has an edge, a player is in better form, or a
-          rivalry is strong, the page should also show whether the claim is based
-          on official data, ranking snapshots, match data, player stats, or a
-          limited sample. This keeps PlayRank useful without overclaiming.
+          rivalry is strong, the page should also show whether the claim is
+          based on official data, ranking snapshots, match data, player stats,
+          or a limited sample. This keeps PlayRank useful without overclaiming.
         </p>
       </div>
     </section>

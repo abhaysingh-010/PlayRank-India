@@ -81,7 +81,7 @@ export default function DataFreshnessBadge({
     <span
       title={`${label}: ${displayDate}`}
       className={`inline-flex items-center gap-1.5 rounded-full border font-black uppercase tracking-[0.14em] ${getTone(
-        status
+        status,
       )} ${sizeClass}`}
     >
       <span className="h-1.5 w-1.5 rounded-full bg-current" />

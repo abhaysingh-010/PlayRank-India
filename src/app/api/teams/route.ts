@@ -63,7 +63,7 @@ export async function GET(request: NextRequest) {
         ok: false,
         error: "Failed to load team rankings",
       },
-      500
+      500,
     );
   }
 
@@ -77,7 +77,7 @@ export async function GET(request: NextRequest) {
   const { data: teamsRaw, error: teamsError } = await supabase
     .from("teams")
     .select(
-      "id, name, short_name, slug, country, logo_url, points, wins, kills, matches_played, source, verified, active"
+      "id, name, short_name, slug, country, logo_url, points, wins, kills, matches_played, source, verified, active",
     )
     .in("id", ids)
     .eq("active", true);
@@ -88,7 +88,7 @@ export async function GET(request: NextRequest) {
         ok: false,
         error: "Failed to load team records",
       },
-      500
+      500,
     );
   }
 

@@ -155,7 +155,7 @@ function HealthBreakdownCard({
 
         <span
           className={`rounded-full border px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.12em] ${toneStyle(
-            tone
+            tone,
           )}`}
         >
           {value.toLocaleString("en-IN")}
@@ -177,7 +177,7 @@ function RosterHealthRowView({ row }: { row: RosterHealthRow }) {
           <div className="flex flex-wrap items-center gap-2">
             <span
               className={`rounded-full border px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.12em] ${toneStyle(
-                tone
+                tone,
               )}`}
             >
               {toneLabel(tone)}
@@ -262,27 +262,29 @@ export default async function AdminRosterHealthPage({
   const rows = (data || []) as RosterHealthRow[];
 
   const healthy = rows.filter((row) => row.health_status === "healthy").length;
-  const promotionSafe = rows.filter((row) => row.promotion_safe === true).length;
+  const promotionSafe = rows.filter(
+    (row) => row.promotion_safe === true,
+  ).length;
   const issues = rows.filter((row) => row.health_status !== "healthy").length;
 
   const noTeamNoRoster = rows.filter(
-    (row) => row.health_status === "no_team_no_active_roster"
+    (row) => row.health_status === "no_team_no_active_roster",
   ).length;
 
   const teamButNoRoster = rows.filter(
-    (row) => row.health_status === "player_has_team_but_no_active_roster"
+    (row) => row.health_status === "player_has_team_but_no_active_roster",
   ).length;
 
   const rosterButTeamMissing = rows.filter(
-    (row) => row.health_status === "active_roster_but_player_team_missing"
+    (row) => row.health_status === "active_roster_but_player_team_missing",
   ).length;
 
   const mismatch = rows.filter(
-    (row) => row.health_status === "player_team_roster_mismatch"
+    (row) => row.health_status === "player_team_roster_mismatch",
   ).length;
 
   const multipleActive = rows.filter(
-    (row) => row.health_status === "multiple_active_rosters"
+    (row) => row.health_status === "multiple_active_rosters",
   ).length;
 
   const visibleRows = rows.filter((row) => {
@@ -317,8 +319,14 @@ export default async function AdminRosterHealthPage({
     { label: "Blocked", value: "blocked" },
     { label: "Healthy", value: "healthy" },
     { label: "No Team / No Roster", value: "no_team_no_active_roster" },
-    { label: "Team / No Roster", value: "player_has_team_but_no_active_roster" },
-    { label: "Roster / Team Missing", value: "active_roster_but_player_team_missing" },
+    {
+      label: "Team / No Roster",
+      value: "player_has_team_but_no_active_roster",
+    },
+    {
+      label: "Roster / Team Missing",
+      value: "active_roster_but_player_team_missing",
+    },
     { label: "Team/Roster Mismatch", value: "player_team_roster_mismatch" },
     { label: "Multiple Active Rosters", value: "multiple_active_rosters" },
   ];
@@ -335,7 +343,9 @@ export default async function AdminRosterHealthPage({
                 <DataSourceBadge label="Promotion Safety" size="md" />
               </div>
 
-              <p className="mt-7 text-xs font-black uppercase tracking-[0.24em] text-[#f4473b]">Integrity monitor / player-team links</p>
+              <p className="mt-7 text-xs font-black uppercase tracking-[0.24em] text-[#f4473b]">
+                Integrity monitor / player-team links
+              </p>
               <h1 className="mt-4 text-5xl font-black uppercase leading-[0.9] tracking-[-0.07em] text-white md:text-7xl">
                 Roster
                 <br />
@@ -369,7 +379,6 @@ export default async function AdminRosterHealthPage({
                 >
                   Data Health
                 </Link>
-
               </div>
             </div>
 
@@ -409,10 +418,7 @@ export default async function AdminRosterHealthPage({
 
       <section className="mx-auto grid max-w-[1500px] gap-5 px-5 py-10 md:px-8 lg:grid-cols-[0.85fr_1.15fr]">
         <section className={shell + " p-5 md:p-6"}>
-          <SectionHeader
-            eyebrow="Issue Breakdown"
-            title="Roster Blockers"
-          />
+          <SectionHeader eyebrow="Issue Breakdown" title="Roster Blockers" />
 
           <div className="grid gap-3">
             <HealthBreakdownCard

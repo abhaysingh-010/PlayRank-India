@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
 
-const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+const UUID =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 function aliasSlug(value: string) {
   return value
@@ -14,18 +15,22 @@ function aliasSlug(value: string) {
 
 export async function POST(
   request: NextRequest,
-  context: { params: Promise<{ id: string }> }
+  context: { params: Promise<{ id: string }> },
 ) {
   const { id: batchId } = await context.params;
-  const body = (await request.json().catch(() => null)) as
-    | { sourceTeamName?: string; teamId?: string }
-    | null;
+  const body = (await request.json().catch(() => null)) as {
+    sourceTeamName?: string;
+    teamId?: string;
+  } | null;
 
   const sourceTeamName = body?.sourceTeamName?.trim() || "";
   const teamId = body?.teamId?.trim() || "";
 
   if (!UUID.test(batchId) || !UUID.test(teamId) || !sourceTeamName) {
-    return NextResponse.json({ ok: false, error: "Invalid resolution request" }, { status: 400 });
+    return NextResponse.json(
+      { ok: false, error: "Invalid resolution request" },
+      { status: 400 },
+    );
   }
 
   const { data: team, error: teamError } = await supabaseAdmin
@@ -35,23 +40,31 @@ export async function POST(
     .single();
 
   if (teamError || !team) {
-    return NextResponse.json({ ok: false, error: "PlayRank team not found" }, { status: 404 });
+    return NextResponse.json(
+      { ok: false, error: "PlayRank team not found" },
+      { status: 404 },
+    );
   }
 
-  const { error: aliasError } = await supabaseAdmin.from("bgmi_team_aliases").upsert(
-    {
-      team_id: teamId,
-      alias: sourceTeamName,
-      alias_slug: aliasSlug(sourceTeamName),
-      source: "liquipedia",
-      verified: true,
-      updated_at: new Date().toISOString(),
-    },
-    { onConflict: "alias_slug" }
-  );
+  const { error: aliasError } = await supabaseAdmin
+    .from("bgmi_team_aliases")
+    .upsert(
+      {
+        team_id: teamId,
+        alias: sourceTeamName,
+        alias_slug: aliasSlug(sourceTeamName),
+        source: "liquipedia",
+        verified: true,
+        updated_at: new Date().toISOString(),
+      },
+      { onConflict: "alias_slug" },
+    );
 
   if (aliasError) {
-    return NextResponse.json({ ok: false, error: aliasError.message }, { status: 409 });
+    return NextResponse.json(
+      { ok: false, error: aliasError.message },
+      { status: 409 },
+    );
   }
 
   const { data: affected, error: affectedError } = await supabaseAdmin
@@ -62,14 +75,17 @@ export async function POST(
     .eq("status", "unresolved");
 
   if (affectedError) {
-    return NextResponse.json({ ok: false, error: affectedError.message }, { status: 500 });
+    return NextResponse.json(
+      { ok: false, error: affectedError.message },
+      { status: 500 },
+    );
   }
 
   for (const row of affected || []) {
     const errors = Array.isArray(row.validation_errors)
       ? row.validation_errors.filter(
           (error): error is string =>
-            typeof error === "string" && !error.startsWith("Unmapped team:")
+            typeof error === "string" && !error.startsWith("Unmapped team:"),
         )
       : [];
 
@@ -84,7 +100,10 @@ export async function POST(
       .eq("id", row.id);
 
     if (error) {
-      return NextResponse.json({ ok: false, error: error.message }, { status: 500 });
+      return NextResponse.json(
+        { ok: false, error: error.message },
+        { status: 500 },
+      );
     }
   }
 
@@ -98,10 +117,11 @@ export async function POST(
       if (row.status in counts) counts[row.status as keyof typeof counts] += 1;
       return counts;
     },
-    { matched: 0, unresolved: 0, invalid: 0, imported: 0, pending: 0 }
+    { matched: 0, unresolved: 0, invalid: 0, imported: 0, pending: 0 },
   );
 
-  const status = summary.unresolved || summary.invalid ? "needs_review" : "validated";
+  const status =
+    summary.unresolved || summary.invalid ? "needs_review" : "validated";
 
   await supabaseAdmin
     .from("import_batches")
@@ -121,4 +141,3 @@ export async function POST(
     summary,
   });
 }
-

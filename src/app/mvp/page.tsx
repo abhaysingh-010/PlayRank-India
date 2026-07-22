@@ -1,1 +1,100 @@
-import Link from "next/link";import {Trophy} from "lucide-react";import {supabase} from "@/lib/supabase";export const dynamic="force-dynamic";type Ranking={id:string;entity_id:string;rank:number;score:number;change:number|null};type Player={id:string;ign:string;slug:string;role:string|null;country:string|null;total_kills:number|null;avg_damage:number|null;mvp_count:number|null};export default async function MVPPage(){const {data,error}=await supabase.from("rankings").select("id,entity_id,rank,score,change").eq("entity_type","player").order("score",{ascending:false}).limit(20);const rankings=(data||[]) as Ranking[],ids=rankings.map((row)=>row.entity_id);const playersResult=ids.length?await supabase.from("players").select("id,ign,slug,role,country,total_kills,avg_damage,mvp_count").in("id",ids):{data:[]};const players=(playersResult.data||[]) as Player[],byId=new Map(players.map((player)=>[player.id,player])),rows=rankings.map((ranking)=>({ranking,player:byId.get(ranking.entity_id)})).filter((item):item is {ranking:Ranking;player:Player}=>Boolean(item.player));return <main className="bg-[var(--pr-bg)] text-white"><section className="border-b border-white/15"><div className="pr-container grid gap-10 py-20 md:py-28 lg:grid-cols-[1fr_auto] lg:items-end"><div><p className="pr-kicker">Individual performance order</p><h1 className="mt-6 text-[clamp(4.2rem,9vw,9rem)] font-semibold uppercase leading-[.8] tracking-[-.08em]">MVP<br/><span className="text-[var(--pr-red)]">signal.</span></h1></div><Trophy size={54} className="text-[var(--pr-gold)]"/></div></section><section className="pr-container py-14">{error?<p className="py-12 text-[var(--pr-red)]">MVP rankings are unavailable.</p>:rows.map(({ranking,player},index)=><Link key={ranking.id} href={`/players/${player.slug}`} className="pr-ranking-row grid grid-cols-[54px_1fr_repeat(4,.6fr)] items-center gap-4 border-b border-white/10 py-5"><span className={`text-xl font-semibold ${index<3?"text-[var(--pr-gold)]":"text-white/40"}`}>{String(index+1).padStart(2,"0")}</span><div><p className="font-semibold">{player.ign}</p><p className="mt-1 text-[9px] uppercase tracking-[.14em] text-white/25">{player.role||"Player"} · {player.country||"India"}</p></div><Stat value={Math.round(ranking.score)} label="Score"/><Stat value={player.mvp_count||0} label="MVP"/><Stat value={player.total_kills||0} label="Kills"/><Stat value={Math.round(player.avg_damage||0)} label="Damage"/></Link>)}</section></main>;}function Stat({value,label}:{value:number;label:string}){return <div><p className="text-sm font-semibold">{value}</p><p className="mt-1 text-[8px] uppercase text-white/25">{label}</p></div>;}
+import Link from "next/link";
+import { Trophy } from "lucide-react";
+import { supabase } from "@/lib/supabase";
+export const dynamic = "force-dynamic";
+type Ranking = {
+  id: string;
+  entity_id: string;
+  rank: number;
+  score: number;
+  change: number | null;
+};
+type Player = {
+  id: string;
+  ign: string;
+  slug: string;
+  role: string | null;
+  country: string | null;
+  total_kills: number | null;
+  avg_damage: number | null;
+  mvp_count: number | null;
+};
+export default async function MVPPage() {
+  const { data, error } = await supabase
+    .from("rankings")
+    .select("id,entity_id,rank,score,change")
+    .eq("entity_type", "player")
+    .order("score", { ascending: false })
+    .limit(20);
+  const rankings = (data || []) as Ranking[],
+    ids = rankings.map((row) => row.entity_id);
+  const playersResult = ids.length
+    ? await supabase
+        .from("players")
+        .select("id,ign,slug,role,country,total_kills,avg_damage,mvp_count")
+        .in("id", ids)
+    : { data: [] };
+  const players = (playersResult.data || []) as Player[],
+    byId = new Map(players.map((player) => [player.id, player])),
+    rows = rankings
+      .map((ranking) => ({ ranking, player: byId.get(ranking.entity_id) }))
+      .filter((item): item is { ranking: Ranking; player: Player } =>
+        Boolean(item.player),
+      );
+  return (
+    <main className="bg-[var(--pr-bg)] text-white">
+      <section className="border-b border-white/15">
+        <div className="pr-container grid gap-10 py-20 md:py-28 lg:grid-cols-[1fr_auto] lg:items-end">
+          <div>
+            <p className="pr-kicker">Individual performance order</p>
+            <h1 className="mt-6 text-[clamp(4.2rem,9vw,9rem)] font-semibold uppercase leading-[.8] tracking-[-.08em]">
+              MVP
+              <br />
+              <span className="text-[var(--pr-red)]">signal.</span>
+            </h1>
+          </div>
+          <Trophy size={54} className="text-[var(--pr-gold)]" />
+        </div>
+      </section>
+      <section className="pr-container py-14">
+        {error ? (
+          <p className="py-12 text-[var(--pr-red)]">
+            MVP rankings are unavailable.
+          </p>
+        ) : (
+          rows.map(({ ranking, player }, index) => (
+            <Link
+              key={ranking.id}
+              href={`/players/${player.slug}`}
+              className="pr-ranking-row grid grid-cols-[54px_1fr_repeat(4,.6fr)] items-center gap-4 border-b border-white/10 py-5"
+            >
+              <span
+                className={`text-xl font-semibold ${index < 3 ? "text-[var(--pr-gold)]" : "text-white/40"}`}
+              >
+                {String(index + 1).padStart(2, "0")}
+              </span>
+              <div>
+                <p className="font-semibold">{player.ign}</p>
+                <p className="mt-1 text-[9px] uppercase tracking-[.14em] text-white/25">
+                  {player.role || "Player"} · {player.country || "India"}
+                </p>
+              </div>
+              <Stat value={Math.round(ranking.score)} label="Score" />
+              <Stat value={player.mvp_count || 0} label="MVP" />
+              <Stat value={player.total_kills || 0} label="Kills" />
+              <Stat value={Math.round(player.avg_damage || 0)} label="Damage" />
+            </Link>
+          ))
+        )}
+      </section>
+    </main>
+  );
+}
+function Stat({ value, label }: { value: number; label: string }) {
+  return (
+    <div>
+      <p className="text-sm font-semibold">{value}</p>
+      <p className="mt-1 text-[8px] uppercase text-white/25">{label}</p>
+    </div>
+  );
+}

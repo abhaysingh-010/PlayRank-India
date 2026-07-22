@@ -56,11 +56,19 @@ export default function AdminMatchesPage() {
               className="group min-h-72 border-b border-r border-white/10 bg-[#080a0f] p-6 transition hover:bg-white/[0.045]"
             >
               <div className="flex items-start justify-between">
-                <span className="font-mono text-xs text-[#ffd21a]">{workflow.index}</span>
-                <span className="text-white/20 transition group-hover:translate-x-1 group-hover:text-[#ffd21a]">→</span>
+                <span className="font-mono text-xs text-[#ffd21a]">
+                  {workflow.index}
+                </span>
+                <span className="text-white/20 transition group-hover:translate-x-1 group-hover:text-[#ffd21a]">
+                  →
+                </span>
               </div>
-              <h2 className="mt-16 text-2xl font-black uppercase tracking-[-0.04em]">{workflow.label}</h2>
-              <p className="mt-4 max-w-sm text-sm leading-6 text-white/40">{workflow.detail}</p>
+              <h2 className="mt-16 text-2xl font-black uppercase tracking-[-0.04em]">
+                {workflow.label}
+              </h2>
+              <p className="mt-4 max-w-sm text-sm leading-6 text-white/40">
+                {workflow.detail}
+              </p>
               <p className="mt-8 text-[10px] font-black uppercase tracking-[0.18em] text-white/30 group-hover:text-[#ffd21a]">
                 {workflow.action}
               </p>
@@ -70,16 +78,27 @@ export default function AdminMatchesPage() {
 
         <div className="mt-6 grid gap-px border border-white/10 bg-white/10 md:grid-cols-3">
           <div className="bg-[#080a0f] p-5">
-            <p className="text-[10px] font-black uppercase tracking-[0.18em] text-white/30">Source boundary</p>
+            <p className="text-[10px] font-black uppercase tracking-[0.18em] text-white/30">
+              Source boundary
+            </p>
             <p className="mt-3 font-bold">Raw → staging → core</p>
           </div>
           <div className="bg-[#080a0f] p-5">
-            <p className="text-[10px] font-black uppercase tracking-[0.18em] text-white/30">Required gate</p>
+            <p className="text-[10px] font-black uppercase tracking-[0.18em] text-white/30">
+              Required gate
+            </p>
             <p className="mt-3 font-bold">Player and team mappings</p>
           </div>
           <div className="bg-[#080a0f] p-5">
-            <p className="text-[10px] font-black uppercase tracking-[0.18em] text-white/30">Integrity check</p>
-            <Link href="/admin/data-health/pubg-blocked-promotions" className="mt-3 inline-block font-bold text-[#ffd21a] hover:text-white">Blocked promotions →</Link>
+            <p className="text-[10px] font-black uppercase tracking-[0.18em] text-white/30">
+              Integrity check
+            </p>
+            <Link
+              href="/admin/data-health/pubg-blocked-promotions"
+              className="mt-3 inline-block font-bold text-[#ffd21a] hover:text-white"
+            >
+              Blocked promotions →
+            </Link>
           </div>
         </div>
       </section>

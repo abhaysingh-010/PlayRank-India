@@ -151,15 +151,15 @@ export default async function RosterIssuesPage() {
     .limit(1000);
 
   const healthRows = ((healthRaw || []) as RosterHealthRow[]).filter(
-    isRosterIssue
+    isRosterIssue,
   );
 
   const playerIds = Array.from(
     new Set(
       healthRows
         .map((row) => row.player_id)
-        .filter((value): value is string => Boolean(value))
-    )
+        .filter((value): value is string => Boolean(value)),
+    ),
   );
 
   const { data: playersRaw, error: playersError } =
@@ -167,7 +167,7 @@ export default async function RosterIssuesPage() {
       ? await supabaseAdmin
           .from("players")
           .select(
-            "id, ign, slug, team_id, role, source, verified, active, created_at"
+            "id, ign, slug, team_id, role, source, verified, active, created_at",
           )
           .in("id", playerIds)
       : { data: [], error: null };
@@ -179,8 +179,8 @@ export default async function RosterIssuesPage() {
     new Set(
       players
         .map((player) => player.team_id)
-        .filter((value): value is string => Boolean(value))
-    )
+        .filter((value): value is string => Boolean(value)),
+    ),
   );
 
   const { data: teamsRaw, error: teamsError } =
@@ -197,7 +197,9 @@ export default async function RosterIssuesPage() {
   const error = healthError || playersError || teamsError;
 
   const issues: RosterIssue[] = healthRows.map((health) => {
-    const player = health.player_id ? playerById.get(health.player_id) || null : null;
+    const player = health.player_id
+      ? playerById.get(health.player_id) || null
+      : null;
     const team = player?.team_id ? teamById.get(player.team_id) || null : null;
 
     return {
@@ -210,15 +212,15 @@ export default async function RosterIssuesPage() {
   });
 
   const criticalCount = issues.filter(
-    (issue) => issue.priority.label === "Critical"
+    (issue) => issue.priority.label === "Critical",
   ).length;
 
   const highCount = issues.filter(
-    (issue) => issue.priority.label === "High"
+    (issue) => issue.priority.label === "High",
   ).length;
 
   const promotionUnsafeCount = issues.filter(
-    (issue) => issue.health.promotion_safe !== true
+    (issue) => issue.health.promotion_safe !== true,
   ).length;
 
   const missingPlayerCount = issues.filter((issue) => !issue.player).length;
@@ -321,10 +323,7 @@ export default async function RosterIssuesPage() {
           >
             Roster Health
           </Link>
-          <Link
-            href="/admin/rosters"
-            className="pr-button pr-button-secondary"
-          >
+          <Link href="/admin/rosters" className="pr-button pr-button-secondary">
             Rosters
           </Link>
           <Link
@@ -452,7 +451,7 @@ export default async function RosterIssuesPage() {
                       {formatDate(issue.player?.created_at || null)}
                     </td>
 
-                                        <td className="px-6 py-5 text-right">
+                    <td className="px-6 py-5 text-right">
                       <div className="flex justify-end gap-2">
                         <Link
                           href={getPlayerReviewHref(issue.player)}

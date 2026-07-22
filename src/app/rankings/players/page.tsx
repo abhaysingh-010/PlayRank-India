@@ -1,57 +1,447 @@
 import Link from "next/link";
-import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp, Minus, Radar } from "lucide-react";
+import {
+  ArrowDown,
+  ArrowLeft,
+  ArrowRight,
+  ArrowUp,
+  Minus,
+  Radar,
+} from "lucide-react";
 import { Reveal } from "@/components/home/HomeMotion";
 import { supabase } from "@/lib/supabase";
 
-type RankingRow = { id: string; entity_id: string; rank: number; score: number; change: number | null; updated_at: string | null };
-type PlayerRow = { id: string; ign: string; slug: string; country: string | null; role: string | null; avg_damage: number | null; matches_played: number | null; total_kills: number | null; mvp_count: number | null; source: string | null; verified: boolean | null };
+type RankingRow = {
+  id: string;
+  entity_id: string;
+  rank: number;
+  score: number;
+  change: number | null;
+  updated_at: string | null;
+};
+type PlayerRow = {
+  id: string;
+  ign: string;
+  slug: string;
+  country: string | null;
+  role: string | null;
+  avg_damage: number | null;
+  matches_played: number | null;
+  total_kills: number | null;
+  mvp_count: number | null;
+  source: string | null;
+  verified: boolean | null;
+};
 
-function formatDate(value?: string | null) { return value ? new Date(value).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }) : "Not available"; }
-function initials(value: string) { return value.split(" ").filter(Boolean).slice(0, 2).map((part) => part[0]).join("").toUpperCase(); }
-function PlayerMark({ player, large = false }: { player: PlayerRow; large?: boolean }) { return <div className={`flex shrink-0 items-center justify-center border border-white/15 bg-white/[0.035] font-black text-white/60 ${large ? "h-20 w-20 text-lg" : "h-12 w-12 text-xs"}`}>{initials(player.ign)}</div>; }
-function Movement({ value }: { value: number | null }) { if (!value) return <span className="inline-flex items-center gap-1 text-white/30"><Minus size={13} /> 0</span>; if (value > 0) return <span className="inline-flex items-center gap-1 text-[var(--pr-positive)]"><ArrowUp size={13} /> {value}</span>; return <span className="inline-flex items-center gap-1 text-[var(--pr-red)]"><ArrowDown size={13} /> {Math.abs(value)}</span>; }
+function formatDate(value?: string | null) {
+  return value
+    ? new Date(value).toLocaleDateString("en-IN", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+      })
+    : "Not available";
+}
+function initials(value: string) {
+  return value
+    .split(" ")
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0])
+    .join("")
+    .toUpperCase();
+}
+function PlayerMark({
+  player,
+  large = false,
+}: {
+  player: PlayerRow;
+  large?: boolean;
+}) {
+  return (
+    <div
+      className={`flex shrink-0 items-center justify-center border border-white/15 bg-white/[0.035] font-black text-white/60 ${large ? "h-20 w-20 text-lg" : "h-12 w-12 text-xs"}`}
+    >
+      {initials(player.ign)}
+    </div>
+  );
+}
+function Movement({ value }: { value: number | null }) {
+  if (!value)
+    return (
+      <span className="inline-flex items-center gap-1 text-white/30">
+        <Minus size={13} /> 0
+      </span>
+    );
+  if (value > 0)
+    return (
+      <span className="inline-flex items-center gap-1 text-[var(--pr-positive)]">
+        <ArrowUp size={13} /> {value}
+      </span>
+    );
+  return (
+    <span className="inline-flex items-center gap-1 text-[var(--pr-red)]">
+      <ArrowDown size={13} /> {Math.abs(value)}
+    </span>
+  );
+}
 
-export default async function PlayerRankingsPage({ searchParams }: { searchParams?: Promise<{ page?: string }> }) {
+export default async function PlayerRankingsPage({
+  searchParams,
+}: {
+  searchParams?: Promise<{ page?: string }>;
+}) {
   const params = searchParams ? await searchParams : {};
   const requestedPage = Number.parseInt(params.page || "1", 10);
-  const page = Number.isFinite(requestedPage) && requestedPage > 0 ? requestedPage : 1;
+  const page =
+    Number.isFinite(requestedPage) && requestedPage > 0 ? requestedPage : 1;
   const pageSize = 10;
   const offset = (page - 1) * pageSize;
-  const [rankingsResult, podiumResult, snapshotResult, countResult] = await Promise.all([
-    supabase.from("rankings").select("id,entity_id,rank,score,change,updated_at", { count: "exact" }).eq("entity_type", "player").order("rank", { ascending: true }).range(offset, offset + pageSize - 1),
-    supabase.from("rankings").select("id,entity_id,rank,score,change,updated_at").eq("entity_type", "player").order("rank", { ascending: true }).range(0, 2),
-    supabase.from("ranking_history").select("snapshot_date,created_at").eq("entity_type", "player").order("snapshot_date", { ascending: false }).limit(1).maybeSingle(),
-    supabase.from("players").select("*", { count: "exact", head: true }),
-  ]);
+  const [rankingsResult, podiumResult, snapshotResult, countResult] =
+    await Promise.all([
+      supabase
+        .from("rankings")
+        .select("id,entity_id,rank,score,change,updated_at", { count: "exact" })
+        .eq("entity_type", "player")
+        .order("rank", { ascending: true })
+        .range(offset, offset + pageSize - 1),
+      supabase
+        .from("rankings")
+        .select("id,entity_id,rank,score,change,updated_at")
+        .eq("entity_type", "player")
+        .order("rank", { ascending: true })
+        .range(0, 2),
+      supabase
+        .from("ranking_history")
+        .select("snapshot_date,created_at")
+        .eq("entity_type", "player")
+        .order("snapshot_date", { ascending: false })
+        .limit(1)
+        .maybeSingle(),
+      supabase.from("players").select("*", { count: "exact", head: true }),
+    ]);
   const rankings = (rankingsResult.data || []) as RankingRow[];
   const podiumRankings = (podiumResult.data || []) as RankingRow[];
-  const ids = [...new Set([...rankings, ...podiumRankings].map((row) => row.entity_id))];
-  const playersResult = ids.length ? await supabase.from("players").select("id,ign,slug,country,role,avg_damage,matches_played,total_kills,mvp_count,source,verified").in("id", ids) : { data: [], error: null };
+  const ids = [
+    ...new Set([...rankings, ...podiumRankings].map((row) => row.entity_id)),
+  ];
+  const playersResult = ids.length
+    ? await supabase
+        .from("players")
+        .select(
+          "id,ign,slug,country,role,avg_damage,matches_played,total_kills,mvp_count,source,verified",
+        )
+        .in("id", ids)
+    : { data: [], error: null };
   if (rankingsResult.error || playersResult.error) return <ErrorState />;
 
   const players = (playersResult.data || []) as PlayerRow[];
   const byId = new Map(players.map((player) => [player.id, player]));
-  const ranked = rankings.map((ranking) => ({ ranking, player: byId.get(ranking.entity_id) })).filter((item): item is { ranking: RankingRow; player: PlayerRow } => Boolean(item.player));
-  const podium = podiumRankings.map((ranking) => ({ ranking, player: byId.get(ranking.entity_id) })).filter((item): item is { ranking: RankingRow; player: PlayerRow } => Boolean(item.player));
-  const snapshot = rankings[0]?.updated_at || snapshotResult.data?.snapshot_date || snapshotResult.data?.created_at || null;
+  const ranked = rankings
+    .map((ranking) => ({ ranking, player: byId.get(ranking.entity_id) }))
+    .filter((item): item is { ranking: RankingRow; player: PlayerRow } =>
+      Boolean(item.player),
+    );
+  const podium = podiumRankings
+    .map((ranking) => ({ ranking, player: byId.get(ranking.entity_id) }))
+    .filter((item): item is { ranking: RankingRow; player: PlayerRow } =>
+      Boolean(item.player),
+    );
+  const snapshot =
+    rankings[0]?.updated_at ||
+    snapshotResult.data?.snapshot_date ||
+    snapshotResult.data?.created_at ||
+    null;
   const totalRankings = rankingsResult.count || 0;
   const totalPages = Math.max(1, Math.ceil(totalRankings / pageSize));
 
-  return <main className="bg-[var(--pr-bg)] text-white">
-    <section className="border-b border-white/15"><div className="pr-container py-14 md:py-20"><Link href="/rankings" className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-[.18em] text-white/35 transition hover:text-white"><ArrowLeft size={13} /> Rankings overview</Link><div className="mt-14 grid gap-10 lg:grid-cols-[1.25fr_.75fr] lg:items-end"><div><p className="pr-kicker">PlayRank performance layer</p><h1 className="mt-5 text-[clamp(4.3rem,9vw,8.5rem)] font-semibold uppercase leading-[.78] tracking-[-.08em]">Player<br /><span className="text-[var(--pr-red)]">form.</span></h1></div><div className="lg:pb-1"><p className="max-w-lg text-base leading-7 text-white/50">A directional view of individual performance across the available Indian esports match and player record.</p><div className="mt-7 flex gap-3"><Link href="/rankings/teams" className="pr-button pr-button-secondary text-[10px]">Team rankings</Link><Link href="/players" className="pr-button pr-button-primary text-[10px]">Player directory</Link></div></div></div></div></section>
+  return (
+    <main className="bg-[var(--pr-bg)] text-white">
+      <section className="border-b border-white/15">
+        <div className="pr-container py-14 md:py-20">
+          <Link
+            href="/rankings"
+            className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-[.18em] text-white/35 transition hover:text-white"
+          >
+            <ArrowLeft size={13} /> Rankings overview
+          </Link>
+          <div className="mt-14 grid gap-10 lg:grid-cols-[1.25fr_.75fr] lg:items-end">
+            <div>
+              <p className="pr-kicker">PlayRank performance layer</p>
+              <h1 className="mt-5 text-[clamp(4.3rem,9vw,8.5rem)] font-semibold uppercase leading-[.78] tracking-[-.08em]">
+                Player
+                <br />
+                <span className="text-[var(--pr-red)]">form.</span>
+              </h1>
+            </div>
+            <div className="lg:pb-1">
+              <p className="max-w-lg text-base leading-7 text-white/50">
+                A directional view of individual performance across the
+                available Indian esports match and player record.
+              </p>
+              <div className="mt-7 flex gap-3">
+                <Link
+                  href="/rankings/teams"
+                  className="pr-button pr-button-secondary text-[10px]"
+                >
+                  Team rankings
+                </Link>
+                <Link
+                  href="/players"
+                  className="pr-button pr-button-primary text-[10px]"
+                >
+                  Player directory
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
 
-    <section className="border-b border-white/15"><div className="pr-container grid grid-cols-2 md:grid-cols-4">{[[formatDate(snapshot), "Latest snapshot"], [totalRankings.toLocaleString("en-IN"), "Ranked players"], [(countResult.count || 0).toLocaleString("en-IN"), "Player database"], ["Directional", "Confidence"]].map(([value, label]) => <div key={label} className="border-r border-white/15 px-5 py-7 first:border-l md:px-7"><p className="text-lg font-semibold tracking-[-.03em] md:text-2xl">{value}</p><p className="mt-2 text-[10px] font-bold uppercase tracking-[.18em] text-white/30">{label}</p></div>)}</div></section>
+      <section className="border-b border-white/15">
+        <div className="pr-container grid grid-cols-2 md:grid-cols-4">
+          {[
+            [formatDate(snapshot), "Latest snapshot"],
+            [totalRankings.toLocaleString("en-IN"), "Ranked players"],
+            [
+              (countResult.count || 0).toLocaleString("en-IN"),
+              "Player database",
+            ],
+            ["Directional", "Confidence"],
+          ].map(([value, label]) => (
+            <div
+              key={label}
+              className="border-r border-white/15 px-5 py-7 first:border-l md:px-7"
+            >
+              <p className="text-lg font-semibold tracking-[-.03em] md:text-2xl">
+                {value}
+              </p>
+              <p className="mt-2 text-[10px] font-bold uppercase tracking-[.18em] text-white/30">
+                {label}
+              </p>
+            </div>
+          ))}
+        </div>
+      </section>
 
-    {podium.length > 0 ? <section className="pr-container py-16 md:py-24"><Reveal><div className="border-b border-white/15 pb-7"><p className="pr-kicker">Current form</p><h2 className="mt-4 text-4xl font-semibold tracking-[-.055em] md:text-6xl">The top three.</h2></div></Reveal><div className="grid md:grid-cols-3">{podium.map(({ ranking, player }, index) => <Reveal key={player.id} delay={index * .08} className="border-b border-white/15 py-8 md:border-r md:px-7 md:first:pl-0 md:last:border-r-0 md:last:pr-0"><Link href={`/players/${player.slug}`} className="group block"><div className="flex items-start justify-between"><PlayerMark player={player} large /><span className="text-7xl font-semibold tracking-[-.08em] text-[var(--pr-gold)]">{String(ranking.rank).padStart(2, "0")}</span></div><h3 className="mt-14 text-2xl font-semibold tracking-[-.04em]">{player.ign}</h3><p className="mt-2 text-[10px] font-bold uppercase tracking-[.16em] text-white/30">{player.role || "Player"} · {player.country || "India"}</p><div className="mt-6 grid grid-cols-3 border-t border-white/15 pt-4"><Metric value={Math.round(ranking.score)} label="Score" /><Metric value={player.total_kills || 0} label="Kills" /><div className="text-right"><Movement value={ranking.change} /><p className="mt-1 text-[9px] uppercase tracking-[.14em] text-white/25">Move</p></div></div></Link></Reveal>)}</div></section> : null}
+      {podium.length > 0 ? (
+        <section className="pr-container py-16 md:py-24">
+          <Reveal>
+            <div className="border-b border-white/15 pb-7">
+              <p className="pr-kicker">Current form</p>
+              <h2 className="mt-4 text-4xl font-semibold tracking-[-.055em] md:text-6xl">
+                The top three.
+              </h2>
+            </div>
+          </Reveal>
+          <div className="grid md:grid-cols-3">
+            {podium.map(({ ranking, player }, index) => (
+              <Reveal
+                key={player.id}
+                delay={index * 0.08}
+                className="border-b border-white/15 py-8 md:border-r md:px-7 md:first:pl-0 md:last:border-r-0 md:last:pr-0"
+              >
+                <Link href={`/players/${player.slug}`} className="group block">
+                  <div className="flex items-start justify-between">
+                    <PlayerMark player={player} large />
+                    <span className="text-7xl font-semibold tracking-[-.08em] text-[var(--pr-gold)]">
+                      {String(ranking.rank).padStart(2, "0")}
+                    </span>
+                  </div>
+                  <h3 className="mt-14 text-2xl font-semibold tracking-[-.04em]">
+                    {player.ign}
+                  </h3>
+                  <p className="mt-2 text-[10px] font-bold uppercase tracking-[.16em] text-white/30">
+                    {player.role || "Player"} · {player.country || "India"}
+                  </p>
+                  <div className="mt-6 grid grid-cols-3 border-t border-white/15 pt-4">
+                    <Metric value={Math.round(ranking.score)} label="Score" />
+                    <Metric value={player.total_kills || 0} label="Kills" />
+                    <div className="text-right">
+                      <Movement value={ranking.change} />
+                      <p className="mt-1 text-[9px] uppercase tracking-[.14em] text-white/25">
+                        Move
+                      </p>
+                    </div>
+                  </div>
+                </Link>
+              </Reveal>
+            ))}
+          </div>
+        </section>
+      ) : null}
 
-    <section className="border-y border-white/15 bg-[var(--pr-surface)]"><div className="pr-container py-16 md:py-20"><div className="flex flex-col gap-4 border-b border-white/15 pb-7 sm:flex-row sm:items-end sm:justify-between"><div><p className="pr-kicker">Complete table</p><h2 className="mt-4 text-4xl font-semibold tracking-[-.05em]">Player leaderboard.</h2></div><p className="text-xs uppercase tracking-[.15em] text-white/30">Score · movement · performance</p></div><div>{ranked.length ? ranked.map(({ ranking, player }) => <Link key={ranking.id} href={`/players/${player.slug}`} className="pr-ranking-row group grid grid-cols-[42px_1fr_auto] items-center gap-3 border-b border-white/10 py-5 md:grid-cols-[62px_1.4fr_repeat(4,.55fr)_24px] md:gap-5"><span className={`text-xl font-semibold ${ranking.rank <= 3 ? "text-[var(--pr-gold)]" : "text-white/45"}`}>{String(ranking.rank).padStart(2, "0")}</span><div className="flex min-w-0 items-center gap-3"><PlayerMark player={player} /><div className="min-w-0"><p className="truncate font-semibold">{player.ign}</p><p className="mt-1 text-[9px] font-bold uppercase tracking-[.15em] text-white/25">{player.role || "Player"} · {player.country || "India"}</p></div></div><div className="text-right md:text-left"><p className="font-semibold">{Math.round(ranking.score)}</p><p className="mt-1 text-[9px] uppercase tracking-[.14em] text-white/25 md:hidden">Score</p></div><RowMetric value={<Movement value={ranking.change} />} label="Movement" /><RowMetric value={player.total_kills || 0} label="Kills" /><RowMetric value={Math.round(player.avg_damage || 0)} label="Avg damage" /><RowMetric value={player.mvp_count || 0} label="MVP" /><ArrowRight size={15} className="hidden text-white/20 transition group-hover:text-[var(--pr-red)] md:block" /></Link>) : <p className="py-14 text-white/40">No player rankings are available yet.</p>}</div></div></section>
+      <section className="border-y border-white/15 bg-[var(--pr-surface)]">
+        <div className="pr-container py-16 md:py-20">
+          <div className="flex flex-col gap-4 border-b border-white/15 pb-7 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <p className="pr-kicker">Complete table</p>
+              <h2 className="mt-4 text-4xl font-semibold tracking-[-.05em]">
+                Player leaderboard.
+              </h2>
+            </div>
+            <p className="text-xs uppercase tracking-[.15em] text-white/30">
+              Score · movement · performance
+            </p>
+          </div>
+          <div>
+            {ranked.length ? (
+              ranked.map(({ ranking, player }) => (
+                <Link
+                  key={ranking.id}
+                  href={`/players/${player.slug}`}
+                  className="pr-ranking-row group grid grid-cols-[42px_1fr_auto] items-center gap-3 border-b border-white/10 py-5 md:grid-cols-[62px_1.4fr_repeat(4,.55fr)_24px] md:gap-5"
+                >
+                  <span
+                    className={`text-xl font-semibold ${ranking.rank <= 3 ? "text-[var(--pr-gold)]" : "text-white/45"}`}
+                  >
+                    {String(ranking.rank).padStart(2, "0")}
+                  </span>
+                  <div className="flex min-w-0 items-center gap-3">
+                    <PlayerMark player={player} />
+                    <div className="min-w-0">
+                      <p className="truncate font-semibold">{player.ign}</p>
+                      <p className="mt-1 text-[9px] font-bold uppercase tracking-[.15em] text-white/25">
+                        {player.role || "Player"} · {player.country || "India"}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="text-right md:text-left">
+                    <p className="font-semibold">{Math.round(ranking.score)}</p>
+                    <p className="mt-1 text-[9px] uppercase tracking-[.14em] text-white/25 md:hidden">
+                      Score
+                    </p>
+                  </div>
+                  <RowMetric
+                    value={<Movement value={ranking.change} />}
+                    label="Movement"
+                  />
+                  <RowMetric value={player.total_kills || 0} label="Kills" />
+                  <RowMetric
+                    value={Math.round(player.avg_damage || 0)}
+                    label="Avg damage"
+                  />
+                  <RowMetric value={player.mvp_count || 0} label="MVP" />
+                  <ArrowRight
+                    size={15}
+                    className="hidden text-white/20 transition group-hover:text-[var(--pr-red)] md:block"
+                  />
+                </Link>
+              ))
+            ) : (
+              <p className="py-14 text-white/40">
+                No player rankings are available yet.
+              </p>
+            )}
+          </div>
+        </div>
+      </section>
 
-    <div className="pr-container"><Pagination page={page} totalPages={totalPages} basePath="/rankings/players" /></div>
-    <section className="pr-container py-14 md:py-18"><div className="grid gap-7 border-b border-white/15 pb-12 md:grid-cols-[.7fr_1.3fr]"><div><Radar size={20} className="text-[var(--pr-red)]" /><h2 className="mt-5 text-3xl font-semibold tracking-[-.04em]">Directional by design.</h2></div><p className="max-w-3xl text-sm leading-7 text-white/45">Player rankings are independently calculated from available player, match and performance data. Sample sizes vary, so this leaderboard should be read as directional competitive intelligence—not a prediction, betting signal or outcome guarantee. Snapshot shown: {formatDate(snapshot)}.</p></div></section>
-  </main>;
+      <div className="pr-container">
+        <Pagination
+          page={page}
+          totalPages={totalPages}
+          basePath="/rankings/players"
+        />
+      </div>
+      <section className="pr-container py-14 md:py-18">
+        <div className="grid gap-7 border-b border-white/15 pb-12 md:grid-cols-[.7fr_1.3fr]">
+          <div>
+            <Radar size={20} className="text-[var(--pr-red)]" />
+            <h2 className="mt-5 text-3xl font-semibold tracking-[-.04em]">
+              Directional by design.
+            </h2>
+          </div>
+          <p className="max-w-3xl text-sm leading-7 text-white/45">
+            Player rankings are independently calculated from available player,
+            match and performance data. Sample sizes vary, so this leaderboard
+            should be read as directional competitive intelligence—not a
+            prediction, betting signal or outcome guarantee. Snapshot shown:{" "}
+            {formatDate(snapshot)}.
+          </p>
+        </div>
+      </section>
+    </main>
+  );
 }
 
-function Metric({ value, label }: { value: number; label: string }) { return <div><p className="font-semibold">{value}</p><p className="mt-1 text-[9px] uppercase tracking-[.14em] text-white/25">{label}</p></div>; }
-function RowMetric({ value, label }: { value: React.ReactNode; label: string }) { return <div className="hidden md:block"><p className="text-sm font-semibold">{value}</p><p className="mt-1 text-[9px] uppercase tracking-[.14em] text-white/25">{label}</p></div>; }
-function Pagination({ page, totalPages, basePath }: { page: number; totalPages: number; basePath: string }) { return <nav className="flex items-center justify-between border-b border-white/15 py-7" aria-label="Ranking pages"><p className="text-[10px] font-bold uppercase tracking-[.16em] text-white/30">Page {Math.min(page, totalPages)} of {totalPages}</p><div className="flex gap-2">{page > 1 ? <Link href={`${basePath}?page=${page - 1}`} scroll={false} className="pr-button pr-button-secondary text-[10px]">Previous 10</Link> : null}{page < totalPages ? <Link href={`${basePath}?page=${page + 1}`} scroll={false} className="pr-button pr-button-primary text-[10px]">Next 10 <ArrowRight size={13} /></Link> : null}</div></nav>; }
-function ErrorState() { return <main className="pr-container py-20"><section className="border border-[var(--pr-red)]/30 bg-[var(--pr-red)]/5 p-8"><p className="pr-kicker">Data unavailable</p><h1 className="mt-4 text-4xl font-semibold">Player rankings could not be loaded.</h1><p className="mt-3 text-white/45">Check Supabase permissions and the latest ranking snapshot.</p></section></main>; }
+function Metric({ value, label }: { value: number; label: string }) {
+  return (
+    <div>
+      <p className="font-semibold">{value}</p>
+      <p className="mt-1 text-[9px] uppercase tracking-[.14em] text-white/25">
+        {label}
+      </p>
+    </div>
+  );
+}
+function RowMetric({
+  value,
+  label,
+}: {
+  value: React.ReactNode;
+  label: string;
+}) {
+  return (
+    <div className="hidden md:block">
+      <p className="text-sm font-semibold">{value}</p>
+      <p className="mt-1 text-[9px] uppercase tracking-[.14em] text-white/25">
+        {label}
+      </p>
+    </div>
+  );
+}
+function Pagination({
+  page,
+  totalPages,
+  basePath,
+}: {
+  page: number;
+  totalPages: number;
+  basePath: string;
+}) {
+  return (
+    <nav
+      className="flex items-center justify-between border-b border-white/15 py-7"
+      aria-label="Ranking pages"
+    >
+      <p className="text-[10px] font-bold uppercase tracking-[.16em] text-white/30">
+        Page {Math.min(page, totalPages)} of {totalPages}
+      </p>
+      <div className="flex gap-2">
+        {page > 1 ? (
+          <Link
+            href={`${basePath}?page=${page - 1}`}
+            scroll={false}
+            className="pr-button pr-button-secondary text-[10px]"
+          >
+            Previous 10
+          </Link>
+        ) : null}
+        {page < totalPages ? (
+          <Link
+            href={`${basePath}?page=${page + 1}`}
+            scroll={false}
+            className="pr-button pr-button-primary text-[10px]"
+          >
+            Next 10 <ArrowRight size={13} />
+          </Link>
+        ) : null}
+      </div>
+    </nav>
+  );
+}
+function ErrorState() {
+  return (
+    <main className="pr-container py-20">
+      <section className="border border-[var(--pr-red)]/30 bg-[var(--pr-red)]/5 p-8">
+        <p className="pr-kicker">Data unavailable</p>
+        <h1 className="mt-4 text-4xl font-semibold">
+          Player rankings could not be loaded.
+        </h1>
+        <p className="mt-3 text-white/45">
+          Check Supabase permissions and the latest ranking snapshot.
+        </p>
+      </section>
+    </main>
+  );
+}

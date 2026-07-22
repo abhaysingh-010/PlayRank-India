@@ -46,7 +46,7 @@ export default function BgmiBatchPromotionPanel({
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ confirmationText: confirmation }),
-      }
+      },
     );
     const payload = (await response.json()) as {
       ok?: boolean;
@@ -94,8 +94,8 @@ export default function BgmiBatchPromotionPanel({
           </h2>
           <p className="mt-3 max-w-xl text-sm leading-6 text-white/40">
             This creates tournament matches and statistics, then refreshes
-            PlayRank summaries and rankings. The operation is transactional
-            and safe to retry.
+            PlayRank summaries and rankings. The operation is transactional and
+            safe to retry.
           </p>
           <div className="mt-6 flex gap-6 text-xs uppercase tracking-[0.14em] text-white/35">
             <span>{totalRows} rows</span>
@@ -132,9 +132,7 @@ export default function BgmiBatchPromotionPanel({
               This batch must be fully validated before it can be published.
             </p>
           )}
-          {error && (
-            <p className="mt-3 text-xs text-red-300">{error}</p>
-          )}
+          {error && <p className="mt-3 text-xs text-red-300">{error}</p>}
         </div>
       </div>
     </article>

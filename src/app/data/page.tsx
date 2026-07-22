@@ -3,21 +3,138 @@ import { Database, ShieldCheck } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 export const dynamic = "force-dynamic";
 export default async function DataPage() {
-  const [teams,players,matches,tournaments,rankings,snapshot]=await Promise.all([
-    supabase.from("teams").select("*",{count:"exact",head:true}),
-    supabase.from("players").select("*",{count:"exact",head:true}),
-    supabase.from("matches").select("*",{count:"exact",head:true}),
-    supabase.from("tournaments").select("*",{count:"exact",head:true}),
-    supabase.from("rankings").select("*",{count:"exact",head:true}),
-    supabase.from("ranking_history").select("snapshot_date,created_at").order("snapshot_date",{ascending:false}).limit(1).maybeSingle(),
-  ]);
-  const counts:Array<[number,string]>=[[teams.count||0,"Teams"],[players.count||0,"Players"],[matches.count||0,"Matches"],[tournaments.count||0,"Events"],[rankings.count||0,"Ranking rows"]];
-  const latest=snapshot.data?.snapshot_date||snapshot.data?.created_at;
-  return <main className="bg-[var(--pr-bg)] text-white">
-    <section className="border-b border-white/15"><div className="pr-container grid gap-12 py-16 md:py-24 lg:grid-cols-[1.2fr_.8fr] lg:items-end"><div><p className="pr-kicker">Sources · coverage · confidence</p><h1 className="mt-5 text-[clamp(4.5rem,9vw,9rem)] font-semibold uppercase leading-[.78] tracking-[-.08em]">Know the<br/><span className="text-[var(--pr-red)]">record.</span></h1></div><p className="max-w-xl text-base leading-7 text-white/50">How PlayRank separates source records, verified identity, promoted match data and independently calculated intelligence.</p></div></section>
-    <section className="border-b border-white/15"><div className="pr-container grid grid-cols-2 md:grid-cols-5">{counts.map(([value,label])=><div key={label} className="border-r border-white/15 px-5 py-7 first:border-l"><p className="text-2xl font-semibold">{value}</p><p className="mt-2 text-[9px] uppercase tracking-[.15em] text-white/25">{label}</p></div>)}</div></section>
-    <section className="pr-container py-16 md:py-22"><p className="pr-kicker">Trust architecture</p><div className="mt-7 grid md:grid-cols-2">{[["01","Source records","Official or attributed external records are retained separately from PlayRank analysis."],["02","Identity mapping","Teams, players, aliases and rosters are normalized before data connects across pages."],["03","Controlled promotion","Imported match data remains staged until mapping and roster checks allow public use."],["04","Derived intelligence","Ranks, comparisons and form signals are labelled as PlayRank calculations, not official outcomes."]].map(([number,title,body])=><article key={number} className="border-b border-white/15 py-8 md:odd:border-r md:odd:pr-8 md:even:pl-8"><p className="text-sm text-[var(--pr-red)]">{number}</p><h2 className="mt-5 text-3xl font-semibold tracking-[-.04em]">{title}</h2><p className="mt-4 max-w-xl text-sm leading-7 text-white/45">{body}</p></article>)}</div></section>
-    <section className="border-y border-white/15 bg-[var(--pr-surface)]"><div className="pr-container grid gap-10 py-14 md:grid-cols-[.8fr_1.2fr]"><div><Database size={20} className="text-[var(--pr-red)]"/><h2 className="mt-5 text-3xl font-semibold">Current snapshot.</h2></div><div><p className="text-4xl font-semibold tracking-[-.05em]">{latest?new Date(latest).toLocaleDateString("en-IN",{day:"2-digit",month:"short",year:"numeric"}):"Not available"}</p><p className="mt-4 text-sm leading-7 text-white/40">Public ranking pages reflect the latest available snapshot. Coverage may differ between entities as records are verified and promoted.</p></div></div></section>
-    <section className="pr-container grid gap-8 py-14 md:grid-cols-[auto_1fr_auto]"><ShieldCheck size={20} className="text-[var(--pr-red)]"/><p className="max-w-4xl text-sm leading-7 text-white/40">PlayRank is independent and is not affiliated with Krafton, PUBG, BGMI, or tournament organisers.</p><Link href="/methodology" className="pr-button pr-button-secondary text-[10px]">Methodology</Link></section>
-  </main>;
+  const [teams, players, matches, tournaments, rankings, snapshot] =
+    await Promise.all([
+      supabase.from("teams").select("*", { count: "exact", head: true }),
+      supabase.from("players").select("*", { count: "exact", head: true }),
+      supabase.from("matches").select("*", { count: "exact", head: true }),
+      supabase.from("tournaments").select("*", { count: "exact", head: true }),
+      supabase.from("rankings").select("*", { count: "exact", head: true }),
+      supabase
+        .from("ranking_history")
+        .select("snapshot_date,created_at")
+        .order("snapshot_date", { ascending: false })
+        .limit(1)
+        .maybeSingle(),
+    ]);
+  const counts: Array<[number, string]> = [
+    [teams.count || 0, "Teams"],
+    [players.count || 0, "Players"],
+    [matches.count || 0, "Matches"],
+    [tournaments.count || 0, "Events"],
+    [rankings.count || 0, "Ranking rows"],
+  ];
+  const latest = snapshot.data?.snapshot_date || snapshot.data?.created_at;
+  return (
+    <main className="bg-[var(--pr-bg)] text-white">
+      <section className="border-b border-white/15">
+        <div className="pr-container grid gap-12 py-16 md:py-24 lg:grid-cols-[1.2fr_.8fr] lg:items-end">
+          <div>
+            <p className="pr-kicker">Sources · coverage · confidence</p>
+            <h1 className="mt-5 text-[clamp(4.5rem,9vw,9rem)] font-semibold uppercase leading-[.78] tracking-[-.08em]">
+              Know the
+              <br />
+              <span className="text-[var(--pr-red)]">record.</span>
+            </h1>
+          </div>
+          <p className="max-w-xl text-base leading-7 text-white/50">
+            How PlayRank separates source records, verified identity, promoted
+            match data and independently calculated intelligence.
+          </p>
+        </div>
+      </section>
+      <section className="border-b border-white/15">
+        <div className="pr-container grid grid-cols-2 md:grid-cols-5">
+          {counts.map(([value, label]) => (
+            <div
+              key={label}
+              className="border-r border-white/15 px-5 py-7 first:border-l"
+            >
+              <p className="text-2xl font-semibold">{value}</p>
+              <p className="mt-2 text-[9px] uppercase tracking-[.15em] text-white/25">
+                {label}
+              </p>
+            </div>
+          ))}
+        </div>
+      </section>
+      <section className="pr-container py-16 md:py-22">
+        <p className="pr-kicker">Trust architecture</p>
+        <div className="mt-7 grid md:grid-cols-2">
+          {[
+            [
+              "01",
+              "Source records",
+              "Official or attributed external records are retained separately from PlayRank analysis.",
+            ],
+            [
+              "02",
+              "Identity mapping",
+              "Teams, players, aliases and rosters are normalized before data connects across pages.",
+            ],
+            [
+              "03",
+              "Controlled promotion",
+              "Imported match data remains staged until mapping and roster checks allow public use.",
+            ],
+            [
+              "04",
+              "Derived intelligence",
+              "Ranks, comparisons and form signals are labelled as PlayRank calculations, not official outcomes.",
+            ],
+          ].map(([number, title, body]) => (
+            <article
+              key={number}
+              className="border-b border-white/15 py-8 md:odd:border-r md:odd:pr-8 md:even:pl-8"
+            >
+              <p className="text-sm text-[var(--pr-red)]">{number}</p>
+              <h2 className="mt-5 text-3xl font-semibold tracking-[-.04em]">
+                {title}
+              </h2>
+              <p className="mt-4 max-w-xl text-sm leading-7 text-white/45">
+                {body}
+              </p>
+            </article>
+          ))}
+        </div>
+      </section>
+      <section className="border-y border-white/15 bg-[var(--pr-surface)]">
+        <div className="pr-container grid gap-10 py-14 md:grid-cols-[.8fr_1.2fr]">
+          <div>
+            <Database size={20} className="text-[var(--pr-red)]" />
+            <h2 className="mt-5 text-3xl font-semibold">Current snapshot.</h2>
+          </div>
+          <div>
+            <p className="text-4xl font-semibold tracking-[-.05em]">
+              {latest
+                ? new Date(latest).toLocaleDateString("en-IN", {
+                    day: "2-digit",
+                    month: "short",
+                    year: "numeric",
+                  })
+                : "Not available"}
+            </p>
+            <p className="mt-4 text-sm leading-7 text-white/40">
+              Public ranking pages reflect the latest available snapshot.
+              Coverage may differ between entities as records are verified and
+              promoted.
+            </p>
+          </div>
+        </div>
+      </section>
+      <section className="pr-container grid gap-8 py-14 md:grid-cols-[auto_1fr_auto]">
+        <ShieldCheck size={20} className="text-[var(--pr-red)]" />
+        <p className="max-w-4xl text-sm leading-7 text-white/40">
+          PlayRank is independent and is not affiliated with Krafton, PUBG,
+          BGMI, or tournament organisers.
+        </p>
+        <Link
+          href="/methodology"
+          className="pr-button pr-button-secondary text-[10px]"
+        >
+          Methodology
+        </Link>
+      </section>
+    </main>
+  );
 }

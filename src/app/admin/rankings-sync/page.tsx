@@ -302,7 +302,9 @@ export default async function AdminRankingsSyncPage() {
                 </p>
                 <div className="mt-2 flex flex-wrap items-center gap-2">
                   <p className="text-lg font-black text-white">
-                    {latestJob ? formatDate(latestJob.started_at) : "No jobs yet"}
+                    {latestJob
+                      ? formatDate(latestJob.started_at)
+                      : "No jobs yet"}
                   </p>
                   {latestJob && <JobStatusBadge status={latestJob.status} />}
                 </div>

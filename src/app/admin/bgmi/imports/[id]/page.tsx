@@ -22,8 +22,12 @@ function score(source: string, candidate: string) {
   if (left === right) return 100;
   if (left.includes(right) || right.includes(left)) return 85;
   const leftSet = new Set(left);
-  const overlap = [...new Set(right)].filter((char) => leftSet.has(char)).length;
-  return Math.round((overlap / Math.max(new Set(left).size, new Set(right).size)) * 65);
+  const overlap = [...new Set(right)].filter((char) =>
+    leftSet.has(char),
+  ).length;
+  return Math.round(
+    (overlap / Math.max(new Set(left).size, new Set(right).size)) * 65,
+  );
 }
 
 export default async function BgmiImportReviewPage({
@@ -80,7 +84,9 @@ export default async function BgmiImportReviewPage({
     imported: importedResult.count ?? 0,
     pending: pendingResult.count ?? 0,
   };
-  const totalRows = batch.total_records ?? Object.values(counts).reduce((sum, count) => sum + count, 0);
+  const totalRows =
+    batch.total_records ??
+    Object.values(counts).reduce((sum, count) => sum + count, 0);
 
   const grouped = new Map<string, number>();
   for (const row of unresolvedRows || []) {
@@ -102,8 +108,12 @@ export default async function BgmiImportReviewPage({
     <main className="min-h-screen bg-[#030406] text-white">
       <section className="border-b border-white/10">
         <div className="mx-auto max-w-[1500px] px-5 py-12 md:px-8">
-          <p className="text-xs font-black uppercase tracking-[0.22em] text-[#f4473b]">BGMI import review</p>
-          <h1 className="mt-4 text-4xl font-black tracking-[-0.05em] md:text-6xl">{batch.batch_name}</h1>
+          <p className="text-xs font-black uppercase tracking-[0.22em] text-[#f4473b]">
+            BGMI import review
+          </p>
+          <h1 className="mt-4 text-4xl font-black tracking-[-0.05em] md:text-6xl">
+            {batch.batch_name}
+          </h1>
           <div className="mt-8 grid grid-cols-2 gap-3 md:grid-cols-4">
             {[
               ["Rows", totalRows],
@@ -111,8 +121,13 @@ export default async function BgmiImportReviewPage({
               ["Unresolved", counts.unresolved],
               ["Invalid", counts.invalid],
             ].map(([label, value]) => (
-              <div key={String(label)} className="border border-white/10 bg-white/[0.025] p-4">
-                <p className="text-[10px] uppercase tracking-widest text-white/35">{label}</p>
+              <div
+                key={String(label)}
+                className="border border-white/10 bg-white/[0.025] p-4"
+              >
+                <p className="text-[10px] uppercase tracking-widest text-white/35">
+                  {label}
+                </p>
                 <p className="mt-2 text-3xl font-black text-white">{value}</p>
               </div>
             ))}
@@ -122,11 +137,22 @@ export default async function BgmiImportReviewPage({
 
       <section className="mx-auto max-w-[1500px] px-5 py-10 md:px-8">
         <div className="mb-6">
-          <p className="text-xs font-black uppercase tracking-[0.2em] text-[#ffd21a]">Team aliases</p>
-          <h2 className="mt-2 text-2xl font-black">Resolve uncertain source names</h2>
-          <p className="mt-2 text-sm text-white/40">Approval stores a reusable alias and revalidates every affected row in this batch.</p>
+          <p className="text-xs font-black uppercase tracking-[0.2em] text-[#ffd21a]">
+            Team aliases
+          </p>
+          <h2 className="mt-2 text-2xl font-black">
+            Resolve uncertain source names
+          </h2>
+          <p className="mt-2 text-sm text-white/40">
+            Approval stores a reusable alias and revalidates every affected row
+            in this batch.
+          </p>
         </div>
-        <BgmiTeamResolutionPanel batchId={id} groups={groups} allTeams={teamList} />
+        <BgmiTeamResolutionPanel
+          batchId={id}
+          groups={groups}
+          allTeams={teamList}
+        />
       </section>
 
       <section className="border-t border-white/10">
@@ -149,4 +175,3 @@ export default async function BgmiImportReviewPage({
     </main>
   );
 }
-

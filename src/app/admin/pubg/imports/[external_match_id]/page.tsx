@@ -14,7 +14,8 @@ type AnyRecord = Record<string, unknown>;
 function valueToText(value: unknown) {
   if (value === null || value === undefined) return "—";
   if (typeof value === "string") return value;
-  if (typeof value === "number" || typeof value === "boolean") return String(value);
+  if (typeof value === "number" || typeof value === "boolean")
+    return String(value);
   return JSON.stringify(value);
 }
 
@@ -42,20 +43,12 @@ function getPromotionReadinessHref(readiness: AnyRecord | null) {
       : "blocked";
 
   return `/api/admin/pubg/promotion-readiness?status=${encodeURIComponent(
-    status
+    status,
   )}`;
 }
-function StatusBadge({
-  status,
-}: {
-  status: "ready" | "blocked" | "unknown";
-}) {
+function StatusBadge({ status }: { status: "ready" | "blocked" | "unknown" }) {
   const label =
-    status === "ready"
-      ? "Ready"
-      : status === "blocked"
-        ? "Blocked"
-        : "Unknown";
+    status === "ready" ? "Ready" : status === "blocked" ? "Blocked" : "Unknown";
 
   const className =
     status === "ready"
@@ -65,7 +58,9 @@ function StatusBadge({
         : "border-zinc-700 bg-zinc-900 text-zinc-300";
 
   return (
-    <span className={`inline-flex border px-3 py-1 text-xs font-semibold ${className}`}>
+    <span
+      className={`inline-flex border px-3 py-1 text-xs font-semibold ${className}`}
+    >
       {label}
     </span>
   );
@@ -82,7 +77,9 @@ function InfoCard({
 }) {
   return (
     <div className="border border-white/10 bg-[#080a0f] p-5">
-      <p className="text-xs uppercase tracking-[0.2em] text-white/30">{title}</p>
+      <p className="text-xs uppercase tracking-[0.2em] text-white/30">
+        {title}
+      </p>
       <p className="mt-3 text-2xl font-bold text-white">{value}</p>
       {helper ? <p className="mt-2 text-sm text-white/35">{helper}</p> : null}
     </div>
@@ -164,7 +161,7 @@ export default async function PubgImportDetailPage({ params }: PageProps) {
       dry_run: true,
     },
     null,
-    2
+    2,
   );
 
   const confirmedPromotionRequestBody = JSON.stringify(
@@ -175,13 +172,17 @@ export default async function PubgImportDetailPage({ params }: PageProps) {
       confirmation_text: PROMOTION_CONFIRMATION_TEXT,
     },
     null,
-    2
+    2,
   );
 
   const errors = [
     matchResult.error ? `Match: ${matchResult.error.message}` : null,
-    participantsResult.error ? `Participants: ${participantsResult.error.message}` : null,
-    readinessResult.error ? `Readiness: ${readinessResult.error.message}` : null,
+    participantsResult.error
+      ? `Participants: ${participantsResult.error.message}`
+      : null,
+    readinessResult.error
+      ? `Readiness: ${readinessResult.error.message}`
+      : null,
   ].filter(Boolean);
 
   return (
@@ -195,10 +196,16 @@ export default async function PubgImportDetailPage({ params }: PageProps) {
             {PROMOTION_WRITE_STATUS}
           </p>
           <div className="mt-3 flex flex-wrap gap-3">
-            <Link href="/admin/pubg/promotions" className="text-sm font-bold text-yellow-300 hover:text-yellow-200">
+            <Link
+              href="/admin/pubg/promotions"
+              className="text-sm font-bold text-yellow-300 hover:text-yellow-200"
+            >
               Promotion Audit -&gt;
             </Link>
-            <Link href="/admin/pubg/imports" className="text-sm font-bold text-zinc-300 hover:text-white">
+            <Link
+              href="/admin/pubg/imports"
+              className="text-sm font-bold text-zinc-300 hover:text-white"
+            >
               Import Review -&gt;
             </Link>
           </div>
@@ -215,7 +222,8 @@ export default async function PubgImportDetailPage({ params }: PageProps) {
                 Step 1: Run dry-run readiness check
               </p>
               <p className="mt-2 text-sm leading-6 text-zinc-300">
-                Dry-run validates readiness and returns would_promote without writing to PlayRank core tables.
+                Dry-run validates readiness and returns would_promote without
+                writing to PlayRank core tables.
               </p>
               <pre className="mt-3 overflow-auto border border-black/30 bg-black/30 p-3 text-xs leading-5 text-zinc-300">
                 {dryRunRequestBody}
@@ -227,7 +235,10 @@ export default async function PubgImportDetailPage({ params }: PageProps) {
                 Step 2: Confirm promotion intent
               </p>
               <p className="mt-2 text-sm leading-6 text-zinc-300">
-                Confirmed promotion requires confirm_promotion, the exact confirmation_text, and the server flag PLAYRANK_ENABLE_PUBG_CORE_PROMOTION. Real writes execute only after the guarded server flag is enabled.
+                Confirmed promotion requires confirm_promotion, the exact
+                confirmation_text, and the server flag
+                PLAYRANK_ENABLE_PUBG_CORE_PROMOTION. Real writes execute only
+                after the guarded server flag is enabled.
               </p>
               <pre className="mt-3 overflow-auto border border-black/30 bg-black/30 p-3 text-xs leading-5 text-zinc-300">
                 {confirmedPromotionRequestBody}
@@ -236,7 +247,10 @@ export default async function PubgImportDetailPage({ params }: PageProps) {
           </div>
 
           <p className="mt-4 text-sm leading-6 text-zinc-300">
-            Required confirmation text: <span className="font-black text-yellow-300">PROMOTE_TO_PLAYRANK_CORE</span>
+            Required confirmation text:{" "}
+            <span className="font-black text-yellow-300">
+              PROMOTE_TO_PLAYRANK_CORE
+            </span>
           </p>
 
           <div className="mt-4 border border-white/10 bg-black/20 p-4">
@@ -245,7 +259,10 @@ export default async function PubgImportDetailPage({ params }: PageProps) {
             </p>
 
             <p className="mt-2 text-sm leading-6 text-zinc-300">
-              After any confirmed attempt, review Promotion Audit for failed, blocked, started, and promoted states. Failed or started rows must remain in staging until error_message, completed_at, and core_match_id are reviewed.
+              After any confirmed attempt, review Promotion Audit for failed,
+              blocked, started, and promoted states. Failed or started rows must
+              remain in staging until error_message, completed_at, and
+              core_match_id are reviewed.
             </p>
           </div>
         </div>
@@ -280,8 +297,8 @@ export default async function PubgImportDetailPage({ params }: PageProps) {
 
         <div className="mb-6 border border-yellow-500/30 bg-yellow-500/10 p-5 text-sm text-yellow-200">
           PUBG core promotion is intentionally disabled until SQL safety is
-          audited. This page is read-only and should not write to core
-          PlayRank tables.
+          audited. This page is read-only and should not write to core PlayRank
+          tables.
         </div>
 
         <div className="mb-6 flex flex-wrap gap-3 border border-white/10 bg-[#080a0f] p-5">
@@ -404,13 +421,25 @@ export default async function PubgImportDetailPage({ params }: PageProps) {
                         {getField(participant, ["kills", "kill_count"])}
                       </td>
                       <td className="px-4 py-3 text-zinc-300">
-                        {getField(participant, ["damage", "damage_dealt", "damageDealt"])}
+                        {getField(participant, [
+                          "damage",
+                          "damage_dealt",
+                          "damageDealt",
+                        ])}
                       </td>
                       <td className="px-4 py-3 text-zinc-300">
-                        {getField(participant, ["placement", "rank", "win_place"])}
+                        {getField(participant, [
+                          "placement",
+                          "rank",
+                          "win_place",
+                        ])}
                       </td>
                       <td className="px-4 py-3 font-mono text-xs text-zinc-500">
-                        {getField(participant, ["id", "participant_id", "account_id"])}
+                        {getField(participant, [
+                          "id",
+                          "participant_id",
+                          "account_id",
+                        ])}
                       </td>
                     </tr>
                   ))}

@@ -15,7 +15,10 @@ export function Reveal({
   distance?: number;
 }) {
   return (
-    <div className={`pr-reveal ${className}`} style={{ animationDelay: `${delay}s` }}>
+    <div
+      className={`pr-reveal ${className}`}
+      style={{ animationDelay: `${delay}s` }}
+    >
       {children}
     </div>
   );
@@ -29,12 +32,21 @@ const lines = [
 
 export function HeroTitle() {
   return (
-    <h1 className="pr-display max-w-[1160px]" aria-label="The data layer for Indian esports">
+    <h1
+      className="pr-display max-w-[1160px]"
+      aria-label="The data layer for Indian esports"
+    >
       {lines.map((line, lineIndex) => (
         <span key={lineIndex} className="block overflow-hidden pb-[0.08em]">
-          <span className="pr-hero-line block" style={{ animationDelay: `${0.08 + lineIndex * 0.1}s` }}>
+          <span
+            className="pr-hero-line block"
+            style={{ animationDelay: `${0.08 + lineIndex * 0.1}s` }}
+          >
             {line.map((part, partIndex) => (
-              <span key={partIndex} className={part.accent ? "text-[var(--pr-red)]" : undefined}>
+              <span
+                key={partIndex}
+                className={part.accent ? "text-[var(--pr-red)]" : undefined}
+              >
                 {part.text}
               </span>
             ))}

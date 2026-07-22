@@ -1,12 +1,102 @@
 "use client";
 import Link from "next/link";
-import {useEffect,useState} from "react";
-type Tab="players"|"teams";
-type Row={id:string;rank:number;score:number;change:number|null;player?:{ign:string;slug:string;role:string|null}|null;team?:{name:string;slug:string;short_name:string|null}|null};
-export default function LeaderboardsPage(){
-  const [tab,setTab]=useState<Tab>("players");
-  const [rows,setRows]=useState<Row[]|null>(null);
-  useEffect(()=>{const controller=new AbortController();fetch(tab==="players"?"/api/players":"/api/teams",{signal:controller.signal,cache:"no-store"}).then((response)=>response.json()).then((data)=>setRows(Array.isArray(data)?data.slice(0,20):[])).catch(()=>{if(!controller.signal.aborted)setRows([]);});return()=>controller.abort();},[tab]);
-  function changeTab(next:Tab){setTab(next);setRows(null);}
-  return <main className="bg-[var(--pr-bg)] text-white"><section className="border-b border-white/15"><div className="pr-container py-20 md:py-28"><p className="pr-kicker">Live public ranking API</p><h1 className="mt-6 text-[clamp(4.2rem,9vw,9rem)] font-semibold uppercase leading-[.8] tracking-[-.08em]">Leader<br/><span className="text-[var(--pr-red)]">boards.</span></h1></div></section><section className="pr-container py-12"><div className="flex gap-2 border-b border-white/15 pb-6"><button onClick={()=>changeTab("players")} className={`pr-button ${tab==="players"?"pr-button-primary":"pr-button-secondary"}`}>Players</button><button onClick={()=>changeTab("teams")} className={`pr-button ${tab==="teams"?"pr-button-primary":"pr-button-secondary"}`}>Teams</button></div><div>{rows===null?<p className="py-16 text-white/35">Loading leaderboard…</p>:rows.map((row)=>{const name=tab==="players"?row.player?.ign:row.team?.name,slug=tab==="players"?row.player?.slug:row.team?.slug,sub=tab==="players"?row.player?.role:row.team?.short_name;return <Link key={row.id} href={slug?`/${tab}/${slug}`:`/${tab}`} className="pr-ranking-row grid grid-cols-[54px_1fr_auto_auto] items-center gap-4 border-b border-white/10 py-5"><span className={`text-xl font-semibold ${row.rank<=3?"text-[var(--pr-gold)]":"text-white/40"}`}>{String(row.rank).padStart(2,"0")}</span><div><p className="font-semibold">{name||"Unknown"}</p><p className="mt-1 text-[9px] uppercase tracking-[.14em] text-white/25">{sub||tab.slice(0,-1)}</p></div><p className="text-sm text-white/35">{row.change?`${row.change>0?"+":""}${row.change}`:"—"}</p><p className="w-20 text-right font-semibold">{Math.round(row.score)}</p></Link>})}</div></section></main>;
+import { useEffect, useState } from "react";
+type Tab = "players" | "teams";
+type Row = {
+  id: string;
+  rank: number;
+  score: number;
+  change: number | null;
+  player?: { ign: string; slug: string; role: string | null } | null;
+  team?: { name: string; slug: string; short_name: string | null } | null;
+};
+export default function LeaderboardsPage() {
+  const [tab, setTab] = useState<Tab>("players");
+  const [rows, setRows] = useState<Row[] | null>(null);
+  useEffect(() => {
+    const controller = new AbortController();
+    fetch(tab === "players" ? "/api/players" : "/api/teams", {
+      signal: controller.signal,
+      cache: "no-store",
+    })
+      .then((response) => response.json())
+      .then((data) => setRows(Array.isArray(data) ? data.slice(0, 20) : []))
+      .catch(() => {
+        if (!controller.signal.aborted) setRows([]);
+      });
+    return () => controller.abort();
+  }, [tab]);
+  function changeTab(next: Tab) {
+    setTab(next);
+    setRows(null);
+  }
+  return (
+    <main className="bg-[var(--pr-bg)] text-white">
+      <section className="border-b border-white/15">
+        <div className="pr-container py-20 md:py-28">
+          <p className="pr-kicker">Live public ranking API</p>
+          <h1 className="mt-6 text-[clamp(4.2rem,9vw,9rem)] font-semibold uppercase leading-[.8] tracking-[-.08em]">
+            Leader
+            <br />
+            <span className="text-[var(--pr-red)]">boards.</span>
+          </h1>
+        </div>
+      </section>
+      <section className="pr-container py-12">
+        <div className="flex gap-2 border-b border-white/15 pb-6">
+          <button
+            onClick={() => changeTab("players")}
+            className={`pr-button ${tab === "players" ? "pr-button-primary" : "pr-button-secondary"}`}
+          >
+            Players
+          </button>
+          <button
+            onClick={() => changeTab("teams")}
+            className={`pr-button ${tab === "teams" ? "pr-button-primary" : "pr-button-secondary"}`}
+          >
+            Teams
+          </button>
+        </div>
+        <div>
+          {rows === null ? (
+            <p className="py-16 text-white/35">Loading leaderboard…</p>
+          ) : (
+            rows.map((row) => {
+              const name = tab === "players" ? row.player?.ign : row.team?.name,
+                slug = tab === "players" ? row.player?.slug : row.team?.slug,
+                sub =
+                  tab === "players" ? row.player?.role : row.team?.short_name;
+              return (
+                <Link
+                  key={row.id}
+                  href={slug ? `/${tab}/${slug}` : `/${tab}`}
+                  className="pr-ranking-row grid grid-cols-[54px_1fr_auto_auto] items-center gap-4 border-b border-white/10 py-5"
+                >
+                  <span
+                    className={`text-xl font-semibold ${row.rank <= 3 ? "text-[var(--pr-gold)]" : "text-white/40"}`}
+                  >
+                    {String(row.rank).padStart(2, "0")}
+                  </span>
+                  <div>
+                    <p className="font-semibold">{name || "Unknown"}</p>
+                    <p className="mt-1 text-[9px] uppercase tracking-[.14em] text-white/25">
+                      {sub || tab.slice(0, -1)}
+                    </p>
+                  </div>
+                  <p className="text-sm text-white/35">
+                    {row.change
+                      ? `${row.change > 0 ? "+" : ""}${row.change}`
+                      : "—"}
+                  </p>
+                  <p className="w-20 text-right font-semibold">
+                    {Math.round(row.score)}
+                  </p>
+                </Link>
+              );
+            })
+          )}
+        </div>
+      </section>
+    </main>
+  );
 }

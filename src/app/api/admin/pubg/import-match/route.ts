@@ -38,7 +38,7 @@ function methodNotAllowed() {
       error: "Method not allowed",
       allowed_methods: ["POST"],
     },
-    405
+    405,
   );
 }
 
@@ -166,7 +166,7 @@ async function importPubgMatch(input: ImportInput) {
         ok: false,
         error: "PUBG API is not configured",
       },
-      500
+      500,
     );
   }
 
@@ -196,7 +196,7 @@ async function importPubgMatch(input: ImportInput) {
         ok: false,
         error: "Failed to create API import job",
       },
-      500
+      500,
     );
   }
 
@@ -233,7 +233,7 @@ async function importPubgMatch(input: ImportInput) {
           error: "PUBG API request failed",
           http_status: response.status,
         },
-        502
+        502,
       );
     }
 
@@ -254,7 +254,7 @@ async function importPubgMatch(input: ImportInput) {
         },
         {
           onConflict: "source,source_type,external_id",
-        }
+        },
       )
       .select("id")
       .single();
@@ -277,7 +277,7 @@ async function importPubgMatch(input: ImportInput) {
           job_id: job.id,
           error: "Failed to store raw import",
         },
-        500
+        500,
       );
     }
 
@@ -285,7 +285,7 @@ async function importPubgMatch(input: ImportInput) {
       "normalize_pubg_api_match",
       {
         raw_external_id: rawExternalId,
-      }
+      },
     );
 
     if (normalizeError) {
@@ -309,7 +309,7 @@ async function importPubgMatch(input: ImportInput) {
           raw_import_id: rawImport.id,
           error: "Raw import succeeded, but normalization failed",
         },
-        500
+        500,
       );
     }
 
@@ -341,7 +341,7 @@ async function importPubgMatch(input: ImportInput) {
           raw_import_id: rawImport.id,
           error: "Normalization succeeded, but overview fetch failed",
         },
-        500
+        500,
       );
     }
 
@@ -402,7 +402,7 @@ async function importPubgMatch(input: ImportInput) {
         job_id: job.id,
         error: "Unexpected PUBG import failure",
       },
-      500
+      500,
     );
   }
 }
@@ -412,7 +412,9 @@ export async function GET() {
 }
 
 export async function POST(request: NextRequest) {
-  const body = (await request.json().catch(() => null)) as Partial<ImportInput> | null;
+  const body = (await request
+    .json()
+    .catch(() => null)) as Partial<ImportInput> | null;
 
   return importPubgMatch({
     shard: body?.shard || "steam",

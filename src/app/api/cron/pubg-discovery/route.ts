@@ -28,9 +28,12 @@ function reply(payload: unknown, status = 200) {
 
 function hasValidCronSecret(request: NextRequest) {
   const expected = process.env.CRON_SECRET;
-  const provided = request.headers.get("authorization")?.replace(/^Bearer\s+/i, "");
+  const provided = request.headers
+    .get("authorization")
+    ?.replace(/^Bearer\s+/i, "");
 
-  if (!expected || !provided || expected.length !== provided.length) return false;
+  if (!expected || !provided || expected.length !== provided.length)
+    return false;
 
   let mismatch = 0;
   for (let index = 0; index < expected.length; index += 1) {
@@ -100,11 +103,14 @@ export async function POST(request: NextRequest) {
     .limit(20);
 
   if (error) {
-    await supabaseAdmin.from("api_import_jobs").update({
-      status: "failed",
-      completed_at: new Date().toISOString(),
-      error_message: error.message,
-    }).eq("id", job.id);
+    await supabaseAdmin
+      .from("api_import_jobs")
+      .update({
+        status: "failed",
+        completed_at: new Date().toISOString(),
+        error_message: error.message,
+      })
+      .eq("id", job.id);
 
     return reply({ ok: false, job_id: job.id, error: error.message }, 500);
   }
@@ -156,23 +162,29 @@ export async function POST(request: NextRequest) {
 
       await markWatchlistResult(account.id, null);
     } catch (accountError) {
-      const message = accountError instanceof Error ? accountError.message : "Unknown discovery error";
+      const message =
+        accountError instanceof Error
+          ? accountError.message
+          : "Unknown discovery error";
       await markWatchlistResult(account.id, message);
       failedAccounts += 1;
     }
   }
 
-  await supabaseAdmin.from("api_import_jobs").update({
-    status: "completed",
-    completed_at: new Date().toISOString(),
-    response_summary: {
-      ok: true,
-      accounts_checked: watchlist.length,
-      matches_seen: discovered,
-      failed_accounts: failedAccounts,
-    },
-    error_message: null,
-  }).eq("id", job.id);
+  await supabaseAdmin
+    .from("api_import_jobs")
+    .update({
+      status: "completed",
+      completed_at: new Date().toISOString(),
+      response_summary: {
+        ok: true,
+        accounts_checked: watchlist.length,
+        matches_seen: discovered,
+        failed_accounts: failedAccounts,
+      },
+      error_message: null,
+    })
+    .eq("id", job.id);
 
   return reply({
     ok: true,

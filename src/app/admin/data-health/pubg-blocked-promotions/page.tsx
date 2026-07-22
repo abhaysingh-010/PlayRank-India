@@ -109,7 +109,7 @@ export default async function PubgBlockedPromotionsPage() {
   const { data, error } = await supabaseAdmin
     .from("pubg_match_promotion_readiness")
     .select(
-      "external_match_id, shard, map_name, game_mode, created_at_api, total_participants, mapped_players, mapped_players_with_team, mapped_teams, mapped_player_percentage, promotion_status, promotion_allowed, roster_safe_players, roster_safe_teams, unmapped_players, unsafe_roster_players, ai_participants, human_participants"
+      "external_match_id, shard, map_name, game_mode, created_at_api, total_participants, mapped_players, mapped_players_with_team, mapped_teams, mapped_player_percentage, promotion_status, promotion_allowed, roster_safe_players, roster_safe_teams, unmapped_players, unsafe_roster_players, ai_participants, human_participants",
     )
     .or("promotion_allowed.is.false,promotion_allowed.is.null")
     .order("created_at_api", { ascending: false })
@@ -117,22 +117,24 @@ export default async function PubgBlockedPromotionsPage() {
 
   const rows = (data || []) as PromotionReadinessRow[];
 
-  const aiBlockedCount = rows.filter((row) => n(row.ai_participants) > 0).length;
+  const aiBlockedCount = rows.filter(
+    (row) => n(row.ai_participants) > 0,
+  ).length;
   const unmappedPlayerCount = rows.reduce(
     (sum, row) => sum + n(row.unmapped_players),
-    0
+    0,
   );
   const unsafeRosterCount = rows.reduce(
     (sum, row) => sum + n(row.unsafe_roster_players),
-    0
+    0,
   );
   const totalParticipants = rows.reduce(
     (sum, row) => sum + n(row.total_participants),
-    0
+    0,
   );
   const mappedPlayers = rows.reduce(
     (sum, row) => sum + n(row.mapped_players),
-    0
+    0,
   );
 
   const mappingPercentage =
@@ -227,18 +229,33 @@ export default async function PubgBlockedPromotionsPage() {
               <p className="text-xs uppercase tracking-[0.2em] text-white/35">
                 Mapping Coverage
               </p>
-              <p className="mt-2 text-3xl font-black">
-                {mappingPercentage}%
-              </p>
+              <p className="mt-2 text-3xl font-black">{mappingPercentage}%</p>
             </div>
           </div>
         </div>
 
         <div className="mt-7 flex flex-wrap gap-3">
-          <Link href="/admin/data-health" className="pr-button pr-button-secondary">Back to Data Health</Link>
-          <Link href="/admin/pubg/mappings" className="pr-button pr-button-primary">Fix Player Mappings</Link>
-          <Link href="/admin/pubg/imports" className="pr-button pr-button-secondary">PUBG Imports</Link>
-          <Link href="/admin/pubg" className="pr-button pr-button-secondary">PUBG Admin</Link>
+          <Link
+            href="/admin/data-health"
+            className="pr-button pr-button-secondary"
+          >
+            Back to Data Health
+          </Link>
+          <Link
+            href="/admin/pubg/mappings"
+            className="pr-button pr-button-primary"
+          >
+            Fix Player Mappings
+          </Link>
+          <Link
+            href="/admin/pubg/imports"
+            className="pr-button pr-button-secondary"
+          >
+            PUBG Imports
+          </Link>
+          <Link href="/admin/pubg" className="pr-button pr-button-secondary">
+            PUBG Admin
+          </Link>
         </div>
       </section>
 
@@ -350,16 +367,16 @@ export default async function PubgBlockedPromotionsPage() {
                         <div className="flex flex-col items-end gap-2">
                           <Link
                             href={`/admin/pubg/imports/${encodeURIComponent(
-                              row.external_match_id
+                              row.external_match_id,
                             )}`}
                             className="rounded-full border border-red-400/30 bg-red-400/10 px-4 py-2 text-sm text-red-300 transition hover:border-red-300 hover:text-red-200"
                           >
                             Review import
                           </Link>
 
-                                                    <Link
+                          <Link
                             href={`/admin/pubg/mappings?match=${encodeURIComponent(
-                              row.external_match_id
+                              row.external_match_id,
                             )}`}
                             className="rounded-full border border-white/10 bg-white/[0.04] px-4 py-2 text-sm text-white/60 transition hover:border-[#ffd21a]/30 hover:text-[#ffd21a]"
                           >
@@ -367,7 +384,9 @@ export default async function PubgBlockedPromotionsPage() {
                           </Link>
 
                           <Link
-                            href={getPromotionReadinessHref(row.promotion_status)}
+                            href={getPromotionReadinessHref(
+                              row.promotion_status,
+                            )}
                             className="rounded-full border border-[#ffd21a]/20 bg-[#ffd21a]/10 px-4 py-2 text-sm font-bold text-[#ffd21a] transition hover:bg-[#ffd21a]/15"
                           >
                             Readiness filter

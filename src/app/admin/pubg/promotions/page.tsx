@@ -185,7 +185,7 @@ function AuditRow({ row }: { row: PromotionAuditRow }) {
 
             <span
               className={`rounded-full border px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.12em] ${toneStyle(
-                getStatusTone(row.status)
+                getStatusTone(row.status),
               )}`}
             >
               {formatStatus(row.status)}
@@ -205,7 +205,7 @@ function AuditRow({ row }: { row: PromotionAuditRow }) {
         <div className="flex flex-wrap gap-2">
           <Link
             href={`/admin/pubg/imports/${encodeURIComponent(
-              row.external_match_id
+              row.external_match_id,
             )}`}
             className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 text-xs font-black text-white/60 transition hover:border-[#ffd21a]/30 hover:text-[#ffd21a]"
           >
@@ -214,7 +214,7 @@ function AuditRow({ row }: { row: PromotionAuditRow }) {
 
           <Link
             href={`/admin/pubg/mappings?match=${encodeURIComponent(
-              row.external_match_id
+              row.external_match_id,
             )}`}
             className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 text-xs font-black text-white/60 transition hover:border-[#ffd21a]/30 hover:text-[#ffd21a]"
           >
@@ -235,7 +235,9 @@ function AuditRow({ row }: { row: PromotionAuditRow }) {
         </p>
       ) : null}
 
-      <div className={`mt-4 rounded-2xl border p-3 ${toneStyle(operatorAction.tone)}`}>
+      <div
+        className={`mt-4 rounded-2xl border p-3 ${toneStyle(operatorAction.tone)}`}
+      >
         <p className="text-xs font-black uppercase tracking-[0.16em]">
           {operatorAction.title}
         </p>
@@ -256,7 +258,7 @@ export default async function PubgPromotionAuditPage() {
   const { data, error } = await supabaseAdmin
     .from("pubg_core_promotions")
     .select(
-      "id, external_match_id, core_match_id, status, result, error_message, created_at, completed_at"
+      "id, external_match_id, core_match_id, status, result, error_message, created_at, completed_at",
     )
     .order("created_at", { ascending: false })
     .limit(50);
@@ -278,7 +280,9 @@ export default async function PubgPromotionAuditPage() {
             <DataSourceBadge label="Core Write Guard" size="md" />
           </div>
 
-          <p className="mt-7 text-xs font-black uppercase tracking-[0.24em] text-[#f4473b]">Core-write history / operator accountability</p>
+          <p className="mt-7 text-xs font-black uppercase tracking-[0.24em] text-[#f4473b]">
+            Core-write history / operator accountability
+          </p>
           <h1 className="mt-4 text-5xl font-black uppercase leading-[0.9] tracking-[-0.07em] text-white md:text-7xl">
             PUBG Promotion
             <br />
@@ -296,7 +300,10 @@ export default async function PubgPromotionAuditPage() {
             </p>
 
             <p className="mt-2 text-sm leading-6 text-white/65">
-              SQL promotion function exists, and the admin API route calls it only after readiness, exact confirmation, and the server-side feature flag pass. Dry-run and locked responses still do not write.
+              SQL promotion function exists, and the admin API route calls it
+              only after readiness, exact confirmation, and the server-side
+              feature flag pass. Dry-run and locked responses still do not
+              write.
             </p>
           </div>
 
@@ -307,16 +314,20 @@ export default async function PubgPromotionAuditPage() {
 
             <div className="mt-3 grid gap-3 text-sm leading-6 text-white/60 md:grid-cols-2">
               <p>
-                Failed: inspect error_message and result payload, repair the root cause, then rerun dry-run before retry.
+                Failed: inspect error_message and result payload, repair the
+                root cause, then rerun dry-run before retry.
               </p>
               <p>
-                Blocked: readiness guard stopped the promotion; fix mapping, roster, AI, or team safety blockers first.
+                Blocked: readiness guard stopped the promotion; fix mapping,
+                roster, AI, or team safety blockers first.
               </p>
               <p>
-                Started: if completed_at is missing, treat the attempt as unsafe until database state is verified.
+                Started: if completed_at is missing, treat the attempt as unsafe
+                until database state is verified.
               </p>
               <p>
-                Promoted: verify core_match_id, inserted stats, team results, and downstream ranking effects.
+                Promoted: verify core_match_id, inserted stats, team results,
+                and downstream ranking effects.
               </p>
             </div>
           </div>

@@ -25,12 +25,12 @@ function json(payload: unknown, status = 200) {
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   const { id } = await params;
-  const body = (await request.json().catch(() => null)) as
-    | { confirmationText?: unknown }
-    | null;
+  const body = (await request.json().catch(() => null)) as {
+    confirmationText?: unknown;
+  } | null;
 
   if (!/^[0-9a-f-]{36}$/i.test(id)) {
     return json({ ok: false, error: "Invalid batch ID" }, 400);
@@ -43,7 +43,7 @@ export async function POST(
         error: "Enter the exact confirmation text before promotion.",
         requiredConfirmationText: CONFIRMATION_TEXT,
       },
-      423
+      423,
     );
   }
 
@@ -54,7 +54,7 @@ export async function POST(
         error: "BGMI batch promotion is disabled on this server.",
         featureFlag: FEATURE_FLAG,
       },
-      423
+      423,
     );
   }
 
@@ -71,8 +71,11 @@ export async function POST(
   }
   if (batch.status !== "validated" && batch.status !== "imported") {
     return json(
-      { ok: false, error: "Resolve every invalid or unresolved row before promotion." },
-      409
+      {
+        ok: false,
+        error: "Resolve every invalid or unresolved row before promotion.",
+      },
+      409,
     );
   }
 
@@ -86,7 +89,7 @@ export async function POST(
   if (!result?.ok) {
     return json(
       { ok: false, error: result?.reason || "Promotion was blocked", result },
-      409
+      409,
     );
   }
 

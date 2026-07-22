@@ -17,7 +17,7 @@ export default function RecalculateRankingsButton() {
 
   async function runRecalculation() {
     const confirmed = window.confirm(
-      "Run ranking recalculation now? This will trigger calculate_player_scores and create an internal job record."
+      "Run ranking recalculation now? This will trigger calculate_player_scores and create an internal job record.",
     );
 
     if (!confirmed) return;
@@ -85,7 +85,9 @@ export default function RecalculateRankingsButton() {
               result.ok ? "text-emerald-300" : "text-red-300"
             }`}
           >
-            {result.ok ? "Ranking recalculation completed" : "Ranking recalculation failed"}
+            {result.ok
+              ? "Ranking recalculation completed"
+              : "Ranking recalculation failed"}
           </p>
 
           <div className="mt-3 grid gap-2 text-sm text-white/55">

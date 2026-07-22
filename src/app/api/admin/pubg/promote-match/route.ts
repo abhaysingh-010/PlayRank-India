@@ -34,7 +34,7 @@ type PromotionReadinessRow = {
 type PromotionRpcClient = {
   rpc: (
     functionName: string,
-    args: Record<string, string>
+    args: Record<string, string>,
   ) => Promise<{
     data: unknown;
     error: { message: string } | null;
@@ -57,7 +57,7 @@ function methodNotAllowed() {
       error: "Method not allowed",
       allowed_methods: ["POST"],
     },
-    405
+    405,
   );
 }
 
@@ -175,7 +175,7 @@ export async function POST(request: NextRequest) {
           ok: false,
           error: "Invalid JSON body",
         },
-        400
+        400,
       );
     }
 
@@ -193,7 +193,7 @@ export async function POST(request: NextRequest) {
     const { data: readiness, error: readinessError } = await supabaseAdmin
       .from("pubg_match_promotion_readiness")
       .select(
-        "external_match_id, promotion_allowed, promotion_status, total_participants, mapped_players, mapped_players_with_team, mapped_teams, mapped_player_percentage, roster_safe_players, roster_safe_teams, unmapped_players, unsafe_roster_players, ai_participants, human_participants"
+        "external_match_id, promotion_allowed, promotion_status, total_participants, mapped_players, mapped_players_with_team, mapped_teams, mapped_player_percentage, roster_safe_players, roster_safe_teams, unmapped_players, unsafe_roster_players, ai_participants, human_participants",
       )
       .eq("external_match_id", validated.externalMatchId)
       .maybeSingle();
@@ -205,7 +205,7 @@ export async function POST(request: NextRequest) {
           error: "Failed to read PUBG match readiness",
           external_match_id: validated.externalMatchId,
         },
-        500
+        500,
       );
     }
 
@@ -216,7 +216,7 @@ export async function POST(request: NextRequest) {
           error: "PUBG match readiness record not found",
           external_match_id: validated.externalMatchId,
         },
-        404
+        404,
       );
     }
 
@@ -233,7 +233,7 @@ export async function POST(request: NextRequest) {
           reason: readinessRow.promotion_status || "unknown",
           readiness: readinessSummary,
         },
-        409
+        409,
       );
     }
 
@@ -253,7 +253,7 @@ export async function POST(request: NextRequest) {
             "Review SQL safety audit before enabling PlayRank core promotion.",
           readiness: readinessSummary,
         },
-        200
+        200,
       );
     }
 
@@ -273,7 +273,7 @@ export async function POST(request: NextRequest) {
             "Run a dry-run check first, then confirm promotion explicitly.",
           readiness: readinessSummary,
         },
-        423
+        423,
       );
     }
 
@@ -293,7 +293,7 @@ export async function POST(request: NextRequest) {
             "Use the exact confirmation text before enabling a real promotion request.",
           readiness: readinessSummary,
         },
-        423
+        423,
       );
     }
 
@@ -313,7 +313,7 @@ export async function POST(request: NextRequest) {
             "Set PLAYRANK_ENABLE_PUBG_CORE_PROMOTION=true only after rollout approval.",
           readiness: readinessSummary,
         },
-        423
+        423,
       );
     }
 
@@ -337,7 +337,7 @@ export async function POST(request: NextRequest) {
           details: promotionError.message,
           readiness: readinessSummary,
         },
-        500
+        500,
       );
     }
 
@@ -362,7 +362,7 @@ export async function POST(request: NextRequest) {
           : "Promotion RPC executed but did not return promoted status. Review the promotion audit log.",
         readiness: readinessSummary,
       },
-      promoted ? 200 : blocked ? 409 : failed ? 500 : 202
+      promoted ? 200 : blocked ? 409 : failed ? 500 : 202,
     );
   } catch {
     return jsonResponse(
@@ -370,7 +370,7 @@ export async function POST(request: NextRequest) {
         ok: false,
         error: "Unexpected promotion safety check failure",
       },
-      500
+      500,
     );
   }
 }

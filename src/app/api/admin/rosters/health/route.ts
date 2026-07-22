@@ -59,7 +59,7 @@ function methodNotAllowed() {
       error: "Method not allowed",
       allowed_methods: ["GET"],
     },
-    405
+    405,
   );
 }
 
@@ -105,7 +105,7 @@ function parseStatus(value: string | null) {
 function buildSummary(rows: RosterHealthRow[]) {
   const healthy = rows.filter((row) => row.health_status === "healthy").length;
   const promotionSafe = rows.filter(
-    (row) => row.promotion_safe === true
+    (row) => row.promotion_safe === true,
   ).length;
   const issues = rows.filter((row) => row.health_status !== "healthy").length;
 
@@ -116,19 +116,19 @@ function buildSummary(rows: RosterHealthRow[]) {
     blocked: rows.length - promotionSafe,
     issues,
     no_team_no_active_roster: rows.filter(
-      (row) => row.health_status === "no_team_no_active_roster"
+      (row) => row.health_status === "no_team_no_active_roster",
     ).length,
     player_has_team_but_no_active_roster: rows.filter(
-      (row) => row.health_status === "player_has_team_but_no_active_roster"
+      (row) => row.health_status === "player_has_team_but_no_active_roster",
     ).length,
     active_roster_but_player_team_missing: rows.filter(
-      (row) => row.health_status === "active_roster_but_player_team_missing"
+      (row) => row.health_status === "active_roster_but_player_team_missing",
     ).length,
     player_team_roster_mismatch: rows.filter(
-      (row) => row.health_status === "player_team_roster_mismatch"
+      (row) => row.health_status === "player_team_roster_mismatch",
     ).length,
     multiple_active_rosters: rows.filter(
-      (row) => row.health_status === "multiple_active_rosters"
+      (row) => row.health_status === "multiple_active_rosters",
     ).length,
   };
 }
@@ -148,7 +148,7 @@ export async function GET(request: NextRequest) {
   let query = supabaseAdmin
     .from("player_roster_health")
     .select(
-      "player_id, ign, slug, player_team_id, player_team_name, active_roster_count, active_roster_team_id, active_roster_team_name, health_status, promotion_safe"
+      "player_id, ign, slug, player_team_id, player_team_name, active_roster_count, active_roster_team_id, active_roster_team_name, health_status, promotion_safe",
     )
     .order("promotion_safe", { ascending: true })
     .order("health_status", { ascending: true })
@@ -189,7 +189,7 @@ export async function GET(request: NextRequest) {
         ok: false,
         error: "Failed to fetch roster health",
       },
-      500
+      500,
     );
   }
 

@@ -1,1 +1,81 @@
-import Link from "next/link";export default function AboutPage(){return <main className="bg-[var(--pr-bg)] text-white"><section className="border-b border-white/15"><div className="pr-container py-20 md:py-28"><p className="pr-kicker">About PlayRank</p><h1 className="mt-6 max-w-6xl text-[clamp(4.2rem,9vw,9rem)] font-semibold uppercase leading-[.8] tracking-[-.08em]">One ecosystem.<br/><span className="text-[var(--pr-red)]">Clearer competition.</span></h1></div></section><section className="pr-container grid gap-12 py-16 lg:grid-cols-[.8fr_1.2fr]"><h2 className="text-4xl font-semibold tracking-[-.05em]">Indian esports deserves a dependable competitive record.</h2><div className="space-y-6 text-base leading-8 text-white/48"><p>PlayRank connects rankings, teams, players, matches, tournaments and historical movement so competitive performance is easier to understand.</p><p>The platform is independent. It structures attributed public records and produces clearly labelled analytics from the data available.</p><p>Our aim is simple: make it easier for fans, teams, players and organisers to read the game beyond isolated results.</p></div></section><section className="border-y border-white/15 bg-[var(--pr-surface)]"><div className="pr-container grid md:grid-cols-3">{[["01","Traceable","Source and snapshot context accompanies the intelligence."],["02","Connected","Every entity links back to the wider competitive ecosystem."],["03","Independent","Analysis remains separate from official tournament decisions."]].map(([n,title,body])=><article key={n} className="border-b border-white/15 py-10 md:border-b-0 md:border-r md:px-8 md:first:pl-0"><p className="text-[var(--pr-red)]">{n}</p><h3 className="mt-6 text-2xl font-semibold">{title}</h3><p className="mt-3 text-sm leading-7 text-white/40">{body}</p></article>)}</div></section><section className="pr-container flex flex-wrap gap-3 py-14"><Link href="/rankings" className="pr-button pr-button-primary text-[10px]">Explore rankings</Link><Link href="/methodology" className="pr-button pr-button-secondary text-[10px]">Methodology</Link></section></main>;}
+import Link from "next/link";
+export default function AboutPage() {
+  return (
+    <main className="bg-[var(--pr-bg)] text-white">
+      <section className="border-b border-white/15">
+        <div className="pr-container py-20 md:py-28">
+          <p className="pr-kicker">About PlayRank</p>
+          <h1 className="mt-6 max-w-6xl text-[clamp(4.2rem,9vw,9rem)] font-semibold uppercase leading-[.8] tracking-[-.08em]">
+            One ecosystem.
+            <br />
+            <span className="text-[var(--pr-red)]">Clearer competition.</span>
+          </h1>
+        </div>
+      </section>
+      <section className="pr-container grid gap-12 py-16 lg:grid-cols-[.8fr_1.2fr]">
+        <h2 className="text-4xl font-semibold tracking-[-.05em]">
+          Indian esports deserves a dependable competitive record.
+        </h2>
+        <div className="space-y-6 text-base leading-8 text-white/48">
+          <p>
+            PlayRank connects rankings, teams, players, matches, tournaments and
+            historical movement so competitive performance is easier to
+            understand.
+          </p>
+          <p>
+            The platform is independent. It structures attributed public records
+            and produces clearly labelled analytics from the data available.
+          </p>
+          <p>
+            Our aim is simple: make it easier for fans, teams, players and
+            organisers to read the game beyond isolated results.
+          </p>
+        </div>
+      </section>
+      <section className="border-y border-white/15 bg-[var(--pr-surface)]">
+        <div className="pr-container grid md:grid-cols-3">
+          {[
+            [
+              "01",
+              "Traceable",
+              "Source and snapshot context accompanies the intelligence.",
+            ],
+            [
+              "02",
+              "Connected",
+              "Every entity links back to the wider competitive ecosystem.",
+            ],
+            [
+              "03",
+              "Independent",
+              "Analysis remains separate from official tournament decisions.",
+            ],
+          ].map(([n, title, body]) => (
+            <article
+              key={n}
+              className="border-b border-white/15 py-10 md:border-b-0 md:border-r md:px-8 md:first:pl-0"
+            >
+              <p className="text-[var(--pr-red)]">{n}</p>
+              <h3 className="mt-6 text-2xl font-semibold">{title}</h3>
+              <p className="mt-3 text-sm leading-7 text-white/40">{body}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+      <section className="pr-container flex flex-wrap gap-3 py-14">
+        <Link
+          href="/rankings"
+          className="pr-button pr-button-primary text-[10px]"
+        >
+          Explore rankings
+        </Link>
+        <Link
+          href="/methodology"
+          className="pr-button pr-button-secondary text-[10px]"
+        >
+          Methodology
+        </Link>
+      </section>
+    </main>
+  );
+}

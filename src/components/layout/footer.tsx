@@ -95,8 +95,8 @@ export default function Footer() {
         <div className="mt-12 border-t border-[var(--border-soft)] pt-6">
           <p className="max-w-5xl text-xs leading-6 text-[var(--text-subtle)]">
             PlayRank is an independent esports intelligence platform and is not
-            affiliated with, endorsed by, or operated by Krafton, PUBG, BGMI,
-            or tournament organisers. Official source data is attributed where
+            affiliated with, endorsed by, or operated by Krafton, PUBG, BGMI, or
+            tournament organisers. Official source data is attributed where
             available. PlayRank rankings and analytics are independently
             calculated from available competitive data.
           </p>

@@ -106,7 +106,7 @@ function getParticipantMappingKeys(participant: MatchParticipantRow) {
 
 function mappingMatchesParticipant(
   mapping: MappingRow,
-  participantKeySet: Set<string>
+  participantKeySet: Set<string>,
 ) {
   return (
     participantKeySet.has(textKey(mapping.pubg_player_account_id)) ||
@@ -117,7 +117,7 @@ function mappingMatchesParticipant(
 function buildMappingFilterHref(
   status: string,
   searchQuery: string,
-  matchQuery: string
+  matchQuery: string,
 ) {
   const params = new URLSearchParams({ status });
 
@@ -267,7 +267,7 @@ function MappingCard({
           <div className="flex flex-wrap items-center gap-2">
             <span
               className={`rounded-full border px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.12em] ${toneStyle(
-                tone
+                tone,
               )}`}
             >
               {getMappingLabel(mapping)}
@@ -384,28 +384,28 @@ export default async function PubgMappingsPage({
 
   const [mappingsResult, playersResult, teamsResult, matchParticipantsResult] =
     await Promise.all([
-    supabaseAdmin
-      .from("pubg_player_mappings")
-      .select(
-        "id, pubg_player_account_id, pubg_player_name, player_id, mapping_status, confidence_score, verified, updated_at"
-      )
-      .order("verified", { ascending: true })
-      .order("confidence_score", { ascending: false })
-      .order("pubg_player_name", { ascending: true })
-      .limit(1000),
+      supabaseAdmin
+        .from("pubg_player_mappings")
+        .select(
+          "id, pubg_player_account_id, pubg_player_name, player_id, mapping_status, confidence_score, verified, updated_at",
+        )
+        .order("verified", { ascending: true })
+        .order("confidence_score", { ascending: false })
+        .order("pubg_player_name", { ascending: true })
+        .limit(1000),
 
-    supabaseAdmin
-      .from("players")
-      .select("id, ign, slug, team_id")
-      .order("ign", { ascending: true }),
+      supabaseAdmin
+        .from("players")
+        .select("id, ign, slug, team_id")
+        .order("ign", { ascending: true }),
 
-    supabaseAdmin
-      .from("teams")
-      .select("id, name, slug")
-      .order("name", { ascending: true }),
+      supabaseAdmin
+        .from("teams")
+        .select("id, name, slug")
+        .order("name", { ascending: true }),
 
-    matchParticipantsQuery,
-  ]);
+      matchParticipantsQuery,
+    ]);
 
   const mappings = (mappingsResult.data || []) as MappingRow[];
   const players = (playersResult.data || []) as PlayerRow[];
@@ -416,7 +416,7 @@ export default async function PubgMappingsPage({
   const playerById = new Map(players.map((player) => [player.id, player]));
   const teamById = new Map(teams.map((team) => [team.id, team]));
   const matchParticipantKeySet = new Set(
-    matchParticipants.flatMap(getParticipantMappingKeys)
+    matchParticipants.flatMap(getParticipantMappingKeys),
   );
 
   const statusFilteredMappings = mappings.filter((mapping) => {
@@ -431,7 +431,7 @@ export default async function PubgMappingsPage({
   const matchFilteredMappings =
     matchQuery.length > 0
       ? statusFilteredMappings.filter((mapping) =>
-          mappingMatchesParticipant(mapping, matchParticipantKeySet)
+          mappingMatchesParticipant(mapping, matchParticipantKeySet),
         )
       : statusFilteredMappings;
 
@@ -459,7 +459,7 @@ export default async function PubgMappingsPage({
 
   const totalMappings = mappings.length;
   const verifiedMappings = mappings.filter(
-    (row) => row.verified === true
+    (row) => row.verified === true,
   ).length;
   const mappedMappings = mappings.filter((row) => row.player_id).length;
   const unmappedMappings = mappings.filter((row) => !row.player_id).length;
@@ -490,7 +490,9 @@ export default async function PubgMappingsPage({
                 <DataSourceBadge label="Promotion Gate" size="md" />
               </div>
 
-              <p className="mt-7 text-xs font-black uppercase tracking-[0.24em] text-[#f4473b]">Identity resolution / promotion prerequisite</p>
+              <p className="mt-7 text-xs font-black uppercase tracking-[0.24em] text-[#f4473b]">
+                Identity resolution / promotion prerequisite
+              </p>
               <h1 className="mt-4 text-5xl font-black uppercase leading-[0.9] tracking-[-0.07em] text-white md:text-7xl">
                 PUBG Player
                 <br />
@@ -524,7 +526,6 @@ export default async function PubgMappingsPage({
                 >
                   Data Health
                 </Link>
-
               </div>
             </div>
 
@@ -570,15 +571,9 @@ export default async function PubgMappingsPage({
 
       <section className="mx-auto grid max-w-[1500px] gap-5 px-5 py-10 md:px-8 lg:grid-cols-[0.85fr_1.15fr]">
         <section className={shell + " p-5 md:p-6"}>
-          <SectionHeader
-            eyebrow="Mapping Filters"
-            title="Search & Review"
-          />
+          <SectionHeader eyebrow="Mapping Filters" title="Search & Review" />
 
-          <form
-            action="/admin/pubg/mappings"
-            className="grid gap-3"
-          >
+          <form action="/admin/pubg/mappings" className="grid gap-3">
             <input type="hidden" name="status" value={selectedStatus} />
             {matchQuery ? (
               <input type="hidden" name="match" value={matchQuery} />
@@ -604,7 +599,7 @@ export default async function PubgMappingsPage({
               const href = buildMappingFilterHref(
                 filter.value,
                 searchQuery,
-                matchQuery
+                matchQuery,
               );
 
               return (
@@ -680,5 +675,3 @@ export default async function PubgMappingsPage({
     </main>
   );
 }
-
-

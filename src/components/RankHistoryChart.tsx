@@ -1,7 +1,6 @@
 "use client";
 
-type RankingHistoryPoint = 
-{
+type RankingHistoryPoint = {
   id?: string;
   rank: number | null;
   score?: number | null;
@@ -9,41 +8,34 @@ type RankingHistoryPoint =
   created_at?: string | null;
 };
 
-type Props = 
-{
+type Props = {
   history: RankingHistoryPoint[];
 };
 
-function n(value: unknown, fallback = 0) 
-{
+function n(value: unknown, fallback = 0) {
   const numberValue = Number(value);
   return Number.isFinite(numberValue) ? numberValue : fallback;
 }
 
-function formatDate(value: string | null | undefined) 
-{
+function formatDate(value: string | null | undefined) {
   if (!value) return "Not available";
 
-  return new Date(value).toLocaleDateString("en-IN", 
-  {
+  return new Date(value).toLocaleDateString("en-IN", {
     day: "2-digit",
     month: "short",
     year: "numeric",
   });
 }
 
-export default function RankHistoryChart({ history }: Props) 
-{
-  if (!history || history.length === 0) 
-  {
+export default function RankHistoryChart({ history }: Props) {
+  if (!history || history.length === 0) {
     return <div className="text-zinc-500">No ranking history</div>;
   }
 
   const validHistory = history.filter((item) => n(item.rank) > 0);
   const maxRank = Math.max(...validHistory.map((item) => n(item.rank)), 1);
 
-  if (validHistory.length === 0) 
-  {
+  if (validHistory.length === 0) {
     return <div className="text-zinc-500">No ranking history</div>;
   }
 

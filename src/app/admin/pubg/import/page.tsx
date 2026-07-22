@@ -59,7 +59,9 @@ export default function PubgImportPage() {
               <DataSourceBadge label="Staging Only" size="md" />
             </div>
 
-            <p className="mt-7 text-xs font-black uppercase tracking-[0.24em] text-[#f4473b]">Pipeline entry / staging only</p>
+            <p className="mt-7 text-xs font-black uppercase tracking-[0.24em] text-[#f4473b]">
+              Pipeline entry / staging only
+            </p>
             <h1 className="mt-4 text-5xl font-black uppercase leading-[0.9] tracking-[-0.07em] text-white md:text-7xl">
               Import PUBG
               <br />
@@ -93,7 +95,6 @@ export default function PubgImportPage() {
               >
                 Player Mappings
               </Link>
-
             </div>
           </div>
         </div>
@@ -112,8 +113,8 @@ export default function PubgImportPage() {
 
             <p className="mt-3 max-w-2xl text-sm leading-6 text-white/45">
               Paste the PUBG match ID and select the correct shard. The import
-              endpoint will store raw payloads, normalize staging rows and update
-              promotion readiness.
+              endpoint will store raw payloads, normalize staging rows and
+              update promotion readiness.
             </p>
           </div>
 

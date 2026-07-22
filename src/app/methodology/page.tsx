@@ -1,1 +1,71 @@
-import Link from "next/link";export default function MethodologyPage(){const steps=[["01","Collect","Ingest attributed rankings, entity records, standings and controlled match sources."],["02","Resolve","Map teams, players, aliases and roster relationships to stable PlayRank identities."],["03","Validate","Hold incomplete imports outside public tables until mapping and roster checks pass."],["04","Calculate","Create rankings, movement and comparisons from the available promoted record."],["05","Disclose","Show source, snapshot and sample limitations wherever they affect interpretation."]];return <main className="bg-[var(--pr-bg)] text-white"><section className="border-b border-white/15"><div className="pr-container py-20 md:py-28"><p className="pr-kicker">PlayRank methodology</p><h1 className="mt-6 max-w-6xl text-[clamp(4.2rem,9vw,9rem)] font-semibold uppercase leading-[.8] tracking-[-.08em]">From record<br/>to <span className="text-[var(--pr-red)]">signal.</span></h1><p className="mt-8 max-w-2xl text-base leading-7 text-white/50">A transparent pipeline for turning fragmented Indian esports data into useful competitive context.</p></div></section><section className="pr-container py-12">{steps.map(([number,title,body])=><article key={number} className="grid gap-5 border-b border-white/15 py-8 md:grid-cols-[80px_.7fr_1.3fr]"><p className="text-[var(--pr-red)]">{number}</p><h2 className="text-3xl font-semibold tracking-[-.04em]">{title}</h2><p className="max-w-2xl text-sm leading-7 text-white/45">{body}</p></article>)}</section><section className="pr-container flex flex-col gap-6 border-t border-white/15 py-12 sm:flex-row sm:items-center sm:justify-between"><p className="text-sm text-white/40">Rankings are intelligence signals, not predictions or official tournament decisions.</p><Link href="/data" className="pr-button pr-button-primary text-[10px]">Explore data trust</Link></section></main>;}
+import Link from "next/link";
+export default function MethodologyPage() {
+  const steps = [
+    [
+      "01",
+      "Collect",
+      "Ingest attributed rankings, entity records, standings and controlled match sources.",
+    ],
+    [
+      "02",
+      "Resolve",
+      "Map teams, players, aliases and roster relationships to stable PlayRank identities.",
+    ],
+    [
+      "03",
+      "Validate",
+      "Hold incomplete imports outside public tables until mapping and roster checks pass.",
+    ],
+    [
+      "04",
+      "Calculate",
+      "Create rankings, movement and comparisons from the available promoted record.",
+    ],
+    [
+      "05",
+      "Disclose",
+      "Show source, snapshot and sample limitations wherever they affect interpretation.",
+    ],
+  ];
+  return (
+    <main className="bg-[var(--pr-bg)] text-white">
+      <section className="border-b border-white/15">
+        <div className="pr-container py-20 md:py-28">
+          <p className="pr-kicker">PlayRank methodology</p>
+          <h1 className="mt-6 max-w-6xl text-[clamp(4.2rem,9vw,9rem)] font-semibold uppercase leading-[.8] tracking-[-.08em]">
+            From record
+            <br />
+            to <span className="text-[var(--pr-red)]">signal.</span>
+          </h1>
+          <p className="mt-8 max-w-2xl text-base leading-7 text-white/50">
+            A transparent pipeline for turning fragmented Indian esports data
+            into useful competitive context.
+          </p>
+        </div>
+      </section>
+      <section className="pr-container py-12">
+        {steps.map(([number, title, body]) => (
+          <article
+            key={number}
+            className="grid gap-5 border-b border-white/15 py-8 md:grid-cols-[80px_.7fr_1.3fr]"
+          >
+            <p className="text-[var(--pr-red)]">{number}</p>
+            <h2 className="text-3xl font-semibold tracking-[-.04em]">
+              {title}
+            </h2>
+            <p className="max-w-2xl text-sm leading-7 text-white/45">{body}</p>
+          </article>
+        ))}
+      </section>
+      <section className="pr-container flex flex-col gap-6 border-t border-white/15 py-12 sm:flex-row sm:items-center sm:justify-between">
+        <p className="text-sm text-white/40">
+          Rankings are intelligence signals, not predictions or official
+          tournament decisions.
+        </p>
+        <Link href="/data" className="pr-button pr-button-primary text-[10px]">
+          Explore data trust
+        </Link>
+      </section>
+    </main>
+  );
+}

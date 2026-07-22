@@ -115,7 +115,6 @@ export default function AdminTeamsPage() {
             </p>
           </div>
         </aside>
-
         <section className="border border-white/10 bg-[#080a0f]">
           <div className="flex items-center justify-between border-b border-white/10 px-5 py-4 md:px-6">
             <div>

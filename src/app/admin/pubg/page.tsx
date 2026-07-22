@@ -190,7 +190,7 @@ function ActionCard({
 
         <span
           className={`rounded-full border px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.12em] ${toneStyle(
-            tone
+            tone,
           )}`}
         >
           {value.toLocaleString("en-IN")}
@@ -259,7 +259,7 @@ function JobRow({ job }: { job: ApiImportJob }) {
 
         <span
           className={`mt-2 inline-flex rounded-full border px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.12em] ${toneStyle(
-            tone
+            tone,
           )}`}
         >
           {job.status || "unknown"}
@@ -318,7 +318,7 @@ export default async function PubgAdminHubPage() {
     supabaseAdmin
       .from("api_import_jobs")
       .select(
-        "id, provider, job_type, status, raw_import_count, normalized_match_count, error_message, started_at, completed_at"
+        "id, provider, job_type, status, raw_import_count, normalized_match_count, error_message, started_at, completed_at",
       )
       .eq("provider", "pubg_developer_api")
       .order("started_at", { ascending: false })
@@ -330,29 +330,29 @@ export default async function PubgAdminHubPage() {
   const latestJobs = (latestJobsResult.data || []) as ApiImportJob[];
 
   const rosterHealthIssues = rosterHealthRows.filter(
-    (row) => row.health_status !== "healthy"
+    (row) => row.health_status !== "healthy",
   ).length;
 
   const rosterPromotionSafe = rosterHealthRows.filter(
-    (row) => row.promotion_safe === true
+    (row) => row.promotion_safe === true,
   ).length;
 
   const readyCount = readinessRows.filter(
-    (row) => row.promotion_allowed === true
+    (row) => row.promotion_allowed === true,
   ).length;
 
   const blockedCount = readinessRows.filter(
-    (row) => row.promotion_allowed !== true
+    (row) => row.promotion_allowed !== true,
   ).length;
 
   const totalParticipantsFromReadiness = readinessRows.reduce(
     (sum, row) => sum + n(row.total_participants),
-    0
+    0,
   );
 
   const mappedPlayersFromReadiness = readinessRows.reduce(
     (sum, row) => sum + n(row.mapped_players),
-    0
+    0,
   );
 
   const latestReadiness = readinessRows[0] || null;
@@ -370,7 +370,7 @@ export default async function PubgAdminHubPage() {
   ];
 
   const tableErrors = tableErrorEntries.filter(
-    (entry): entry is [string, string] => Boolean(entry[1])
+    (entry): entry is [string, string] => Boolean(entry[1]),
   );
 
   return (
@@ -426,7 +426,6 @@ export default async function PubgAdminHubPage() {
                 >
                   Promotion Audit
                 </Link>
-
               </div>
             </div>
 
@@ -478,7 +477,7 @@ export default async function PubgAdminHubPage() {
 
                   <span
                     className={`rounded-full border px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.12em] ${toneStyle(
-                      latestReadiness.promotion_allowed ? "healthy" : "warning"
+                      latestReadiness.promotion_allowed ? "healthy" : "warning",
                     )}`}
                   >
                     {latestReadiness.promotion_allowed ? "Ready" : "Blocked"}
@@ -508,10 +507,7 @@ export default async function PubgAdminHubPage() {
         </section>
 
         <section className={shell + " p-5 md:p-6"}>
-          <SectionHeader
-            eyebrow="Workflow"
-            title="Staging-to-Core Safety"
-          />
+          <SectionHeader eyebrow="Workflow" title="Staging-to-Core Safety" />
 
           <div className="grid gap-3">
             <WorkflowStep
@@ -537,10 +533,7 @@ export default async function PubgAdminHubPage() {
 
       <section className="mx-auto grid max-w-[1500px] gap-5 px-5 pb-10 md:px-8 lg:grid-cols-[1fr_1fr]">
         <section className={shell + " p-5 md:p-6"}>
-          <SectionHeader
-            eyebrow="Control Panels"
-            title="PUBG Operations"
-          />
+          <SectionHeader eyebrow="Control Panels" title="PUBG Operations" />
 
           <div className="grid gap-3">
             <ActionCard
@@ -577,7 +570,7 @@ export default async function PubgAdminHubPage() {
               tone={rosterHealthIssues === 0 ? "healthy" : "danger"}
               href="/admin/rosters/health"
               description={`${rosterPromotionSafe.toLocaleString(
-                "en-IN"
+                "en-IN",
               )} players are currently promotion-safe.`}
             />
           </div>
@@ -618,10 +611,7 @@ export default async function PubgAdminHubPage() {
 
       <section className="border-y border-white/10 bg-[#050609]">
         <div className="mx-auto max-w-[1500px] px-5 py-10 md:px-8">
-          <SectionHeader
-            eyebrow="Recent Activity"
-            title="PUBG API Jobs"
-          />
+          <SectionHeader eyebrow="Recent Activity" title="PUBG API Jobs" />
 
           {latestJobs.length === 0 ? (
             <div className="rounded-2xl border border-white/10 bg-white/[0.025] p-5">
@@ -638,10 +628,7 @@ export default async function PubgAdminHubPage() {
       </section>
 
       <section className="mx-auto max-w-[1500px] px-5 py-10 md:px-8">
-        <SectionHeader
-          eyebrow="Errors"
-          title="PUBG Admin Access Report"
-        />
+        <SectionHeader eyebrow="Errors" title="PUBG Admin Access Report" />
 
         {tableErrors.length > 0 ? (
           <div className="space-y-3">

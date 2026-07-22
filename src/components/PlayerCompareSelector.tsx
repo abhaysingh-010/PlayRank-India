@@ -1,4 +1,70 @@
 "use client";
-import {useRouter} from "next/navigation";
-type Player={id:string;ign:string;slug:string;role?:string|null};
-export default function PlayerCompareSelector({players}:{players:Player[]}){const router=useRouter();function submit(event:React.FormEvent<HTMLFormElement>){event.preventDefault();const form=new FormData(event.currentTarget),first=String(form.get("player1")||""),second=String(form.get("player2")||"");if(!first||!second||first===second){alert("Select two different players.");return;}router.push(`/compare/players/${first}/${second}`);}return <form onSubmit={submit} className="grid gap-5 md:grid-cols-[1fr_auto_1fr] md:items-end"><Field label="Player one" name="player1" players={players}/><p className="hidden pb-4 text-[10px] font-black uppercase tracking-[.16em] text-white/25 md:block">versus</p><Field label="Player two" name="player2" players={players} second/><button type="submit" className="pr-button pr-button-primary md:col-span-3">Compare players</button></form>;}function Field({label,name,players,second=false}:{label:string;name:string;players:Player[];second?:boolean}){return <label><span className="mb-3 block text-[10px] font-black uppercase tracking-[.16em] text-white/35">{label}</span><select name={name} defaultValue={second?players[1]?.slug:players[0]?.slug} className="w-full border border-white/15 bg-[var(--pr-bg)] px-4 py-4 text-white outline-none focus:border-[var(--pr-red)]">{players.map((player)=><option key={player.id} value={player.slug}>{player.ign}{player.role?` — ${player.role}`:""}</option>)}</select></label>;}
+import { useRouter } from "next/navigation";
+type Player = { id: string; ign: string; slug: string; role?: string | null };
+export default function PlayerCompareSelector({
+  players,
+}: {
+  players: Player[];
+}) {
+  const router = useRouter();
+  function submit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const form = new FormData(event.currentTarget),
+      first = String(form.get("player1") || ""),
+      second = String(form.get("player2") || "");
+    if (!first || !second || first === second) {
+      alert("Select two different players.");
+      return;
+    }
+    router.push(`/compare/players/${first}/${second}`);
+  }
+  return (
+    <form
+      onSubmit={submit}
+      className="grid gap-5 md:grid-cols-[1fr_auto_1fr] md:items-end"
+    >
+      <Field label="Player one" name="player1" players={players} />
+      <p className="hidden pb-4 text-[10px] font-black uppercase tracking-[.16em] text-white/25 md:block">
+        versus
+      </p>
+      <Field label="Player two" name="player2" players={players} second />
+      <button
+        type="submit"
+        className="pr-button pr-button-primary md:col-span-3"
+      >
+        Compare players
+      </button>
+    </form>
+  );
+}
+function Field({
+  label,
+  name,
+  players,
+  second = false,
+}: {
+  label: string;
+  name: string;
+  players: Player[];
+  second?: boolean;
+}) {
+  return (
+    <label>
+      <span className="mb-3 block text-[10px] font-black uppercase tracking-[.16em] text-white/35">
+        {label}
+      </span>
+      <select
+        name={name}
+        defaultValue={second ? players[1]?.slug : players[0]?.slug}
+        className="w-full border border-white/15 bg-[var(--pr-bg)] px-4 py-4 text-white outline-none focus:border-[var(--pr-red)]"
+      >
+        {players.map((player) => (
+          <option key={player.id} value={player.slug}>
+            {player.ign}
+            {player.role ? ` — ${player.role}` : ""}
+          </option>
+        ))}
+      </select>
+    </label>
+  );
+}
