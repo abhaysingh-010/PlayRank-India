@@ -1,27 +1,18 @@
-import { notFound } from "next/navigation";
 import Link from "next/link";
+import { notFound } from "next/navigation";
+import { ArrowLeft, Crosshair, ShieldCheck, Trophy } from "lucide-react";
 import { supabase } from "@/lib/supabase";
-import DataSourceBadge from "@/components/DataSourceBadge";
 
-type TeamMini = 
-{
+type Team = {
   id: string;
   name: string;
   slug: string;
-  source?: string | null;
-  verified?: boolean | null;
-  active?: boolean | null;
+  source: string | null;
+  verified: boolean | null;
+  active: boolean | null;
 };
-
-type TournamentMini = 
-{
-  id: string;
-  name: string;
-  slug: string;
-};
-
-type MatchRow = 
-{
+type Tournament = { id: string; name: string; slug: string };
+type RawMatch = {
   id: string;
   tournament_id: string | null;
   team1_id: string | null;
@@ -33,52 +24,35 @@ type MatchRow =
   stage: string | null;
   date: string | null;
   source: string | null;
-  source_url: string | null;
   verified: boolean | null;
   created_at: string | null;
-  team1: TeamMini | null;
-  team2: TeamMini | null;
-  winner: TeamMini | null;
+  team1: Team | Team[] | null;
+  team2: Team | Team[] | null;
+  winner: Team | Team[] | null;
 };
-
-type MatchRowRaw = Omit<MatchRow, "team1" | "team2" | "winner"> & 
-{
-  team1: TeamMini | TeamMini[] | null;
-  team2: TeamMini | TeamMini[] | null;
-  winner: TeamMini | TeamMini[] | null;
+type Match = Omit<RawMatch, "team1" | "team2" | "winner"> & {
+  team1: Team | null;
+  team2: Team | null;
+  winner: Team | null;
 };
-
-type PlayerMini = 
-{
-  id: string;
-  ign: string;
-  slug: string;
-};
-
-type PlayerStatRow = 
-{
+type Player = { id: string; ign: string; slug: string };
+type RawPlayerStat = {
   id: string | number;
   player_id: string;
   match_id: string;
   kills: number | null;
   damage: number | null;
   placement: number | null;
-  knocks?: number | null;
-  assists?: number | null;
-  revives?: number | null;
-  survival_time?: number | null;
-  is_mvp?: boolean | null;
-  mvp?: boolean | null;
-  player: PlayerMini | null;
+  knocks: number | null;
+  assists: number | null;
+  revives: number | null;
+  survival_time: number | null;
+  is_mvp: boolean | null;
+  mvp: boolean | null;
+  player: Player | Player[] | null;
 };
-
-type PlayerStatRaw = Omit<PlayerStatRow, "player"> & 
-{
-  player: PlayerMini | PlayerMini[] | null;
-};
-
-type TeamStatRow = 
-{
+type PlayerStat = Omit<RawPlayerStat, "player"> & { player: Player | null };
+type RawTeamStat = {
   id: string | number;
   team_id: string;
   match_id: string;
@@ -87,700 +61,371 @@ type TeamStatRow =
   placement_points: number | null;
   kill_points: number | null;
   total_points: number | null;
-  survival_time?: number | null;
-  team: TeamMini | null;
+  survival_time: number | null;
+  team: Team | Team[] | null;
 };
-
-type TeamStatRaw = Omit<TeamStatRow, "team"> & 
-{
-  team: TeamMini | TeamMini[] | null;
-};
-
-const card = "rounded-[2rem] border border-white/10 bg-[#090b10] shadow-[0_24px_80px_rgba(0,0,0,0.35)]";
-
-const softCard = "rounded-2xl border border-white/10 bg-white/[0.035] shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]";
-
-function one<T>(value: T | T[] | null): T | null 
-{
-  if (Array.isArray(value)) return value[0] || null;
-  return value;
+type TeamStat = Omit<RawTeamStat, "team"> & { team: Team | null };
+function one<T>(value: T | T[] | null) {
+  return Array.isArray(value) ? value[0] || null : value;
 }
-
-function n(value: unknown, fallback = 0) 
-{
-  const numberValue = Number(value);
-  return Number.isFinite(numberValue) ? numberValue : fallback;
+function num(value: unknown) {
+  const result = Number(value);
+  return Number.isFinite(result) ? result : 0;
 }
-
-function clamp(value: number, min = 0, max = 100) 
-{
-  return Math.max(min, Math.min(max, value));
+function formatDate(value?: string | null) {
+  return value
+    ? new Date(value).toLocaleDateString("en-IN", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+      })
+    : "TBD";
 }
-
-function formatDate(value: string | null | undefined) 
-{
-  if (!value) return "Not available";
-
-  const date = new Date(value);
-
-  if (Number.isNaN(date.getTime())) {
-    return "Not available";
-  }
-
-  return date.toLocaleDateString("en-IN", 
-  {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-  });
-}
-
-function getLatestDate(values: Array<string | null | undefined>) 
-{
-  const timestamps = values
-    .filter(Boolean)
-    .map((value) => new Date(value as string).getTime())
-    .filter((value) => Number.isFinite(value));
-
-  if (timestamps.length === 0) return null;
-
-  return new Date(Math.max(...timestamps)).toISOString();
-}
-
-function formatMinutes(seconds: unknown) 
-{
-  const safeSeconds = n(seconds);
-  if (!safeSeconds) return "0m";
-  return `${Math.floor(safeSeconds / 60)}m`;
-}
-
-function getInitials(name: string) 
-{
-  return name
-  .split(" ")
-  .filter(Boolean)
-  .slice(0, 2)
-  .map((word) => word[0])
-  .join("")
-  .toUpperCase();
-}
-
-function getTeamBadgeLabel(team?: TeamMini | null) 
-{
-  if (!team) return "Team Record";
-  if (team.source === "krafton_india_esports") return "Official Krafton Team";
-  if (team.verified) return "Verified Team";
-  return "Team Record";
-}
-
-function getMatchSourceLabel(source: string | null, verified: boolean | null) 
-{
-  if (source === "pubg_developer_api") return "PUBG API Promoted";
+function sourceLabel(source: string | null, verified: boolean | null) {
+  if (source === "pubg_developer_api") return "PUBG API promoted";
   if (source === "pubg_api") return "PUBG API";
-  if (source === "krafton_india_esports") return "Official Krafton Source";
-  if (verified) return "Verified Match";
-  return "Match Record";
+  if (source === "krafton_india_esports") return "Official Krafton";
+  return verified ? "Verified match" : "Match record";
 }
 
-function getMatchConfidence
-(
-  {
-    verified,
-    playerStatsCount,
-    teamStatsCount,
-  }
-  : 
-  {
-    verified: boolean | null;
-    playerStatsCount: number;
-    teamStatsCount: number;
-  }
-) 
-{
-  const sampleSize = playerStatsCount + teamStatsCount;
-
-  if (verified && sampleSize >= 20) 
-  {
-    return {
-      label: "High Confidence",
-      description:
-        "This match has verified source status and a strong stat sample.",
-    };
-  }
-
-  if (sampleSize >= 8) 
-  {
-    return {
-      label: "Medium Confidence",
-      description:
-        "This match has usable stat coverage, but some analytics should still be read directionally.",
-    };
-  }
-
-  return {
-    label: "Low Confidence",
-    description:
-      "This match has limited stat coverage. Treat analytics as early directional signals.",
-  };
-}
-
-function Metric
-(
-  {
-    label,
-    value,
-    muted = false,
-  }
-  : 
-  {
-    label: string;
-    value: string | number;
-    muted?: boolean;
-  }
-) 
-{
-  return (
-     <div className={softCard + " p-4"}>
-      <p className="text-xs uppercase tracking-[0.2em] text-white/35">{label}</p>
-        <p className={`mt-2 text-2xl font-black ${muted ? "text-white/65" : "text-white"}`}>{value}</p>
-      </div>
-    );
-  }
-
-function TeamIdentity
-(
-  {
-    team,
-    align = "left",
-    winner = false,
-  }
-  : 
-  {
-    team: TeamMini | null;
-    align?: "left" | "right";
-    winner?: boolean;
-  }
-) 
-{
-  const teamName = team?.name || "Team N/A";
-  return (
-    <div className={`flex min-w-0 items-center gap-4 ${align === "right" ? "flex-row-reverse text-right" : ""}`}>
-      <div className={`flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl border ${winner? "border-[#ffd21a]/30 bg-[#ffd21a]/10 text-[#ffd21a]" : "border-white/10 bg-white/[0.04] text-white/65"}`}>
-        <span className="text-lg font-black">{getInitials(teamName)}</span>
-      </div>
-      <div className="min-w-0">
-        {team?.slug ? 
-          (
-            <Link href={`/teams/${team.slug}`} className="truncate text-2xl font-black text-white hover:underline">
-              {teamName}
-            </Link>
-          ) 
-          : 
-          (
-            <p className="truncate text-2xl font-black text-white">{teamName}</p>
-          )
-        }
-        <p className="mt-1 text-xs uppercase tracking-[0.2em] text-white/35">{winner ? "Winner" : "Team"}</p>
-        <div className={`mt-2 flex flex-wrap gap-2 ${align === "right" ? "justify-end" : ""}`}>
-          <DataSourceBadge source={team?.source} verified={team?.verified}label={getTeamBadgeLabel(team)}/>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function Bar
-(
-  { label, value }
-  : 
-  { label: string; value: number }
-) 
-{
-  const safeValue = clamp(value);
-
-  return (
-    <div>
-      <div className="mb-2 flex items-center justify-between text-sm">
-        <span className="text-white/50">{label}</span>
-        <span className="font-bold text-white/80">{safeValue}%</span>
-      </div>
-      <div className="h-2 overflow-hidden rounded-full bg-white/10">
-        <div className="h-full rounded-full bg-[#ffd21a]" style={{ width: `${safeValue}%` }}/>
-      </div>
-    </div>
-  );
-}
-
-export default async function MatchDetailPage
-(
-  {
-    params,
-  }
-  : 
-  {
-    params: Promise<{ id: string }>;
-  }
-)
-{
+export default async function MatchDetailPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
   const { id } = await params;
-  const { data: matchRaw, error: matchError } = await supabase
-  .from("matches")
-  .select
-  (
-    `
-      id,
-      tournament_id,
-      team1_id,
-      team2_id,
-      winner_team_id,
-      team1_score,
-      team2_score,
-      map_name,
-      stage,
-      date,
-      source,
-      source_url,
-      verified,
-      created_at,
-      team1:team1_id 
-      (
-        id,
-        name,
-        slug,
-        source,
-        verified,
-        active
-      ),
-      team2:team2_id 
-      (
-        id,
-        name,
-        slug,
-        source,
-        verified,
-        active
-      ),
-      winner:winner_team_id 
-      (
-        id,
-        name,
-        slug,
-        source,
-        verified,
-        active
-      )
-    `
-  )
-  .eq("id", id)
-  .single();
-
-  if (matchError || !matchRaw) 
-  {
-    notFound();
-  }
-  const rawMatch = matchRaw as MatchRowRaw;
-  const match: MatchRow = 
-  {
+  const { data: raw, error } = await supabase
+    .from("matches")
+    .select(
+      "id,tournament_id,team1_id,team2_id,winner_team_id,team1_score,team2_score,map_name,stage,date,source,verified,created_at,team1:team1_id(id,name,slug,source,verified,active),team2:team2_id(id,name,slug,source,verified,active),winner:winner_team_id(id,name,slug,source,verified,active)",
+    )
+    .eq("id", id)
+    .single();
+  if (error || !raw) notFound();
+  const rawMatch = raw as RawMatch;
+  const match = {
     ...rawMatch,
     team1: one(rawMatch.team1),
     team2: one(rawMatch.team2),
     winner: one(rawMatch.winner),
-  };
-  const [playerStatsResult, teamStatsResult, tournamentResult] =
-  await Promise.all
-  (
-    [
-      supabase
+  } as Match;
+  const [playerResult, teamResult, tournamentResult] = await Promise.all([
+    supabase
       .from("player_match_stats")
-      .select
-      (
-        `
-          id,
-          player_id,
-          match_id,
-          kills,
-          damage,
-          placement,
-          knocks,
-          assists,
-          revives,
-          survival_time,
-          is_mvp,
-          mvp,
-          player:player_id 
-          (
-            id,
-            ign,
-            slug
-          )
-        `
+      .select(
+        "id,player_id,match_id,kills,damage,placement,knocks,assists,revives,survival_time,is_mvp,mvp,player:player_id(id,ign,slug)",
       )
       .eq("match_id", id)
       .order("kills", { ascending: false }),
-
-      supabase
+    supabase
       .from("team_match_results")
-      .select
-      (
-        `
-          id,
-          team_id,
-          match_id,
-          placement,
-          kills,
-          placement_points,
-          kill_points,
-          total_points,
-          survival_time,
-          team:team_id 
-          (
-            id,
-            name,
-            slug,
-            source,
-            verified,
-            active
-          )
-        `
+      .select(
+        "id,team_id,match_id,placement,kills,placement_points,kill_points,total_points,survival_time,team:team_id(id,name,slug,source,verified,active)",
       )
       .eq("match_id", id)
       .order("total_points", { ascending: false }),
-
-      match.tournament_id? supabase
-      .from("tournaments")
-      .select("id,name,slug")
-      .eq("id", match.tournament_id)
-      .maybeSingle(): Promise.resolve({ data: null, error: null }),
-    ]
-  );
-
-  const playerStats = ((playerStatsResult.data || []) as PlayerStatRaw[]).map((row) => ({...row, player: one(row.player),})) as PlayerStatRow[];
-  const teamStats = ((teamStatsResult.data || []) as TeamStatRaw[]).map((row) => ({...row, team: one(row.team),})) as TeamStatRow[];
-  const tournament = tournamentResult.data as TournamentMini | null;
-  const team1Score = n(match.team1_score);
-  const team2Score = n(match.team2_score);
-  const scoreTotal = team1Score + team2Score;
-  const scoreDiff = Math.abs(team1Score - team2Score);
-  const totalPlayerKills = playerStats.reduce((sum, row) => sum + n(row.kills),0);
-  const totalTeamKills = teamStats.reduce((sum, row) => sum + n(row.kills), 0);
-  const totalKills = totalPlayerKills || totalTeamKills;
-  const totalDamage = playerStats.reduce((sum, row) => sum + n(row.damage),0);
-  const longestSurvival = Math.max(0, ...playerStats.map((row) => n(row.survival_time)), ...teamStats.map((row) => n(row.survival_time)));
-  const explicitMvp = playerStats.find((row) => row.is_mvp || row.mvp);
-  const topPlayer = explicitMvp || [...playerStats].sort
-  ((a, b) => 
-    {
-      const aScore = n(a.kills) * 100 + n(a.damage);
-      const bScore = n(b.kills) * 100 + n(b.damage);
-      return bScore - aScore;
-    }
-  )[0] ||null;
-  const topTeam = [...teamStats].sort((a, b) => n(b.total_points) - n(a.total_points))[0] || null;
-  const fightIntensity = clamp(Math.round(totalKills * 5));
-  const damagePressure = clamp(Math.round(totalDamage / 45));
-  const survivalIndex = clamp(Math.round(longestSurvival / 18));
-  const scoreTension = scoreTotal > 0 ? clamp(100 - scoreDiff * 10) : 0;
-  const isHeadToHead = Boolean(match.team1 || match.team2);
-  const matchFormat = isHeadToHead ? "Head-to-Head" : "Battle Royale";
-  const latestMatchUpdate = getLatestDate([
-  match.created_at,
-  match.date,
-]);
-
-const matchConfidence = getMatchConfidence({
-  verified: match.verified,
-  playerStatsCount: playerStats.length,
-  teamStatsCount: teamStats.length,
-});
-
+    match.tournament_id
+      ? supabase
+          .from("tournaments")
+          .select("id,name,slug")
+          .eq("id", match.tournament_id)
+          .maybeSingle()
+      : Promise.resolve({ data: null, error: null }),
+  ]);
+  const players = ((playerResult.data || []) as RawPlayerStat[]).map((row) => ({
+    ...row,
+    player: one(row.player),
+  })) as PlayerStat[];
+  const teams = ((teamResult.data || []) as RawTeamStat[]).map((row) => ({
+    ...row,
+    team: one(row.team),
+  })) as TeamStat[];
+  const tournament = tournamentResult.data as Tournament | null;
+  const h2h = Boolean(match.team1 || match.team2),
+    topTeam =
+      [...teams].sort((a, b) => num(b.total_points) - num(a.total_points))[0] ||
+      null;
+  const mvp =
+    players.find((row) => row.is_mvp || row.mvp) || players[0] || null;
+  const totalKills =
+      players.reduce((sum, row) => sum + num(row.kills), 0) ||
+      teams.reduce((sum, row) => sum + num(row.kills), 0),
+    totalDamage = players.reduce((sum, row) => sum + num(row.damage), 0);
+  const winner = match.winner || topTeam?.team || null;
   return (
-    <main className="page-shell space-y-6 py-8 text-white">
-      <section className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-[#07080c] p-7 shadow-2xl md:p-9">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.10),transparent_34%),radial-gradient(circle_at_bottom_right,rgba(250,204,21,0.10),transparent_30%)]" />
-        <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/30 to-transparent" />
-        <div className="relative z-10">
-          <div className="mb-7 flex flex-wrap gap-2">
-            <DataSourceBadge source={match.source} verified={match.verified} label={getMatchSourceLabel(match.source, match.verified)} size="md"/>
-            <DataSourceBadge label={matchFormat} size="md" />
-            <DataSourceBadge label="Match Intelligence" size="md" />
-            <DataSourceBadge label="Analytics Generated" size="md" />
-            <DataSourceBadge label={matchConfidence.label} size="md" />
-            <DataSourceBadge label={`Last Updated: ${formatDate(latestMatchUpdate)}`} size="md" />
-            {tournament ? <DataSourceBadge label="Tournament Record" size="md" /> : null}
-          </div>
-
-          <div className="grid gap-8 xl:grid-cols-[1fr_240px_1fr] xl:items-center">
-            <TeamIdentity team={match.team1} winner={match.winner_team_id === match.team1_id}/>
-            <div className="rounded-[1.5rem] border border-white/10 bg-black/30 p-5 text-center">
-              <p className="text-xs font-black uppercase tracking-[0.25em] text-white/35">{match.stage || "Match"}</p>
-              <p className="mt-3 text-5xl font-black tracking-[-0.08em] text-white">
-                {team1Score}<span className="mx-3 text-white/25">:</span>{team2Score}
+    <main className="bg-[var(--pr-bg)] text-white">
+      <section className="border-b border-white/15">
+        <div className="pr-container py-12 md:py-18">
+          <Link
+            href="/matches"
+            className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-[.18em] text-white/35 hover:text-white"
+          >
+            <ArrowLeft size={13} /> Match centre
+          </Link>
+          <div className="mt-12 flex flex-col gap-7 border-b border-white/15 pb-8 lg:flex-row lg:items-end lg:justify-between">
+            <div>
+              <p className="pr-kicker">
+                {match.stage || "Match"} · {match.map_name || "Map TBD"}
               </p>
-              <p className="mt-3 text-sm text-white/45">{match.map_name || "Map TBD"} · {formatDate(match.date)}</p>
-              {tournament ? 
-                (
-                  <Link href={`/tournaments/${tournament.slug}`} className="mt-4 inline-flex rounded-full border border-white/10 bg-white/[0.04] px-4 py-2 text-xs font-bold uppercase tracking-[0.14em] text-white/55 transition hover:border-[#ffd21a]/30 hover:text-[#ffd21a]">
-                    {tournament.name}
-                  </Link>
-                ) : null
-              }
+              <h1 className="mt-4 text-[clamp(3.8rem,8vw,8rem)] font-semibold uppercase leading-[.8] tracking-[-.075em]">
+                Match
+                <br />
+                <span className="text-[var(--pr-red)]">report.</span>
+              </h1>
             </div>
-            <TeamIdentity team={match.team2} align="right" winner={match.winner_team_id === match.team2_id}/>
+            <div className="text-left lg:text-right">
+              <p className="text-lg font-semibold">{formatDate(match.date)}</p>
+              {tournament ? (
+                <Link
+                  href={`/tournaments/${tournament.slug}`}
+                  className="mt-3 inline-flex text-sm text-[var(--pr-gold)] hover:text-white"
+                >
+                  {tournament.name}
+                </Link>
+              ) : null}
+              <p className="mt-3 text-[9px] font-bold uppercase tracking-[.15em] text-white/25">
+                {sourceLabel(match.source, match.verified)}
+              </p>
+            </div>
           </div>
-
-          {match.winner ? 
-            (
-              <div className="mt-7 rounded-2xl border border-[#ffd21a]/20 bg-[#ffd21a]/10 p-5">
-                <p className="text-xs font-black uppercase tracking-[0.24em] text-[#ffd21a]">Winner</p>
-                <Link href={`/teams/${match.winner.slug}`} className="mt-2 inline-flex text-3xl font-black tracking-[-0.04em] text-white hover:underline">
-                 {match.winner.name}
-                </Link>
-              </div>
-            ) 
-            : topTeam?.team ? 
-            (
-              <div className="mt-7 rounded-2xl border border-[#ffd21a]/20 bg-[#ffd21a]/10 p-5">
-                <p className="text-xs font-black uppercase tracking-[0.24em] text-[#ffd21a]">
-                  Top Placement
+          {h2h ? (
+            <div className="grid items-center gap-7 py-12 md:grid-cols-[1fr_auto_1fr]">
+              <TeamIdentity team={match.team1} />
+              <div className="text-center">
+                <p className="text-[clamp(4rem,8vw,7rem)] font-semibold leading-none tracking-[-.08em]">
+                  <span>{num(match.team1_score)}</span>
+                  <span className="px-4 text-white/18">:</span>
+                  <span>{num(match.team2_score)}</span>
                 </p>
-
-                <Link href={`/teams/${topTeam.team.slug}`} className="mt-2 inline-flex text-3xl font-black tracking-[-0.04em] text-white hover:underline">
-                  {topTeam.team.name}
-                </Link>
+                <p className="mt-4 text-[9px] font-bold uppercase tracking-[.18em] text-white/25">
+                  Final score
+                </p>
               </div>
-            ): null
-          }
+              <TeamIdentity team={match.team2} right />
+            </div>
+          ) : (
+            <div className="grid gap-8 py-12 lg:grid-cols-[1fr_auto]">
+              <div>
+                <p className="pr-kicker">Battle royale result</p>
+                <h2 className="mt-5 text-5xl font-semibold tracking-[-.06em]">
+                  {winner?.name || "Result pending"}
+                </h2>
+              </div>
+              <div className="lg:text-right">
+                <p className="text-6xl font-semibold text-[var(--pr-gold)]">
+                  #{topTeam?.placement || "—"}
+                </p>
+                <p className="mt-2 text-[9px] uppercase tracking-[.15em] text-white/25">
+                  Top placement
+                </p>
+              </div>
+            </div>
+          )}
+          {winner ? (
+            <div className="flex items-center gap-4 border-t border-white/15 py-6">
+              <Trophy size={18} className="text-[var(--pr-gold)]" />
+              <p className="text-xs font-bold uppercase tracking-[.16em] text-white/35">
+                Winner{" "}
+                <Link
+                  href={`/teams/${winner.slug}`}
+                  className="ml-3 text-white hover:text-[var(--pr-gold)]"
+                >
+                  {winner.name}
+                </Link>
+              </p>
+            </div>
+          ) : null}
         </div>
       </section>
-      <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-6">
-        <Metric label="Total Kills" value={totalKills} />
-        <Metric label="Total Damage" value={totalDamage} />
-        <Metric label="Score Gap" value={scoreDiff} />
-        <Metric label="Survival Peak" value={formatMinutes(longestSurvival)} />
-        <Metric label="Teams" value={teamStats.length || (isHeadToHead ? 2 : 0)} muted />
-        <Metric label="Source" value={getMatchSourceLabel(match.source, match.verified)} muted />
-      </section>
-      <section className="grid gap-6 xl:grid-cols-[0.9fr_1.1fr]">
-        <section className={card + " p-6"}>
-          <div className="flex flex-wrap items-start justify-between gap-4">
-            <div>
-              <p className="text-xs font-black uppercase tracking-[0.28em] text-white/35">
-                Match DNA
+      <section className="border-b border-white/15">
+        <div className="pr-container grid grid-cols-2 md:grid-cols-5">
+          {[
+            [totalKills, "Total kills"],
+            [totalDamage.toLocaleString("en-IN"), "Total damage"],
+            [teams.length || (h2h ? 2 : 0), "Teams"],
+            [players.length, "Player records"],
+            [mvp?.player?.ign || "—", "Top player"],
+          ].map(([value, label]) => (
+            <div
+              key={label}
+              className="border-r border-white/15 px-4 py-7 first:border-l"
+            >
+              <p className="truncate text-xl font-semibold">{value}</p>
+              <p className="mt-2 text-[9px] uppercase tracking-[.14em] text-white/25">
+                {label}
               </p>
-              <h2 className="mt-2 text-2xl font-black text-white">
-                Performance Channel
+            </div>
+          ))}
+        </div>
+      </section>
+      <section className="pr-container grid gap-12 py-18 lg:grid-cols-[1fr_1fr]">
+        <div>
+          <div className="flex items-end justify-between border-b border-white/15 pb-6">
+            <div>
+              <p className="pr-kicker">Squad output</p>
+              <h2 className="mt-4 text-4xl font-semibold tracking-[-.05em]">
+                Team standings.
               </h2>
             </div>
-            <DataSourceBadge label="Analytics Generated" />
+            <Trophy size={19} className="text-[var(--pr-gold)]" />
           </div>
-          <div className="mt-6 space-y-5">
-            <Bar label="Fight Intensity" value={fightIntensity} />
-            <Bar label="Damage Pressure" value={damagePressure} />
-            <Bar label="Survival Index" value={survivalIndex} />
-            <Bar label="Score Tension" value={scoreTension} />
-          </div>
-        </section>
-        <section className={card + " p-6"}>
-          <div className="flex flex-wrap items-start justify-between gap-4">
-            <div>
-              <p className="text-xs font-black uppercase tracking-[0.28em] text-white/35">Featured Player</p>
-              <h2 className="mt-2 text-2xl font-black text-white">Match MVP Read</h2>
-            </div>
-            <DataSourceBadge label="Player Match Stats" />
-          </div>
-          {topPlayer?.player ? 
-            (
-              <div className="mt-6 rounded-2xl border border-white/10 bg-white/[0.035] p-5">
-                <Link href={`/players/${topPlayer.player.slug}`} className="text-3xl font-black tracking-[-0.04em] text-white hover:underline">{topPlayer.player.ign}</Link>
-                <div className="mt-5 grid gap-3 md:grid-cols-4">
-                  <Metric label="Kills" value={n(topPlayer.kills)} muted />
-                  <Metric label="Damage" value={n(topPlayer.damage)} muted />
-                  <Metric label="Assists" value={n(topPlayer.assists)} muted />
-                  <Metric label="Revives" value={n(topPlayer.revives)} muted />
+          {teams.length ? (
+            teams.map((row) => (
+              <div
+                key={row.id}
+                className="grid grid-cols-[48px_1fr_repeat(2,auto)] items-center gap-4 border-b border-white/10 py-5"
+              >
+                <span
+                  className={`text-xl font-semibold ${row.placement === 1 ? "text-[var(--pr-gold)]" : "text-white/40"}`}
+                >
+                  {String(row.placement || 0).padStart(2, "0")}
+                </span>
+                <div>
+                  {row.team ? (
+                    <Link
+                      href={`/teams/${row.team.slug}`}
+                      className="font-semibold hover:text-[var(--pr-gold)]"
+                    >
+                      {row.team.name}
+                    </Link>
+                  ) : (
+                    <p className="font-semibold">Team</p>
+                  )}
+                  <p className="mt-1 text-[9px] uppercase tracking-[.14em] text-white/25">
+                    {row.kills || 0} kills
+                  </p>
                 </div>
+                <Stat value={row.placement_points || 0} label="Place pts" />
+                <Stat value={row.total_points || 0} label="Total" />
               </div>
-            ) 
-            : 
-            (
-              <p className="mt-6 rounded-2xl border border-white/10 bg-white/[0.03] p-5 text-sm text-white/45">
-                No player stats available for this match yet.
-              </p>
-            )
-          }
-        </section>
-      </section>
-      <section className="grid gap-6 xl:grid-cols-[1.05fr_0.95fr]">
-        <section className={card + " p-6"}>
-          <div className="flex flex-wrap items-start justify-between gap-4">
-            <div>
-              <p className="text-xs font-black uppercase tracking-[0.28em] text-white/35">Team Results</p>
-              <h2 className="mt-2 text-2xl font-black text-white">Squad Output</h2>
-            </div>
-            <DataSourceBadge label="Team Match Results" />
-          </div>
-          <div className="mt-6 space-y-3">
-            {teamStats.length > 0 ? 
-              (teamStats.map
-                ((row) => 
-                  (
-                    <div key={row.id} className="rounded-2xl border border-white/10 bg-white/[0.035] p-4">
-                      <div className="flex flex-wrap items-start justify-between gap-4">
-                        <div>
-                          {row.team?.slug ? 
-                            (
-                              <Link href={`/teams/${row.team.slug}`} className="text-xl font-black text-white hover:underline">{row.team.name}</Link>
-                            ) 
-                            : 
-                            (
-                              <p className="text-xl font-black text-white">{row.team?.name || "Team"}</p>
-                            )
-                          }
-                          <div className="mt-2">
-                            <DataSourceBadge source={row.team?.source} verified={row.team?.verified} label={getTeamBadgeLabel(row.team)}/>
-                          </div>
-                        </div>
-                        <span className="rounded-full border border-[#ffd21a]/25 bg-[#ffd21a]/10 px-4 py-1 text-sm font-black text-[#ffd21a]">#{row.placement || "—"}</span>
-                      </div>
-                      <div className="mt-5 grid grid-cols-4 gap-3 text-sm">
-                        <div>
-                          <p className="text-white/30">Kills</p>
-                          <p className="font-black text-white">{n(row.kills)}</p>
-                        </div>
-                        <div>
-                          <p className="text-white/30">Placement Pts</p>
-                          <p className="font-black text-white">{n(row.placement_points)}</p>
-                        </div>
-                        <div>
-                          <p className="text-white/30">Kill Pts</p>
-                          <p className="font-black text-white">{n(row.kill_points)}</p>
-                        </div>
-                        <div>
-                          <p className="text-white/30">Total</p>
-                          <p className="font-black text-[#ffd21a]">{n(row.total_points)}</p>
-                        </div>
-                      </div>
-                    </div>
-                  )
-                )
-              ) 
-              : 
-              (
-                <p className="rounded-2xl border border-white/10 bg-white/[0.03] p-5 text-sm text-white/45">No team result rows available for this match yet.</p>
-              )
-            }
-          </div>
-        </section>
-        <section className={card + " p-6"}>
-          <div className="flex flex-wrap items-start justify-between gap-4">
-            <div>
-              <p className="text-xs font-black uppercase tracking-[0.28em] text-white/35">Intelligence Verdict</p>
-              <h2 className="mt-2 text-2xl font-black text-white">Match Read</h2>
-            </div>
-            <DataSourceBadge label="Analytics Generated" />
-          </div>
-
-          <p className="mt-5 leading-7 text-white/60">
-            This match produced{" "}
-            <span className="font-bold text-white">{totalKills}</span> total
-            kills and{" "}
-            <span className="font-bold text-white">{totalDamage}</span> total
-            damage.{" "}
-            {topTeam?.team ? (
-              <>
-                <span className="font-bold text-[#ffd21a]">
-                  {topTeam.team.name}
-                </span>{" "}
-                led the squad output with{" "}
-                <span className="font-bold text-white">
-                  {n(topTeam.total_points)}
-                </span>{" "}
-                total points.
-              </>
-            ) : (
-              "Team output data is still limited for this match."
-            )}
-          </p>
-
-          <div className="mt-6 grid gap-3 md:grid-cols-2">
-            <Metric label="Fight Intensity" value={`${fightIntensity}%`} muted />
-            <Metric label="Score Tension" value={`${scoreTension}%`} muted />
-          </div>
-
-          <div className="mt-5 rounded-2xl border border-white/10 bg-white/[0.03] p-4">
-            <p className="text-xs font-black uppercase tracking-[0.18em] text-white/35">
-              Data Context
+            ))
+          ) : (
+            <p className="py-10 text-white/35">
+              No team result rows are available.
             </p>
-
-            <p className="mt-2 text-sm leading-6 text-white/45">
-              Match detail uses normalized match, team result and player stat
-              tables. PUBG API records only appear here after controlled promotion
-              into PlayRank core tables. {matchConfidence.description} PlayRank
-              match analytics are independent intelligence signals, not official
-              predictions or outcome guarantees.
-            </p>
-          </div>
-        </section>
-      </section>
-
-      <section className={card + " overflow-hidden"}>
-        <div className="flex flex-wrap items-end justify-between gap-4 border-b border-white/10 p-6">
-          <div>
-            <p className="text-xs font-black uppercase tracking-[0.28em] text-white/35">Player Stats</p>
-            <h2 className="mt-2 text-2xl font-black text-white">Match Stat Sheet</h2>
-          </div>
-          <DataSourceBadge label="Player Match Stats" />
+          )}
         </div>
-        <div className="overflow-x-auto">
-          <table className="w-full min-w-[820px] border-collapse text-left">
-            <thead>
-              <tr className="border-b border-white/10 bg-white/[0.025] text-xs uppercase tracking-[0.22em] text-white/35">
-                <th className="px-6 py-4">Player</th>
-                <th className="px-6 py-4 text-right">Kills</th>
-                <th className="px-6 py-4 text-right">Damage</th>
-                <th className="px-6 py-4 text-right">Knocks</th>
-                <th className="px-6 py-4 text-right">Assists</th>
-                <th className="px-6 py-4 text-right">Revives</th>
-                <th className="px-6 py-4 text-right">Survival</th>
-              </tr>
-            </thead>
-            <tbody>
-              {playerStats.length > 0 ? 
-                (playerStats.map
-                  ((row) => 
-                    (
-                      <tr key={row.id}className="border-b border-white/[0.06] transition hover:bg-white/[0.025]">
-                        <td className="px-6 py-5">
-                          {row.player?.slug ? 
-                            (
-                              <Link href={`/players/${row.player.slug}`}className="font-bold text-white hover:underline">{row.player.ign}</Link>
-                            ) 
-                            : 
-                            (
-                              <span className="font-bold text-white">Player N/A</span>
-                            )
-                          }
-                        </td>
-                        <td className="px-6 py-5 text-right font-black text-white">{n(row.kills)}</td>
-                        <td className="px-6 py-5 text-right text-white/65">{n(row.damage)}</td>
-                        <td className="px-6 py-5 text-right text-white/65">{n(row.knocks)}</td>
-                        <td className="px-6 py-5 text-right text-white/65">{n(row.assists)}</td>
-                        <td className="px-6 py-5 text-right text-white/65">{n(row.revives)}</td>
-                        <td className="px-6 py-5 text-right text-white/65">{formatMinutes(row.survival_time)}</td>
-                      </tr>
-                    )
-                  )
-                ) 
-                : 
-                (
-                  <tr>
-                    <td colSpan={7}className="px-6 py-10 text-center text-white/45">No player stats available for this match yet.</td>
-                  </tr>
-                )
-              }
-            </tbody>
-          </table>
+        <div>
+          <div className="flex items-end justify-between border-b border-white/15 pb-6">
+            <div>
+              <p className="pr-kicker">Individual output</p>
+              <h2 className="mt-4 text-4xl font-semibold tracking-[-.05em]">
+                Player sheet.
+              </h2>
+            </div>
+            <Crosshair size={19} className="text-[var(--pr-red)]" />
+          </div>
+          {players.length ? (
+            players.slice(0, 12).map((row, index) => (
+              <div
+                key={row.id}
+                className="grid grid-cols-[38px_1fr_repeat(2,auto)] items-center gap-4 border-b border-white/10 py-5"
+              >
+                <span className="text-sm text-white/30">
+                  {String(index + 1).padStart(2, "0")}
+                </span>
+                <div>
+                  {row.player ? (
+                    <Link
+                      href={`/players/${row.player.slug}`}
+                      className="font-semibold hover:text-[var(--pr-gold)]"
+                    >
+                      {row.player.ign}
+                    </Link>
+                  ) : (
+                    <p className="font-semibold">Player</p>
+                  )}
+                  <p className="mt-1 text-[9px] uppercase tracking-[.14em] text-white/25">
+                    {row.assists || 0} assists · {row.knocks || 0} knocks
+                  </p>
+                </div>
+                <Stat value={row.kills || 0} label="Kills" />
+                <Stat value={Math.round(row.damage || 0)} label="Damage" />
+              </div>
+            ))
+          ) : (
+            <p className="py-10 text-white/35">
+              No player statistics are available.
+            </p>
+          )}
+        </div>
+      </section>
+      {mvp?.player ? (
+        <section className="border-y border-white/15 bg-[var(--pr-surface)]">
+          <div className="pr-container grid gap-8 py-14 md:grid-cols-[.8fr_1.2fr] md:items-end">
+            <div>
+              <p className="pr-kicker">Match standout</p>
+              <Link
+                href={`/players/${mvp.player.slug}`}
+                className="mt-4 block text-5xl font-semibold tracking-[-.06em] hover:text-[var(--pr-gold)]"
+              >
+                {mvp.player.ign}
+              </Link>
+            </div>
+            <div className="grid grid-cols-3 border border-white/15">
+              <Highlight value={mvp.kills || 0} label="Kills" />
+              <Highlight value={Math.round(mvp.damage || 0)} label="Damage" />
+              <Highlight value={mvp.assists || 0} label="Assists" />
+            </div>
+          </div>
+        </section>
+      ) : null}
+      <section className="pr-container py-14">
+        <div className="grid gap-6 border-y border-white/15 py-8 md:grid-cols-[auto_1fr]">
+          <ShieldCheck size={20} className="text-[var(--pr-red)]" />
+          <p className="max-w-4xl text-sm leading-7 text-white/40">
+            This report uses normalized match, team-result and player-stat
+            records. API-sourced data appears after controlled promotion into
+            PlayRank core tables. Analytics describe recorded performance and
+            are not predictions.
+          </p>
         </div>
       </section>
     </main>
+  );
+}
+function TeamIdentity({
+  team,
+  right = false,
+}: {
+  team: Team | null;
+  right?: boolean;
+}) {
+  return (
+    <div className={`${right ? "text-right" : ""}`}>
+      {team ? (
+        <Link
+          href={`/teams/${team.slug}`}
+          className="text-3xl font-semibold tracking-[-.045em] hover:text-[var(--pr-gold)]"
+        >
+          {team.name}
+        </Link>
+      ) : (
+        <p className="text-3xl font-semibold text-white/35">Team TBD</p>
+      )}
+      <p className="mt-3 text-[9px] uppercase tracking-[.15em] text-white/25">
+        {right ? "Team two" : "Team one"}
+      </p>
+    </div>
+  );
+}
+function Stat({ value, label }: { value: number; label: string }) {
+  return (
+    <div className="text-right">
+      <p className="font-semibold">{value}</p>
+      <p className="mt-1 text-[8px] uppercase tracking-[.13em] text-white/25">
+        {label}
+      </p>
+    </div>
+  );
+}
+function Highlight({ value, label }: { value: number; label: string }) {
+  return (
+    <div className="border-r border-white/15 p-5 last:border-r-0">
+      <p className="text-2xl font-semibold">{value}</p>
+      <p className="mt-2 text-[9px] uppercase tracking-[.14em] text-white/25">
+        {label}
+      </p>
+    </div>
   );
 }

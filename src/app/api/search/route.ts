@@ -98,7 +98,7 @@ export async function GET(request: NextRequest) {
         ok: false,
         error: "Failed to run search",
       },
-      500
+      500,
     );
   }
 

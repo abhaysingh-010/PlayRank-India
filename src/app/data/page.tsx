@@ -1,944 +1,139 @@
 import Link from "next/link";
+import { Database, ShieldCheck } from "lucide-react";
 import { supabase } from "@/lib/supabase";
-import { supabaseAdmin } from "@/lib/supabaseAdmin";
-import DataSourceBadge from "@/components/DataSourceBadge";
-import MethodologySection from "@/components/MethodologySection";
-
 export const dynamic = "force-dynamic";
-
-type CountResult = {
-  label: string;
-  value: number;
-  description: string;
-  badgeLabel: string;
-  source?: string | null;
-  verified?: boolean | null;
-};
-
-type SafeCount = {
-  count: number;
-  error: string | null;
-};
-
-type PubgReadinessRow = {
-  promotion_allowed: boolean | null;
-  promotion_status: string | null;
-  total_participants: number | null;
-  mapped_players: number | null;
-  mapped_teams: number | null;
-  roster_safe_players: number | null;
-  roster_safe_teams: number | null;
-  unmapped_players: number | null;
-  unsafe_roster_players: number | null;
-  ai_participants: number | null;
-  human_participants: number | null;
-};
-
-type RosterHealthRow = {
-  health_status: string | null;
-  promotion_safe: boolean | null;
-};
-
-type TrustPolicy = {
-  label: string;
-  title: string;
-  description: string;
-  tone: "official" | "verified" | "analytics" | "staged" | "warning";
-};
-
-const trustLayers = [
-  {
-    label: "Official Layer",
-    title: "Krafton India Rankings",
-    badge: "Official Krafton Source",
-    description:
-      "PlayRank stores official Krafton India ranking data as a source-controlled competitive truth layer.",
-  },
-  {
-    label: "Identity Layer",
-    title: "Verified Teams, Players & Rosters",
-    badge: "Identity Mapping",
-    description:
-      "Teams, players, aliases and rosters are normalized so rankings, search, profiles and comparisons resolve cleanly.",
-  },
-  {
-    label: "Performance Layer",
-    title: "Match & Player Data",
-    badge: "Analytics Input",
-    description:
-      "Matches, team results and player stats are structured into performance tables for rankings, profiles and comparisons.",
-  },
-  {
-    label: "History Layer",
-    title: "Ranking Snapshots",
-    badge: "Ranking Snapshot",
-    description:
-      "Ranking history snapshots make rank movement, form changes and long-term trends measurable over time.",
-  },
-  {
-    label: "API Layer",
-    title: "PUBG API Staging",
-    badge: "PUBG API Data",
-    description:
-      "PUBG API imports are staged separately first. The public Data page only shows aggregate safety signals, never raw payloads or mapping records.",
-  },
-  {
-    label: "Quality Layer",
-    title: "Promotion Guards",
-    badge: "Promotion Safety",
-    description:
-      "Raw imports, staging tables, roster health and promotion readiness checks protect PlayRank from broken, public, AI-filled or unmapped data.",
-  },
-];
-
-const confidencePolicies: TrustPolicy[] = [
-  {
-    label: "High Confidence",
-    title: "Verified source plus enough supporting data",
-    description:
-      "Used when the source is known, entity identity is mapped, and PlayRank has enough supporting match, roster or ranking history to make the claim reliable.",
-    tone: "verified",
-  },
-  {
-    label: "Medium Confidence",
-    title: "Verified source but limited sample size",
-    description:
-      "Used when the source is credible but the current sample size is still limited, such as a new roster, few matches, or incomplete tournament context.",
-    tone: "analytics",
-  },
-  {
-    label: "Low Confidence",
-    title: "Limited or derived signal",
-    description:
-      "Used when PlayRank can show a directional signal but the underlying data is incomplete, sparse, newly imported or still being validated.",
-    tone: "warning",
-  },
-  {
-    label: "Staged Data",
-    title: "Imported but not public-core data",
-    description:
-      "Used for PUBG API rows that are stored for review but have not passed identity mapping, roster checks and promotion readiness.",
-    tone: "staged",
-  },
-];
-
-const sourcePolicies: TrustPolicy[] = [
-  {
-    label: "Official Source",
-    title: "External official records",
-    description:
-      "Official ranking or source records are stored with attribution and treated separately from PlayRank-derived analytics.",
-    tone: "official",
-  },
-  {
-    label: "Verified Record",
-    title: "PlayRank identity verification",
-    description:
-      "Verified records mean PlayRank has normalized the entity identity, slug, aliases or source connection enough to use it across product pages.",
-    tone: "verified",
-  },
-  {
-    label: "PlayRank Analytics",
-    title: "Derived intelligence layer",
-    description:
-      "Analytics, edge scores, form reads and comparison signals are independently calculated by PlayRank from available source and performance data.",
-    tone: "analytics",
-  },
-  {
-    label: "Not Public Yet",
-    title: "Staging and promotion safety",
-    description:
-      "Staged import rows are intentionally held back until mappings and roster health checks prove they are safe to publish.",
-    tone: "staged",
-  },
-];
-
-function n(value: unknown, fallback = 0) {
-  const numberValue = Number(value);
-  return Number.isFinite(numberValue) ? numberValue : fallback;
-}
-
-async function publicCount(table: string, column = "id"): Promise<SafeCount> {
-  const { count, error } = await supabase
-    .from(table)
-    .select(column, { count: "exact", head: true });
-
-  return {
-    count: n(count),
-    error: error?.message || null,
-  };
-}
-
-async function adminCount(table: string, column = "id"): Promise<SafeCount> {
-  const { count, error } = await supabaseAdmin
-    .from(table)
-    .select(column, { count: "exact", head: true });
-
-  return {
-    count: n(count),
-    error: error?.message || null,
-  };
-}
-
-function formatDate(value: string | null | undefined) {
-  if (!value) return "Not available";
-
-  return new Date(value).toLocaleDateString("en-IN", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-  });
-}
-
-function toneClass(tone: TrustPolicy["tone"]) {
-  if (tone === "official") {
-    return "border-blue-400/20 bg-blue-400/[0.06] text-blue-200";
-  }
-
-  if (tone === "verified") {
-    return "border-emerald-400/20 bg-emerald-400/[0.06] text-emerald-200";
-  }
-
-  if (tone === "analytics") {
-    return "border-[#ffd21a]/20 bg-[#ffd21a]/[0.06] text-[#ffd21a]";
-  }
-
-  if (tone === "staged") {
-    return "border-purple-400/20 bg-purple-400/[0.06] text-purple-200";
-  }
-
-  return "border-red-400/20 bg-red-400/[0.06] text-red-200";
-}
-
-function DataMetric({ item }: { item: CountResult }) {
-  return (
-    <div className="krafton-card p-6">
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <p className="data-label">{item.label}</p>
-        <DataSourceBadge
-          source={item.source}
-          verified={item.verified}
-          label={item.badgeLabel}
-        />
-      </div>
-      <p className="mt-4 text-5xl font-black tracking-[-0.06em] text-white">
-        {item.value.toLocaleString("en-IN")}
-      </p>
-      <p className="mt-4 max-w-sm leading-7 text-white/50">
-        {item.description}
-      </p>
-    </div>
-  );
-}
-
-function PolicyCard({ item }: { item: TrustPolicy }) {
-  return (
-    <article className={`rounded-3xl border p-5 ${toneClass(item.tone)}`}>
-      <p className="text-[10px] font-black uppercase tracking-[0.22em] opacity-80">
-        {item.label}
-      </p>
-      <h3 className="mt-3 text-xl font-black uppercase leading-tight tracking-[-0.04em] text-white">
-        {item.title}
-      </h3>
-      <p className="mt-3 text-sm leading-6 text-white/55">
-        {item.description}
-      </p>
-    </article>
-  );
-}
-
-function IndependentDisclaimer() {
-  return (
-    <section className="border-y border-red-400/20 bg-red-400/[0.06] px-7 py-10 md:px-14">
-      <div className="mx-auto max-w-[1600px]">
-        <div className="flex flex-wrap gap-2">
-          <DataSourceBadge label="Independent Platform" size="md" />
-          <DataSourceBadge label="Source Attribution Required" size="md" />
-        </div>
-        <h2 className="mt-5 text-3xl font-black uppercase tracking-[-0.04em] text-white md:text-5xl">
-          Independent Esports Intelligence Platform
-        </h2>
-        <p className="mt-4 max-w-5xl text-sm leading-7 text-white/60 md:text-base">
-          PlayRank is an independent esports intelligence platform. It is not
-          affiliated with, endorsed by, or operated by Krafton, PUBG, BGMI, or
-          tournament organizers. Official source data is credited where
-          available. PlayRank analytics, rankings, edge scores and confidence
-          labels are independently calculated from available source, roster,
-          match and ranking data.
-        </p>
-      </div>
-    </section>
-  );
-}
-
 export default async function DataPage() {
-  const [
-    teamsResult,
-    playersResult,
-    matchesResult,
-    tournamentsResult,
-    rankingsResult,
-    rankingHistoryResult,
-    kraftonRankingsResult,
-    dataSourcesResult,
-    aliasesResult,
-    rawImportsResult,
-    pubgMatchesResult,
-    pubgParticipantsResult,
-    importBatchesResult,
-    pubgReadinessResult,
-    rosterHealthResult,
-    latestSnapshotResult,
-  ] = await Promise.all([
-    publicCount("teams"),
-    publicCount("players"),
-    publicCount("matches"),
-    publicCount("tournaments"),
-    publicCount("rankings"),
-    publicCount("ranking_history"),
-    publicCount("krafton_team_rankings"),
-    publicCount("data_sources"),
-
-    adminCount("team_aliases"),
-    adminCount("raw_esports_imports"),
-    adminCount("pubg_api_matches", "external_match_id"),
-    adminCount("pubg_api_participants", "external_participant_id"),
-    adminCount("import_batches"),
-
-    supabaseAdmin
-    .from("pubg_match_promotion_readiness")
-    .select(
-      "promotion_allowed, promotion_status, total_participants, mapped_players, mapped_teams, roster_safe_players, roster_safe_teams, unmapped_players, unsafe_roster_players, ai_participants, human_participants"
-    ),
-
-    supabaseAdmin
-    .from("player_roster_health")
-    .select("health_status"),
-
-    supabase
-      .from("ranking_history")
-      .select("snapshot_date, created_at")
-      .order("snapshot_date", { ascending: false })
-      .limit(1)
-      .maybeSingle(),
-  ]);
-
-  const pubgReadinessRows = (pubgReadinessResult.data ||
-    []) as PubgReadinessRow[];
-
-  const rosterHealthRows = (rosterHealthResult.data || []) as RosterHealthRow[];
-
-  const pubgReadyForPromotion = pubgReadinessRows.filter(
-    (row) => row.promotion_allowed === true
-  ).length;
-
-  const pubgBlockedInStaging = pubgReadinessRows.filter(
-    (row) => row.promotion_allowed !== true
-  ).length;
-
-  const rejectedPublicImports = pubgReadinessRows.filter(
-    (row) => row.promotion_status === "not_ready_contains_ai_participants"
-  ).length;
-
-  const pubgTotalMappedPlayers = pubgReadinessRows.reduce(
-    (sum, row) => sum + n(row.mapped_players),
-    0
-  );
-
-  const pubgTotalParticipants = pubgReadinessRows.reduce(
-    (sum, row) => sum + n(row.total_participants),
-    0
-  );
-
-  const pubgAiParticipants = pubgReadinessRows.reduce(
-    (sum, row) => sum + n(row.ai_participants),
-    0
-  );
-
-  const pubgUnsafeRosterPlayers = pubgReadinessRows.reduce(
-    (sum, row) => sum + n(row.unsafe_roster_players),
-    0
-  );
-
-  const rosterIssues = rosterHealthRows.filter(
-    (row) => row.health_status !== "healthy"
-  ).length;
-
-  const latestSnapshotDate =
-    latestSnapshotResult.data?.snapshot_date ||
-    latestSnapshotResult.data?.created_at ||
-    null;
-
-  const productCounts: CountResult[] = [
-    {
-      label: "Teams",
-      value: teamsResult.count,
-      description:
-        "Verified and normalized team records used across rankings, team pages and comparison flows.",
-      badgeLabel: "Verified Team Records",
-      verified: true,
-    },
-    {
-      label: "Players",
-      value: playersResult.count,
-      description:
-        "Player records connected to teams, roles, match stats and public profile pages.",
-      badgeLabel: "Player Records",
-    },
-    {
-      label: "Matches",
-      value: matchesResult.count,
-      description:
-        "Structured match records powering match center, team results and player performance context.",
-      badgeLabel: "Analytics Input",
-    },
-    {
-      label: "Tournaments",
-      value: tournamentsResult.count,
-      description:
-        "Tournament records used for event pages, standings and historical context.",
-      badgeLabel: "Event Records",
-    },
+  const [teams, players, matches, tournaments, rankings, snapshot] =
+    await Promise.all([
+      supabase.from("teams").select("*", { count: "exact", head: true }),
+      supabase.from("players").select("*", { count: "exact", head: true }),
+      supabase.from("matches").select("*", { count: "exact", head: true }),
+      supabase.from("tournaments").select("*", { count: "exact", head: true }),
+      supabase.from("rankings").select("*", { count: "exact", head: true }),
+      supabase
+        .from("ranking_history")
+        .select("snapshot_date,created_at")
+        .order("snapshot_date", { ascending: false })
+        .limit(1)
+        .maybeSingle(),
+    ]);
+  const counts: Array<[number, string]> = [
+    [teams.count || 0, "Teams"],
+    [players.count || 0, "Players"],
+    [matches.count || 0, "Matches"],
+    [tournaments.count || 0, "Events"],
+    [rankings.count || 0, "Ranking rows"],
   ];
-
-  const rankingCounts: CountResult[] = [
-    {
-      label: "Active Rankings",
-      value: rankingsResult.count,
-      description:
-        "Current team and player ranking rows used in public ranking views.",
-      badgeLabel: "Ranking Snapshot",
-    },
-    {
-      label: "Ranking History",
-      value: rankingHistoryResult.count,
-      description:
-        "Historical snapshots used for rank movement, trend and form analysis.",
-      badgeLabel: "Snapshot History",
-    },
-    {
-      label: "Krafton Rankings",
-      value: kraftonRankingsResult.count,
-      description:
-        "Official Krafton India ranking rows stored as source-controlled input.",
-      badgeLabel: "Official Krafton Source",
-      source: "krafton_india_esports",
-      verified: true,
-    },
-    {
-      label: "Team Aliases",
-      value: aliasesResult.count,
-      description:
-        "Alias aggregate count used to show identity normalization coverage. Alias records themselves remain internal.",
-      badgeLabel: "Aggregate Only",
-    },
-  ];
-
-  const importCounts: CountResult[] = [
-    {
-      label: "Raw Imports",
-      value: rawImportsResult.count,
-      description:
-        "Aggregate count of raw import records retained for traceability. Raw payloads are not exposed publicly.",
-      badgeLabel: "Aggregate Only",
-    },
-    {
-      label: "PUBG Matches",
-      value: pubgMatchesResult.count,
-      description:
-        "Aggregate count of PUBG API match records stored in staging before product-level promotion.",
-      badgeLabel: "Staged Aggregate",
-      source: "pubg_api",
-    },
-    {
-      label: "PUBG Participants",
-      value: pubgParticipantsResult.count,
-      description:
-        "Aggregate count of PUBG API participant rows used for identity matching and staged performance normalization.",
-      badgeLabel: "Staged Aggregate",
-      source: "pubg_api",
-    },
-    {
-      label: "Import Batches",
-      value: importBatchesResult.count,
-      description:
-        "Aggregate count of ingestion batches. Detailed import jobs and payloads remain admin-only.",
-      badgeLabel: "Admin Controlled",
-    },
-  ];
-
-  const safetyCounts: CountResult[] = [
-    {
-      label: "PUBG Ready",
-      value: pubgReadyForPromotion,
-      description:
-        "Imported PUBG matches that passed mapping and roster gates and are eligible for manual core promotion review.",
-      badgeLabel: "Promotion Safe",
-    },
-    {
-      label: "PUBG Blocked",
-      value: pubgBlockedInStaging,
-      description:
-        "Imported PUBG matches intentionally held in staging because safety or identity checks have not passed.",
-      badgeLabel: "Staged Not Public",
-    },
-    {
-      label: "Rejected Public",
-      value: rejectedPublicImports,
-      description:
-        "PUBG imports rejected as public or non-esports matches because AI participants were detected.",
-      badgeLabel: "AI Rejection",
-    },
-    {
-      label: "Roster Issues",
-      value: rosterIssues,
-      description:
-        "Roster/player-team mismatches detected by the integrity guard.",
-      badgeLabel: rosterIssues === 0 ? "No Issues" : "Needs Review",
-    },
-  ];
-
-  const governanceCounts: CountResult[] = [
-    {
-      label: "Data Sources",
-      value: dataSourcesResult.count,
-      description:
-        "Registered source records used to explain where PlayRank data came from and how it should be trusted.",
-      badgeLabel: "Source Registry",
-    },
-    {
-      label: "Latest Snapshot",
-      value: latestSnapshotDate ? 1 : 0,
-      description: `Latest ranking snapshot date: ${formatDate(
-        latestSnapshotDate
-      )}.`,
-      badgeLabel: "Last Updated",
-    },
-    {
-      label: "Mapped Participants",
-      value: pubgTotalMappedPlayers,
-      description:
-        "Aggregate count of staged PUBG participants currently mapped across promotion readiness checks.",
-      badgeLabel: "Identity Mapping",
-    },
-    {
-      label: "AI Participants Blocked",
-      value: pubgAiParticipants,
-      description:
-        "Aggregate count of AI participants detected in staged PUBG imports and blocked from public core promotion.",
-      badgeLabel: "Public Match Guard",
-    },
-  ];
-
+  const latest = snapshot.data?.snapshot_date || snapshot.data?.created_at;
   return (
-    <main className="min-h-screen bg-black text-white">
-      <section className="krafton-grid relative min-h-[calc(100vh-82px)] overflow-hidden">
-        <div className="blueprint-lines" />
-        <div className="absolute left-[45%] top-[24%] hidden h-[420px] w-[420px] border border-white/20 opacity-25 lg:block" />
-        <div className="absolute left-[48%] top-[37%] hidden h-[280px] w-[520px] -skew-x-12 border border-white/20 opacity-25 lg:block" />
-
-        <div className="relative z-10 mx-auto flex min-h-[calc(100vh-82px)] max-w-[1600px] flex-col justify-center px-7 py-20 md:px-14">
-          <p className="krafton-label">Data Trust Layer</p>
-          <h1 className="krafton-display mt-6 max-w-[1500px] text-[17vw] md:text-[11vw] xl:text-[10rem]">
-            TRUST
-            <br />
-            THE
-            <br />
-            SOURCE
-          </h1>
-
-          <div className="mt-6 flex flex-wrap gap-2">
-            <DataSourceBadge
-              source="krafton_india_esports"
-              verified
-              label="Official Krafton Source"
-              size="md"
-            />
-            <DataSourceBadge label="Ranking Snapshot" size="md" />
-            <DataSourceBadge source="pubg_api" label="PUBG API Aggregate" size="md" />
-            <DataSourceBadge label="RLS Protected" size="md" />
-          </div>
-
-          <p className="mt-8 max-w-5xl text-base font-black uppercase leading-6 tracking-[-0.03em] text-white md:text-xl">
-            PlayRank separates official source data, imported API data,
-            normalized records and public analytics so every ranking, profile
-            and match view has a traceable foundation.
-          </p>
-
-          <div className="mt-10 flex flex-wrap gap-3">
-            <Link href="/rankings" className="btn-primary px-6 py-3 text-sm">
-              View Rankings
-            </Link>
-            <Link href="/matches" className="btn-secondary px-6 py-3 text-sm">
-              View Matches
-            </Link>
-            <Link href="/teams" className="btn-secondary px-6 py-3 text-sm">
-              Explore Teams
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      <IndependentDisclaimer />
-
-      <section className="border-y border-white/10 bg-black px-7 py-10 md:px-14">
-        <div className="mx-auto grid max-w-[1600px] gap-5 md:grid-cols-4">
+    <main className="bg-[var(--pr-bg)] text-white">
+      <section className="border-b border-white/15">
+        <div className="pr-container grid gap-12 py-16 md:py-24 lg:grid-cols-[1.2fr_.8fr] lg:items-end">
           <div>
-            <div className="flex flex-wrap items-center gap-2">
-              <p className="data-label">Official Source Rows</p>
-              <DataSourceBadge
-                source="krafton_india_esports"
-                verified
-                label="Official"
-              />
-            </div>
-            <p className="mt-2 text-5xl font-black text-white">
-              {kraftonRankingsResult.count.toLocaleString("en-IN")}
-            </p>
-          </div>
-
-          <div>
-            <div className="flex flex-wrap items-center gap-2">
-              <p className="data-label">Ranking History</p>
-              <DataSourceBadge label="Snapshot" />
-            </div>
-            <p className="mt-2 text-5xl font-black text-white">
-              {rankingHistoryResult.count.toLocaleString("en-IN")}
-            </p>
-          </div>
-
-          <div>
-            <div className="flex flex-wrap items-center gap-2">
-              <p className="data-label">PUBG Staging Rows</p>
-              <DataSourceBadge source="pubg_api" label="Aggregate" />
-            </div>
-            <p className="mt-2 text-5xl font-black text-white">
-              {(
-                pubgMatchesResult.count + pubgParticipantsResult.count
-              ).toLocaleString("en-IN")}
-            </p>
-          </div>
-
-          <div>
-            <div className="flex flex-wrap items-center gap-2">
-              <p className="data-label">Latest Snapshot</p>
-              <DataSourceBadge label="Ranking Snapshot" />
-            </div>
-            <p className="mt-2 text-3xl font-black text-white">
-              {formatDate(latestSnapshotDate)}
-            </p>
-          </div>
-        </div>
-      </section>
-
-      <section className="mx-auto max-w-[1600px] px-7 py-24 md:px-14">
-        <div className="mb-8 border-b border-white/10 pb-5">
-          <div className="flex flex-wrap items-center gap-3">
-            <p className="krafton-label">Data Foundation</p>
-            <DataSourceBadge label="Normalized Records" />
-          </div>
-          <h2 className="mt-3 text-4xl font-black uppercase tracking-[-0.04em] text-white md:text-5xl">
-            Product Records
-          </h2>
-        </div>
-
-        <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
-          {productCounts.map((item) => (
-            <DataMetric key={item.label} item={item} />
-          ))}
-        </div>
-      </section>
-
-      <section className="border-y border-white/10 bg-[#050505] px-7 py-24 md:px-14">
-        <div className="mx-auto max-w-[1600px]">
-          <div className="mb-8 border-b border-white/10 pb-5">
-            <div className="flex flex-wrap items-center gap-3">
-              <p className="krafton-label">Ranking Source Control</p>
-              <DataSourceBadge
-                source="krafton_india_esports"
-                verified
-                label="Official Krafton Ranking"
-              />
-            </div>
-            <h2 className="mt-3 text-4xl font-black uppercase tracking-[-0.04em] text-white md:text-5xl">
-              Ranking Data
-            </h2>
-          </div>
-
-          <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
-            {rankingCounts.map((item) => (
-              <DataMetric key={item.label} item={item} />
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="mx-auto max-w-[1600px] px-7 py-24 md:px-14">
-        <div className="mb-8 border-b border-white/10 pb-5">
-          <div className="flex flex-wrap items-center gap-3">
-            <p className="krafton-label">Import Pipeline</p>
-            <DataSourceBadge label="Aggregate Only" />
-            <DataSourceBadge source="pubg_api" label="PUBG API Data" />
-          </div>
-          <h2 className="mt-3 text-4xl font-black uppercase tracking-[-0.04em] text-white md:text-5xl">
-            Raw And API Data
-          </h2>
-        </div>
-
-        <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
-          {importCounts.map((item) => (
-            <DataMetric key={item.label} item={item} />
-          ))}
-        </div>
-
-        <div className="mt-8 border border-white/10 bg-white/[0.035] p-6">
-          <p className="text-xs font-black uppercase tracking-[0.18em] text-white/40">
-            RLS Protection Rule
-          </p>
-          <p className="mt-3 max-w-4xl text-sm leading-6 text-white/55">
-            This public page displays only aggregate staging signals. Raw
-            payloads, import jobs, mappings, roster internals and promotion
-            records remain protected behind server-side admin access.
-          </p>
-        </div>
-      </section>
-
-      <section className="border-y border-white/10 bg-[#050505] px-7 py-24 md:px-14">
-        <div className="mx-auto max-w-[1600px]">
-          <div className="mb-8 border-b border-white/10 pb-5">
-            <div className="flex flex-wrap items-center gap-3">
-              <p className="krafton-label">Safety Gates</p>
-              <DataSourceBadge label="Promotion Guard" />
-              <DataSourceBadge label="Roster Guard" />
-              <DataSourceBadge label="AI Rejection" />
-            </div>
-            <h2 className="mt-3 text-4xl font-black uppercase tracking-[-0.04em] text-white md:text-5xl">
-              Staging And Promotion Safety
-            </h2>
-          </div>
-
-          <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
-            {safetyCounts.map((item) => (
-              <DataMetric key={item.label} item={item} />
-            ))}
-          </div>
-
-          <div className="mt-8 border border-yellow-400/20 bg-yellow-400/10 p-6">
-            <p className="text-xs font-black uppercase tracking-[0.18em] text-yellow-300">
-              Public Data Rule
-            </p>
-            <p className="mt-3 max-w-4xl text-sm leading-6 text-white/60">
-              PUBG API data is not automatically treated as PlayRank product
-              data. Imported matches stay in staging until player identities are
-              mapped, roster links are healthy, AI/public match checks pass and
-              promotion guards approve the match.
-            </p>
-            <p className="mt-3 text-sm font-black uppercase tracking-[0.14em] text-white/45">
-              Current PUBG mapping: {pubgTotalMappedPlayers}/
-              {pubgTotalParticipants} participants mapped. AI participants
-              blocked: {pubgAiParticipants}. Unsafe roster players:{" "}
-              {pubgUnsafeRosterPlayers}.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      <section className="mx-auto max-w-[1600px] px-7 py-24 md:px-14">
-        <div className="mb-8 border-b border-white/10 pb-5">
-          <div className="flex flex-wrap items-center gap-3">
-            <p className="krafton-label">Governance</p>
-            <DataSourceBadge label="Source Registry" />
-            <DataSourceBadge label="Last Updated Rules" />
-          </div>
-          <h2 className="mt-3 text-4xl font-black uppercase tracking-[-0.04em] text-white md:text-5xl">
-            Data Governance Signals
-          </h2>
-        </div>
-
-        <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
-          {governanceCounts.map((item) => (
-            <DataMetric key={item.label} item={item} />
-          ))}
-        </div>
-      </section>
-
-      <section className="border-y border-white/10 bg-[#050505] px-7 py-24 md:px-14">
-        <div className="mx-auto grid max-w-[1600px] gap-12 xl:grid-cols-[0.85fr_1.15fr]">
-          <div>
-            <p className="krafton-label">Trust Model</p>
-            <h2 className="mt-4 text-5xl font-black uppercase leading-[0.9] tracking-[-0.07em] text-white md:text-7xl">
-              How Data
+            <p className="pr-kicker">Sources · coverage · confidence</p>
+            <h1 className="mt-5 text-[clamp(4.5rem,9vw,9rem)] font-semibold uppercase leading-[.78] tracking-[-.08em]">
+              Know the
               <br />
-              Becomes
-              <br />
-              Intelligence
-            </h2>
+              <span className="text-[var(--pr-red)]">record.</span>
+            </h1>
           </div>
-
-          <div className="grid gap-5 md:grid-cols-2">
-            {trustLayers.map((item, index) => (
-              <div key={item.title} className="krafton-card p-6">
-                <div className="flex items-start justify-between">
-                  <p className="text-sm font-black uppercase tracking-[0.28em] text-[#ff4038]">
-                    {item.label}
-                  </p>
-                  <span className="text-sm font-black text-white/30">
-                    {String(index + 1).padStart(2, "0")}
-                  </span>
-                </div>
-
-                <div className="mt-5">
-                  <DataSourceBadge
-                    label={item.badge}
-                    verified={item.badge.toLowerCase().includes("official")}
-                    source={
-                      item.badge.toLowerCase().includes("pubg")
-                        ? "pubg_api"
-                        : item.badge.toLowerCase().includes("krafton")
-                          ? "krafton_india_esports"
-                          : undefined
-                    }
-                  />
-                </div>
-
-                <h3 className="mt-8 text-3xl font-black uppercase leading-[0.95] tracking-[-0.055em] text-white">
-                  {item.title}
-                </h3>
-                <p className="mt-5 leading-7 text-white/50">
-                  {item.description}
-                </p>
-              </div>
-            ))}
-          </div>
+          <p className="max-w-xl text-base leading-7 text-white/50">
+            How PlayRank separates source records, verified identity, promoted
+            match data and independently calculated intelligence.
+          </p>
         </div>
       </section>
-
-      <section className="mx-auto max-w-[1600px] px-7 py-24 md:px-14">
-        <div className="mb-8 border-b border-white/10 pb-5">
-          <div className="flex flex-wrap items-center gap-3">
-            <p className="krafton-label">Source Rules</p>
-            <DataSourceBadge label="Source Attribution" />
-            <DataSourceBadge label="Analytics Separation" />
-          </div>
-          <h2 className="mt-3 text-4xl font-black uppercase tracking-[-0.04em] text-white md:text-5xl">
-            Source And Analytics Policy
-          </h2>
-        </div>
-
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-          {sourcePolicies.map((item) => (
-            <PolicyCard key={item.label} item={item} />
+      <section className="border-b border-white/15">
+        <div className="pr-container grid grid-cols-2 md:grid-cols-5">
+          {counts.map(([value, label]) => (
+            <div
+              key={label}
+              className="border-r border-white/15 px-5 py-7 first:border-l"
+            >
+              <p className="text-2xl font-semibold">{value}</p>
+              <p className="mt-2 text-[9px] uppercase tracking-[.15em] text-white/25">
+                {label}
+              </p>
+            </div>
           ))}
         </div>
       </section>
-
-      <section className="border-y border-white/10 bg-[#050505] px-7 py-24 md:px-14">
-        <div className="mx-auto max-w-[1600px]">
-          <div className="mb-8 border-b border-white/10 pb-5">
-            <div className="flex flex-wrap items-center gap-3">
-              <p className="krafton-label">Confidence Labels</p>
-              <DataSourceBadge label="No Overclaiming" />
-              <DataSourceBadge label="Sample Size Aware" />
-            </div>
-            <h2 className="mt-3 text-4xl font-black uppercase tracking-[-0.04em] text-white md:text-5xl">
-              Confidence System
-            </h2>
-            <p className="mt-4 max-w-4xl text-sm leading-7 text-white/50">
-              PlayRank should clearly mark analytics confidence whenever data is
-              limited, newly imported, derived, or not yet promoted into public
-              core tables.
+      <section className="pr-container py-16 md:py-22">
+        <p className="pr-kicker">Trust architecture</p>
+        <div className="mt-7 grid md:grid-cols-2">
+          {[
+            [
+              "01",
+              "Source records",
+              "Official or attributed external records are retained separately from PlayRank analysis.",
+            ],
+            [
+              "02",
+              "Identity mapping",
+              "Teams, players, aliases and rosters are normalized before data connects across pages.",
+            ],
+            [
+              "03",
+              "Controlled promotion",
+              "Imported match data remains staged until mapping and roster checks allow public use.",
+            ],
+            [
+              "04",
+              "Derived intelligence",
+              "Ranks, comparisons and form signals are labelled as PlayRank calculations, not official outcomes.",
+            ],
+          ].map(([number, title, body]) => (
+            <article
+              key={number}
+              className="border-b border-white/15 py-8 md:odd:border-r md:odd:pr-8 md:even:pl-8"
+            >
+              <p className="text-sm text-[var(--pr-red)]">{number}</p>
+              <h2 className="mt-5 text-3xl font-semibold tracking-[-.04em]">
+                {title}
+              </h2>
+              <p className="mt-4 max-w-xl text-sm leading-7 text-white/45">
+                {body}
+              </p>
+            </article>
+          ))}
+        </div>
+      </section>
+      <section className="border-y border-white/15 bg-[var(--pr-surface)]">
+        <div className="pr-container grid gap-10 py-14 md:grid-cols-[.8fr_1.2fr]">
+          <div>
+            <Database size={20} className="text-[var(--pr-red)]" />
+            <h2 className="mt-5 text-3xl font-semibold">Current snapshot.</h2>
+          </div>
+          <div>
+            <p className="text-4xl font-semibold tracking-[-.05em]">
+              {latest
+                ? new Date(latest).toLocaleDateString("en-IN", {
+                    day: "2-digit",
+                    month: "short",
+                    year: "numeric",
+                  })
+                : "Not available"}
+            </p>
+            <p className="mt-4 text-sm leading-7 text-white/40">
+              Public ranking pages reflect the latest available snapshot.
+              Coverage may differ between entities as records are verified and
+              promoted.
             </p>
           </div>
-
-          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-            {confidencePolicies.map((item) => (
-              <PolicyCard key={item.label} item={item} />
-            ))}
-          </div>
         </div>
       </section>
-
-      <section className="mx-auto max-w-[1600px] px-7 py-24 md:px-14">
-        <MethodologySection />
-      </section>
-
-      <section className="border-t border-white/10 bg-black px-7 py-16 md:px-14">
-        <div className="mx-auto grid max-w-[1600px] gap-8 lg:grid-cols-[0.8fr_1.2fr]">
-          <div>
-            <p className="krafton-label">Last Updated Rules</p>
-            <h2 className="mt-4 text-4xl font-black uppercase leading-[0.95] tracking-[-0.05em] text-white md:text-6xl">
-              No Fake Freshness
-            </h2>
-          </div>
-
-          <div className="grid gap-4 md:grid-cols-2">
-            <PolicyCard
-              item={{
-                label: "Available Timestamp",
-                title: "Show the real update time",
-                description:
-                  "When a table has updated_at, snapshot_date, completed_at or created_at data, PlayRank should show the latest real timestamp.",
-                tone: "verified",
-              }}
-            />
-            <PolicyCard
-              item={{
-                label: "Missing Timestamp",
-                title: "Say not available",
-                description:
-                  "When a reliable timestamp is not available, PlayRank should show Not available instead of inventing freshness.",
-                tone: "warning",
-              }}
-            />
-            <PolicyCard
-              item={{
-                label: "Ranking Snapshot",
-                title: formatDate(latestSnapshotDate),
-                description:
-                  "This is the latest ranking_history timestamp currently available to the Data Trust page.",
-                tone: "analytics",
-              }}
-            />
-            <PolicyCard
-              item={{
-                label: "Admin Control",
-                title: "Ranking sync is protected",
-                description:
-                  "Ranking recalculation now belongs behind the admin route layer and should be triggered only through protected admin controls.",
-                tone: "official",
-              }}
-            />
-          </div>
-        </div>
-      </section>
-
-      <section className="krafton-grid relative overflow-hidden px-7 py-20 text-center md:px-14">
-        <div className="relative z-10 mx-auto max-w-5xl">
-          <p className="krafton-label">PlayRank Data Layer</p>
-          <h2 className="krafton-title mt-4 text-6xl text-white md:text-8xl">
-            Build Trust
-            <br />
-            Before Insight
-          </h2>
-          <div className="mt-6 flex justify-center">
-            <DataSourceBadge label="Source Controlled Intelligence" size="md" />
-          </div>
-          <p className="mx-auto mt-6 max-w-2xl leading-7 text-white/50">
-            Every product page should clearly separate official source data,
-            normalized records, staged imports and analytics output.
-          </p>
-          <div className="mt-9 flex flex-wrap justify-center gap-3">
-            <Link href="/rankings" className="btn-primary px-6 py-3 text-sm">
-              View Rankings
-            </Link>
-            <Link href="/teams" className="btn-secondary px-6 py-3 text-sm">
-              Explore Teams
-            </Link>
-            <Link href="/matches" className="btn-secondary px-6 py-3 text-sm">
-              View Matches
-            </Link>
-          </div>
-        </div>
+      <section className="pr-container grid gap-8 py-14 md:grid-cols-[auto_1fr_auto]">
+        <ShieldCheck size={20} className="text-[var(--pr-red)]" />
+        <p className="max-w-4xl text-sm leading-7 text-white/40">
+          PlayRank is independent and is not affiliated with Krafton, PUBG,
+          BGMI, or tournament organisers.
+        </p>
+        <Link
+          href="/methodology"
+          className="pr-button pr-button-secondary text-[10px]"
+        >
+          Methodology
+        </Link>
       </section>
     </main>
   );

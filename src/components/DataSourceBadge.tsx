@@ -35,12 +35,12 @@ export default function DataSourceBadge({
   const tone = isOfficial
     ? "border-[#ff4038]/35 bg-[#ff4038]/10 text-[#ff4038]"
     : isVerified
-    ? "border-emerald-400/30 bg-emerald-400/10 text-emerald-300"
-    : isApi
-    ? "border-blue-400/30 bg-blue-400/10 text-blue-300"
-    : isAnalytics
-    ? "border-[#ffd21a]/30 bg-[#ffd21a]/10 text-[#ffd21a]"
-    : "border-white/15 bg-white/[0.04] text-white/55";
+      ? "border-emerald-400/30 bg-emerald-400/10 text-emerald-300"
+      : isApi
+        ? "border-blue-400/30 bg-blue-400/10 text-blue-300"
+        : isAnalytics
+          ? "border-[#ffd21a]/30 bg-[#ffd21a]/10 text-[#ffd21a]"
+          : "border-white/15 bg-white/[0.04] text-white/55";
 
   const sizeClass =
     size === "md" ? "px-3 py-1.5 text-xs" : "px-2.5 py-1 text-[10px]";

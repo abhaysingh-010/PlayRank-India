@@ -73,8 +73,7 @@ function hasValidSameOrigin(request: NextRequest) {
   }
 
   const host =
-    request.headers.get("x-forwarded-host") ??
-    request.headers.get("host");
+    request.headers.get("x-forwarded-host") ?? request.headers.get("host");
 
   if (!host) {
     return false;
@@ -198,14 +197,8 @@ export default function proxy(req: NextRequest) {
 
     const response = NextResponse.next();
 
-    response.headers.set(
-      "X-RateLimit-Limit",
-      String(RATE_LIMIT_MAX_REQUESTS),
-    );
-    response.headers.set(
-      "X-RateLimit-Remaining",
-      String(result.remaining),
-    );
+    response.headers.set("X-RateLimit-Limit", String(RATE_LIMIT_MAX_REQUESTS));
+    response.headers.set("X-RateLimit-Remaining", String(result.remaining));
 
     return response;
   }

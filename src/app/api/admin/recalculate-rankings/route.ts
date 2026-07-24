@@ -44,7 +44,7 @@ function methodNotAllowed() {
       error: "Method not allowed",
       allowed_methods: ["POST"],
     },
-    405
+    405,
   );
 }
 
@@ -54,7 +54,7 @@ export async function GET() {
 export async function POST() {
   const startedAt = new Date().toISOString();
   const runningSinceCutoff = new Date(
-    Date.now() - RUNNING_JOB_WINDOW_MINUTES * 60 * 1000
+    Date.now() - RUNNING_JOB_WINDOW_MINUTES * 60 * 1000,
   ).toISOString();
 
   const { data: runningJob, error: runningJobError } = await supabaseAdmin
@@ -74,7 +74,7 @@ export async function POST() {
         ok: false,
         error: "Failed to check active ranking recalculation jobs",
       },
-      500
+      500,
     );
   }
 
@@ -87,7 +87,7 @@ export async function POST() {
         running_job_id: runningJob.id,
         started_at: runningJob.started_at,
       },
-      409
+      409,
     );
   }
 
@@ -111,7 +111,7 @@ export async function POST() {
         ok: false,
         error: "Failed to create ranking recalculation job",
       },
-      500
+      500,
     );
   }
 
@@ -127,7 +127,7 @@ export async function POST() {
           job_id: job.id,
           error: "Failed to recalculate player scores",
         },
-        500
+        500,
       );
     }
 
@@ -161,8 +161,7 @@ export async function POST() {
         job_id: job.id,
         error: "Unexpected ranking recalculation failure",
       },
-      500
+      500,
     );
   }
 }
-

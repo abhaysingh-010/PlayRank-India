@@ -40,10 +40,10 @@ type SafeCount = {
 };
 
 const shell =
-  "rounded-[2rem] border border-white/10 bg-[#080a0f] shadow-[0_24px_80px_rgba(0,0,0,0.28)]";
+  "border border-white/10 bg-[#080a0f] shadow-[0_24px_80px_rgba(0,0,0,0.28)]";
 
 const panel =
-  "rounded-2xl border border-white/10 bg-white/[0.035] shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]";
+  "border border-white/10 bg-white/[0.035] shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]";
 
 function n(value: unknown, fallback = 0) {
   const numberValue = Number(value);
@@ -120,7 +120,7 @@ function SectionHeader({
           href={actionHref}
           className="w-fit text-sm font-black text-white/40 transition hover:text-[#ffd21a]"
         >
-          {actionLabel} â†’
+          {actionLabel} →
         </Link>
       ) : null}
     </div>
@@ -190,7 +190,7 @@ function ActionCard({
 
         <span
           className={`rounded-full border px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.12em] ${toneStyle(
-            tone
+            tone,
           )}`}
         >
           {value.toLocaleString("en-IN")}
@@ -259,7 +259,7 @@ function JobRow({ job }: { job: ApiImportJob }) {
 
         <span
           className={`mt-2 inline-flex rounded-full border px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.12em] ${toneStyle(
-            tone
+            tone,
           )}`}
         >
           {job.status || "unknown"}
@@ -318,7 +318,7 @@ export default async function PubgAdminHubPage() {
     supabaseAdmin
       .from("api_import_jobs")
       .select(
-        "id, provider, job_type, status, raw_import_count, normalized_match_count, error_message, started_at, completed_at"
+        "id, provider, job_type, status, raw_import_count, normalized_match_count, error_message, started_at, completed_at",
       )
       .eq("provider", "pubg_developer_api")
       .order("started_at", { ascending: false })
@@ -330,29 +330,29 @@ export default async function PubgAdminHubPage() {
   const latestJobs = (latestJobsResult.data || []) as ApiImportJob[];
 
   const rosterHealthIssues = rosterHealthRows.filter(
-    (row) => row.health_status !== "healthy"
+    (row) => row.health_status !== "healthy",
   ).length;
 
   const rosterPromotionSafe = rosterHealthRows.filter(
-    (row) => row.promotion_safe === true
+    (row) => row.promotion_safe === true,
   ).length;
 
   const readyCount = readinessRows.filter(
-    (row) => row.promotion_allowed === true
+    (row) => row.promotion_allowed === true,
   ).length;
 
   const blockedCount = readinessRows.filter(
-    (row) => row.promotion_allowed !== true
+    (row) => row.promotion_allowed !== true,
   ).length;
 
   const totalParticipantsFromReadiness = readinessRows.reduce(
     (sum, row) => sum + n(row.total_participants),
-    0
+    0,
   );
 
   const mappedPlayersFromReadiness = readinessRows.reduce(
     (sum, row) => sum + n(row.mapped_players),
-    0
+    0,
   );
 
   const latestReadiness = readinessRows[0] || null;
@@ -370,13 +370,13 @@ export default async function PubgAdminHubPage() {
   ];
 
   const tableErrors = tableErrorEntries.filter(
-    (entry): entry is [string, string] => Boolean(entry[1])
+    (entry): entry is [string, string] => Boolean(entry[1]),
   );
 
   return (
-    <main className="min-h-screen bg-[#030406] text-white">
+    <main className="bg-[#030406] text-white">
       <section className="border-b border-white/10 bg-[#050609]">
-        <div className="mx-auto max-w-7xl px-5 py-12 md:py-16">
+        <div className="mx-auto max-w-[1500px] px-5 py-10 md:px-8 md:py-14">
           <div className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:items-end">
             <div>
               <div className="flex flex-wrap gap-2">
@@ -385,7 +385,10 @@ export default async function PubgAdminHubPage() {
                 <DataSourceBadge label="Staging Safe" size="md" />
               </div>
 
-              <h1 className="mt-7 text-5xl font-black uppercase leading-[0.9] tracking-[-0.07em] text-white md:text-7xl">
+              <p className="mt-7 text-xs font-black uppercase tracking-[0.24em] text-[#f4473b]">
+                Controlled ingestion / promotion gate
+              </p>
+              <h1 className="mt-4 text-5xl font-black uppercase leading-[0.9] tracking-[-0.07em] text-white md:text-7xl">
                 PUBG API
                 <br />
                 Control Hub
@@ -399,36 +402,29 @@ export default async function PubgAdminHubPage() {
               <div className="mt-8 flex flex-wrap gap-3">
                 <Link
                   href="/admin/pubg/import"
-                  className="rounded-full border border-[#ffd21a]/30 bg-[#ffd21a]/10 px-5 py-2.5 text-sm font-black text-[#ffd21a] transition hover:bg-[#ffd21a]/15"
+                  className="border border-[#ffd21a]/30 bg-[#ffd21a]/10 px-5 py-2.5 text-xs font-black uppercase tracking-[0.14em] text-[#ffd21a] transition hover:bg-[#ffd21a]/15"
                 >
                   Import Match
                 </Link>
 
                 <Link
                   href="/admin/pubg/imports"
-                  className="rounded-full border border-white/10 bg-white/[0.04] px-5 py-2.5 text-sm font-black text-white/65 transition hover:border-white/25 hover:text-white"
+                  className="border border-white/10 bg-white/[0.04] px-5 py-2.5 text-xs font-black uppercase tracking-[0.14em] text-white/65 transition hover:border-white/25 hover:text-white"
                 >
                   Import Review
                 </Link>
 
                 <Link
                   href="/admin/pubg/mappings"
-                  className="rounded-full border border-white/10 bg-white/[0.04] px-5 py-2.5 text-sm font-black text-white/65 transition hover:border-white/25 hover:text-white"
+                  className="border border-white/10 bg-white/[0.04] px-5 py-2.5 text-xs font-black uppercase tracking-[0.14em] text-white/65 transition hover:border-white/25 hover:text-white"
                 >
                   Player Mappings
                 </Link>
                 <Link
                   href="/admin/pubg/promotions"
-                  className="rounded-full border border-white/10 bg-white/[0.04] px-5 py-2.5 text-sm font-black text-white/65 transition hover:border-white/25 hover:text-white"
+                  className="border border-white/10 bg-white/[0.04] px-5 py-2.5 text-xs font-black uppercase tracking-[0.14em] text-white/65 transition hover:border-white/25 hover:text-white"
                 >
                   Promotion Audit
-                </Link>
-
-                <Link
-                  href="/admin"
-                  className="rounded-full border border-white/10 bg-white/[0.04] px-5 py-2.5 text-sm font-black text-white/65 transition hover:border-white/25 hover:text-white"
-                >
-                  Admin Home
                 </Link>
               </div>
             </div>
@@ -451,7 +447,7 @@ export default async function PubgAdminHubPage() {
         </div>
       </section>
 
-      <section className="mx-auto grid max-w-7xl gap-5 px-5 py-10 lg:grid-cols-[0.95fr_1.05fr]">
+      <section className="mx-auto grid max-w-[1500px] gap-5 px-5 py-10 md:px-8 lg:grid-cols-[0.95fr_1.05fr]">
         <section className={shell + " p-5 md:p-6"}>
           <SectionHeader
             eyebrow="Promotion Gate"
@@ -481,7 +477,7 @@ export default async function PubgAdminHubPage() {
 
                   <span
                     className={`rounded-full border px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.12em] ${toneStyle(
-                      latestReadiness.promotion_allowed ? "healthy" : "warning"
+                      latestReadiness.promotion_allowed ? "healthy" : "warning",
                     )}`}
                   >
                     {latestReadiness.promotion_allowed ? "Ready" : "Blocked"}
@@ -493,8 +489,8 @@ export default async function PubgAdminHubPage() {
                 </p>
 
                 <p className="mt-2 text-sm text-white/45">
-                  {latestReadiness.map_name || "Unknown map"} Â·{" "}
-                  {latestReadiness.game_mode || "Unknown mode"} Â·{" "}
+                  {latestReadiness.map_name || "Unknown map"} ·{" "}
+                  {latestReadiness.game_mode || "Unknown mode"} ·{" "}
                   {latestReadiness.shard || "Unknown shard"}
                 </p>
 
@@ -511,10 +507,7 @@ export default async function PubgAdminHubPage() {
         </section>
 
         <section className={shell + " p-5 md:p-6"}>
-          <SectionHeader
-            eyebrow="Workflow"
-            title="Staging-to-Core Safety"
-          />
+          <SectionHeader eyebrow="Workflow" title="Staging-to-Core Safety" />
 
           <div className="grid gap-3">
             <WorkflowStep
@@ -538,12 +531,9 @@ export default async function PubgAdminHubPage() {
         </section>
       </section>
 
-      <section className="mx-auto grid max-w-7xl gap-5 px-5 pb-10 lg:grid-cols-[1fr_1fr]">
+      <section className="mx-auto grid max-w-[1500px] gap-5 px-5 pb-10 md:px-8 lg:grid-cols-[1fr_1fr]">
         <section className={shell + " p-5 md:p-6"}>
-          <SectionHeader
-            eyebrow="Control Panels"
-            title="PUBG Operations"
-          />
+          <SectionHeader eyebrow="Control Panels" title="PUBG Operations" />
 
           <div className="grid gap-3">
             <ActionCard
@@ -580,7 +570,7 @@ export default async function PubgAdminHubPage() {
               tone={rosterHealthIssues === 0 ? "healthy" : "danger"}
               href="/admin/rosters/health"
               description={`${rosterPromotionSafe.toLocaleString(
-                "en-IN"
+                "en-IN",
               )} players are currently promotion-safe.`}
             />
           </div>
@@ -620,11 +610,8 @@ export default async function PubgAdminHubPage() {
       </section>
 
       <section className="border-y border-white/10 bg-[#050609]">
-        <div className="mx-auto max-w-7xl px-5 py-10">
-          <SectionHeader
-            eyebrow="Recent Activity"
-            title="PUBG API Jobs"
-          />
+        <div className="mx-auto max-w-[1500px] px-5 py-10 md:px-8">
+          <SectionHeader eyebrow="Recent Activity" title="PUBG API Jobs" />
 
           {latestJobs.length === 0 ? (
             <div className="rounded-2xl border border-white/10 bg-white/[0.025] p-5">
@@ -640,11 +627,8 @@ export default async function PubgAdminHubPage() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-5 py-10">
-        <SectionHeader
-          eyebrow="Errors"
-          title="PUBG Admin Access Report"
-        />
+      <section className="mx-auto max-w-[1500px] px-5 py-10 md:px-8">
+        <SectionHeader eyebrow="Errors" title="PUBG Admin Access Report" />
 
         {tableErrors.length > 0 ? (
           <div className="space-y-3">

@@ -46,7 +46,7 @@ export async function GET(
       entityType: string;
       id: string;
     }>;
-  }
+  },
 ) {
   const { entityType, id } = await context.params;
   const { searchParams } = new URL(request.url);
@@ -58,7 +58,7 @@ export async function GET(
         error: "Invalid entity type",
         allowed_entity_types: ["team", "player"],
       },
-      400
+      400,
     );
   }
 
@@ -68,7 +68,7 @@ export async function GET(
         ok: false,
         error: "Invalid entity id",
       },
-      400
+      400,
     );
   }
 
@@ -76,7 +76,9 @@ export async function GET(
 
   const { data, error } = await supabase
     .from("ranking_history")
-    .select("id, entity_type, entity_id, rank, score, snapshot_date, created_at")
+    .select(
+      "id, entity_type, entity_id, rank, score, snapshot_date, created_at",
+    )
     .eq("entity_type", entityType)
     .eq("entity_id", id)
     .order("snapshot_date", { ascending: true })
@@ -88,7 +90,7 @@ export async function GET(
         ok: false,
         error: "Failed to load ranking history",
       },
-      500
+      500,
     );
   }
 

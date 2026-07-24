@@ -1,70 +1,70 @@
 "use client";
-
 import { useRouter } from "next/navigation";
-
-type Player = {id: string; ign: string; slug: string; role?: string | null;};
-export default function PlayerCompareSelector
-(
-  {players,}: 
-  {
+type Player = { id: string; ign: string; slug: string; role?: string | null };
+export default function PlayerCompareSelector({
+  players,
+}: {
   players: Player[];
-  }
-) 
-{
+}) {
   const router = useRouter();
-  function handleSubmit(event: React.FormEvent<HTMLFormElement>) 
-  {
+  function submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    const formData = new FormData(event.currentTarget);
-    const player1 = String(formData.get("player1") || "");
-    const player2 = String(formData.get("player2") || "");
-
-    if (!player1 || !player2 || player1 === player2) 
-    {
+    const form = new FormData(event.currentTarget),
+      first = String(form.get("player1") || ""),
+      second = String(form.get("player2") || "");
+    if (!first || !second || first === second) {
       alert("Select two different players.");
       return;
     }
-    router.push(`/compare/players/${player1}/${player2}`);
+    router.push(`/compare/players/${first}/${second}`);
   }
-
   return (
-    <section className="card p-8">
-      <form onSubmit={handleSubmit}className="grid md:grid-cols-3 gap-6 items-end">
-        <div>
-          <label className="block text-sm text-zinc-500 mb-2">Player A</label>
-          <select name="player1"defaultValue="jonathan"className="w-full rounded-2xl bg-zinc-950 border border-white/10 px-4 py-4 text-white outline-none">
-            {players.map
-              ((player) => 
-                (
-                  <option key={player.id} value={player.slug}>
-                    {player.ign}
-                    {player.role ? ` — ${player.role}` : ""}
-                  </option>
-                )
-              )
-            }
-          </select>
-        </div>
-
-        <div>
-          <label className="block text-sm text-zinc-500 mb-2">Player B</label>
-          <select name="player2"defaultValue="goblin"className="w-full rounded-2xl bg-zinc-950 border border-white/10 px-4 py-4 text-white outline-none">
-            {players.map
-              ((player) => 
-                (
-                  <option key={player.id} value={player.slug}>
-                    {player.ign}
-                    {player.role ? ` — ${player.role}` : ""}
-                  </option>
-                )
-              )
-            }
-          </select>
-        </div>
-        <button type="submit"className="rounded-2xl bg-emerald-500 text-black font-bold px-6 py-4 hover:bg-emerald-400 transition">
-          Compare Players
-        </button>
-      </form>
-    </section>
+    <form
+      onSubmit={submit}
+      className="grid gap-5 md:grid-cols-[1fr_auto_1fr] md:items-end"
+    >
+      <Field label="Player one" name="player1" players={players} />
+      <p className="hidden pb-4 text-[10px] font-black uppercase tracking-[.16em] text-white/25 md:block">
+        versus
+      </p>
+      <Field label="Player two" name="player2" players={players} second />
+      <button
+        type="submit"
+        className="pr-button pr-button-primary md:col-span-3"
+      >
+        Compare players
+      </button>
+    </form>
+  );
+}
+function Field({
+  label,
+  name,
+  players,
+  second = false,
+}: {
+  label: string;
+  name: string;
+  players: Player[];
+  second?: boolean;
+}) {
+  return (
+    <label>
+      <span className="mb-3 block text-[10px] font-black uppercase tracking-[.16em] text-white/35">
+        {label}
+      </span>
+      <select
+        name={name}
+        defaultValue={second ? players[1]?.slug : players[0]?.slug}
+        className="w-full border border-white/15 bg-[var(--pr-bg)] px-4 py-4 text-white outline-none focus:border-[var(--pr-red)]"
+      >
+        {players.map((player) => (
+          <option key={player.id} value={player.slug}>
+            {player.ign}
+            {player.role ? ` — ${player.role}` : ""}
+          </option>
+        ))}
+      </select>
+    </label>
   );
 }

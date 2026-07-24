@@ -1,13 +1,18 @@
-﻿import Image from "next/image";
+import Image from "next/image";
 import Link from "next/link";
+import {
+  ArrowDown,
+  ArrowRight,
+  ArrowUp,
+  Clock3,
+  Minus,
+  ShieldCheck,
+} from "lucide-react";
+import { Reveal } from "@/components/home/HomeMotion";
 import { supabase } from "@/lib/supabase";
-import DataSourceBadge from "@/components/DataSourceBadge";
-import DataFreshnessBadge from "@/components/DataFreshnessBadge";
-import RankingExplanationPanel from "@/components/RankingExplanationPanel";
 
 type RankingRow = {
   entity_id: string;
-  entity_type: "team" | "player";
   rank: number;
   score: number;
   change: number | null;
@@ -20,14 +25,10 @@ type TeamRow = {
   short_name: string | null;
   slug: string;
   logo_url: string | null;
-  global_rank: number | null;
-  points: number | null;
   wins: number | null;
-  kills: number | null;
   matches_played: number | null;
   source: string | null;
   verified: boolean | null;
-  active: boolean | null;
 };
 
 type PlayerRow = {
@@ -35,169 +36,86 @@ type PlayerRow = {
   ign: string;
   slug: string;
   role: string | null;
-  team_id: string | null;
-  kd_ratio: number | null;
-  avg_damage: number | null;
-  win_rate: number | null;
-  matches_played: number | null;
   total_kills: number | null;
+  avg_damage: number | null;
   mvp_count: number | null;
   recent_form: number | string | null;
-  source?: string | null;
-  verified?: boolean | null;
-  active?: boolean | null;
+  verified: boolean | null;
 };
 
-type TrustCard = {
-  label: string;
-  title: string;
-  description: string;
-  tone: "official" | "analytics" | "warning" | "neutral";
-};
-
-function n(value: unknown, fallback = 0) {
-  const numberValue = Number(value);
-  return Number.isFinite(numberValue) ? numberValue : fallback;
+function formatDate(value?: string | null) {
+  return value
+    ? new Date(value).toLocaleDateString("en-IN", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+      })
+    : "Not available";
 }
 
-function getInitials(name: string) {
-  return name
+function initials(value: string) {
+  return value
     .split(" ")
     .filter(Boolean)
     .slice(0, 2)
-    .map((word) => word[0])
+    .map((part) => part[0])
     .join("")
     .toUpperCase();
 }
 
-function formatDate(value: string | null) {
-  if (!value) return "Not available";
-
-  return new Date(value).toLocaleDateString("en-IN", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-  });
-}
-
-function formatChange(value: number | null) {
-  if (!value) return "â€”";
-  if (value > 0) return `+${value}`;
-
-  return String(value);
-}
-
-function changeTone(value: number | null) {
-  if (!value) return "text-white/35";
-  if (value > 0) return "text-emerald-300";
-
-  return "text-red-300";
-}
-
-function TeamLogo({
+function EntityMark({
   name,
   logoUrl,
-  size = "md",
 }: {
   name: string;
-  logoUrl: string | null;
-  size?: "sm" | "md" | "lg";
+  logoUrl?: string | null;
 }) {
-  const sizeClass =
-    size === "lg" ? "h-16 w-16" : size === "sm" ? "h-10 w-10" : "h-12 w-12";
-
   return (
-    <div
-      className={`${sizeClass} flex shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-white/10 bg-white/[0.04] shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]`}
-    >
+    <div className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden border border-white/15 bg-white/[0.035]">
       {logoUrl ? (
-         
-        <Image src={logoUrl} alt={`${name} logo`} width={64} height={64} sizes={size === "lg" ? "64px" : size === "sm" ? "40px" : "48px"} className="h-full w-full object-contain p-2"/>
+        <Image
+          src={logoUrl}
+          alt={`${name} logo`}
+          width={44}
+          height={44}
+          className="h-full w-full object-contain p-1.5"
+        />
       ) : (
-        <span className="text-sm font-black text-white/70">
-          {getInitials(name)}
+        <span className="text-[11px] font-black text-white/65">
+          {initials(name)}
         </span>
       )}
     </div>
   );
 }
 
-function PlayerAvatar({ ign }: { ign: string }) {
+function Movement({ value }: { value: number | null }) {
+  if (!value)
+    return (
+      <span className="inline-flex items-center gap-1 text-white/35">
+        <Minus size={13} /> 0
+      </span>
+    );
+  if (value > 0)
+    return (
+      <span className="inline-flex items-center gap-1 text-[var(--pr-positive)]">
+        <ArrowUp size={13} /> {value}
+      </span>
+    );
   return (
-    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl border border-white/10 bg-white/[0.04] text-sm font-black text-white/70">
-      {getInitials(ign)}
-    </div>
+    <span className="inline-flex items-center gap-1 text-[var(--pr-red)]">
+      <ArrowDown size={13} /> {Math.abs(value)}
+    </span>
   );
 }
 
-function getRankPillStyles(rank: number) {
-  if (rank === 1) return "border-yellow-400/30 bg-yellow-400/10 text-yellow-300";
-  if (rank === 2) return "border-slate-300/25 bg-slate-300/10 text-slate-200";
-  if (rank === 3) return "border-orange-400/25 bg-orange-400/10 text-orange-300";
-  if (rank <= 10) return "border-emerald-400/25 bg-emerald-400/10 text-emerald-300";
-
-  return "border-white/10 bg-white/[0.035] text-white/75";
-}
-
-function getTopCardStyles(rank: number) {
-  if (rank === 1) {
-    return {
-      card: "border-yellow-400/30 bg-gradient-to-br from-yellow-500/20 via-[#15110a] to-[#0b0d12] shadow-[0_0_34px_rgba(250,204,21,0.24)]",
-      glow: "bg-yellow-400/20",
-      accent: "text-yellow-300",
-    };
-  }
-
-  if (rank === 2) {
-    return {
-      card: "border-slate-300/25 bg-gradient-to-br from-slate-300/15 via-[#101216] to-[#0b0d12] shadow-[0_0_30px_rgba(226,232,240,0.17)]",
-      glow: "bg-slate-300/15",
-      accent: "text-slate-200",
-    };
-  }
-
-  return {
-    card: "border-orange-400/25 bg-gradient-to-br from-orange-500/15 via-[#14100d] to-[#0b0d12] shadow-[0_0_28px_rgba(251,146,60,0.2)]",
-    glow: "bg-orange-400/15",
-    accent: "text-orange-300",
-  };
-}
-
-function getTableRowStyles(rank: number) {
-  if (rank === 1) return "bg-yellow-400/[0.055] hover:bg-yellow-400/[0.08]";
-  if (rank === 2) return "bg-slate-300/[0.045] hover:bg-slate-300/[0.07]";
-  if (rank === 3) return "bg-orange-400/[0.05] hover:bg-orange-400/[0.075]";
-
-  return "hover:bg-white/[0.025]";
-}
-
-function trustToneClass(tone: TrustCard["tone"]) {
-  if (tone === "official") {
-    return "border-blue-400/20 bg-blue-400/[0.06] text-blue-200";
-  }
-
-  if (tone === "analytics") {
-    return "border-[#ffd21a]/20 bg-[#ffd21a]/[0.06] text-[#ffd21a]";
-  }
-
-  if (tone === "warning") {
-    return "border-red-400/20 bg-red-400/[0.06] text-red-200";
-  }
-
-  return "border-white/10 bg-white/[0.035] text-white/65";
-}
-
-function TrustCardView({ item }: { item: TrustCard }) {
+function RankNumber({ rank }: { rank: number }) {
   return (
-    <article className={`rounded-2xl border p-4 ${trustToneClass(item.tone)}`}>
-      <p className="text-[10px] font-black uppercase tracking-[0.2em] opacity-75">
-        {item.label}
-      </p>
-      <h3 className="mt-3 text-lg font-black text-white">{item.title}</h3>
-      <p className="mt-2 text-sm leading-6 text-white/50">
-        {item.description}
-      </p>
-    </article>
+    <span
+      className={`text-xl font-semibold tracking-[-0.04em] ${rank <= 3 ? "text-[var(--pr-gold)]" : "text-white/55"}`}
+    >
+      {String(rank).padStart(2, "0")}
+    </span>
   );
 }
 
@@ -205,132 +123,58 @@ export default async function RankingsPage() {
   const [
     teamRankingsResult,
     playerRankingsResult,
-    latestSnapshotResult,
+    snapshotResult,
     teamCountResult,
     playerCountResult,
   ] = await Promise.all([
     supabase
       .from("rankings")
-      .select("entity_id, entity_type, rank, score, change, updated_at")
+      .select("entity_id,rank,score,change,updated_at")
       .eq("entity_type", "team")
       .order("rank", { ascending: true })
       .range(0, 19),
-
     supabase
       .from("rankings")
-      .select("entity_id, entity_type, rank, score, change, updated_at")
+      .select("entity_id,rank,score,change,updated_at")
       .eq("entity_type", "player")
       .order("rank", { ascending: true })
       .range(0, 19),
-
     supabase
       .from("ranking_history")
-      .select("snapshot_date, created_at")
+      .select("snapshot_date,created_at")
       .order("snapshot_date", { ascending: false })
       .limit(1)
       .maybeSingle(),
-
     supabase.from("teams").select("*", { count: "exact", head: true }),
     supabase.from("players").select("*", { count: "exact", head: true }),
   ]);
 
   const teamRankings = (teamRankingsResult.data || []) as RankingRow[];
   const playerRankings = (playerRankingsResult.data || []) as RankingRow[];
-
   const teamIds = teamRankings.map((row) => row.entity_id);
   const playerIds = playerRankings.map((row) => row.entity_id);
 
-  const { data: teamsRaw, error: teamsError } =
-    teamIds.length > 0
-      ? await supabase
+  const [
+    { data: teamsRaw, error: teamsError },
+    { data: playersRaw, error: playersError },
+  ] = await Promise.all([
+    teamIds.length
+      ? supabase
           .from("teams")
           .select(
-            "id, name, short_name, slug, logo_url, global_rank, points, wins, kills, matches_played, source, verified, active"
+            "id,name,short_name,slug,logo_url,wins,matches_played,source,verified",
           )
           .in("id", teamIds)
-      : { data: [], error: null };
-
-  const { data: playersRaw, error: playersError } =
-    playerIds.length > 0
-      ? await supabase
+      : Promise.resolve({ data: [], error: null }),
+    playerIds.length
+      ? supabase
           .from("players")
           .select(
-            "id, ign, slug, role, team_id, kd_ratio, avg_damage, win_rate, matches_played, total_kills, mvp_count, recent_form, source, verified, active"
+            "id,ign,slug,role,total_kills,avg_damage,mvp_count,recent_form,verified",
           )
           .in("id", playerIds)
-      : { data: [], error: null };
-
-  const teams = (teamsRaw || []) as TeamRow[];
-  const players = (playersRaw || []) as PlayerRow[];
-
-  const teamById = new Map(teams.map((team) => [team.id, team]));
-  const playerById = new Map(players.map((player) => [player.id, player]));
-
-  const rankedTeams = teamRankings
-    .map((ranking) => ({
-      ranking,
-      team: teamById.get(ranking.entity_id),
-    }))
-    .filter((item): item is { ranking: RankingRow; team: TeamRow } =>
-      Boolean(item.team)
-    );
-
-  const rankedPlayers = playerRankings
-    .map((ranking) => ({
-      ranking,
-      player: playerById.get(ranking.entity_id),
-    }))
-    .filter((item): item is { ranking: RankingRow; player: PlayerRow } =>
-      Boolean(item.player)
-    );
-
-  const topThreeTeams = rankedTeams.slice(0, 3);
-
-  const latestTeamUpdate = teamRankings[0]?.updated_at || latestSnapshotResult.data?.snapshot_date || latestSnapshotResult.data?.created_at || null;
-
-  const latestPlayerUpdate =
-    playerRankings[0]?.updated_at ||
-    latestSnapshotResult.data?.snapshot_date ||
-    latestSnapshotResult.data?.created_at ||
-    null;
-
-  const latestGlobalSnapshot =
-    latestSnapshotResult.data?.snapshot_date ||
-    latestSnapshotResult.data?.created_at ||
-    null;
-
-  const totalRankedEntities = rankedTeams.length + rankedPlayers.length;
-
-  const trustCards: TrustCard[] = [
-    {
-      label: "Team Ranking Source",
-      title: "Official and verified team layer",
-      description:
-        "Team rankings are shown with source and verification labels wherever available.",
-      tone: "official",
-    },
-    {
-      label: "Player Ranking Source",
-      title: "PlayRank-generated player order",
-      description:
-        "Player rankings are calculated from available player, match and performance data.",
-      tone: "analytics",
-    },
-    {
-      label: "Confidence Rule",
-      title: "Player rankings are directional",
-      description:
-        "Early player rankings should be treated as directional until match sample size grows.",
-      tone: "warning",
-    },
-    {
-      label: "Last Updated",
-      title: formatDate(latestGlobalSnapshot),
-      description:
-        "When reliable timestamps exist, PlayRank shows them. When unavailable, it says not available.",
-      tone: "neutral",
-    },
-  ];
+      : Promise.resolve({ data: [], error: null }),
+  ]);
 
   if (
     teamRankingsResult.error ||
@@ -339,518 +183,313 @@ export default async function RankingsPage() {
     playersError
   ) {
     return (
-      <main className="page-shell py-10">
-        <section className="rounded-[2rem] border border-red-500/20 bg-red-500/5 p-8">
-          <h1 className="text-2xl font-black text-white">Rankings</h1>
-          <p className="mt-3 text-red-300">
-            Failed to load rankings. Check Supabase permissions and selected
-            columns.
+      <main className="pr-container py-20">
+        <section className="border border-[var(--pr-red)]/30 bg-[var(--pr-red)]/5 p-8">
+          <p className="pr-kicker">Data unavailable</p>
+          <h1 className="mt-4 text-4xl font-semibold text-white">
+            Rankings could not be loaded.
+          </h1>
+          <p className="mt-3 text-white/50">
+            Check the Supabase permissions and ranking snapshot.
           </p>
         </section>
       </main>
     );
   }
 
+  const teams = (teamsRaw || []) as TeamRow[];
+  const players = (playersRaw || []) as PlayerRow[];
+  const teamById = new Map(teams.map((team) => [team.id, team]));
+  const playerById = new Map(players.map((player) => [player.id, player]));
+  const rankedTeams = teamRankings
+    .map((ranking) => ({ ranking, team: teamById.get(ranking.entity_id) }))
+    .filter((item): item is { ranking: RankingRow; team: TeamRow } =>
+      Boolean(item.team),
+    );
+  const rankedPlayers = playerRankings
+    .map((ranking) => ({ ranking, player: playerById.get(ranking.entity_id) }))
+    .filter((item): item is { ranking: RankingRow; player: PlayerRow } =>
+      Boolean(item.player),
+    );
+  const snapshot =
+    teamRankings[0]?.updated_at ||
+    snapshotResult.data?.snapshot_date ||
+    snapshotResult.data?.created_at ||
+    null;
+
   return (
-    <main className="page-shell space-y-10 py-8 text-white">
-      <section className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-[#07080c] p-7 shadow-2xl md:p-9">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.10),transparent_34%),radial-gradient(circle_at_bottom_right,rgba(255,64,56,0.12),transparent_30%)]" />
-
-        <div className="relative z-10 flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
+    <main className="bg-[var(--pr-bg)] text-white">
+      <section className="border-b border-white/15">
+        <div className="pr-container grid gap-12 py-16 md:py-24 lg:grid-cols-[1.2fr_.8fr] lg:items-end">
           <div>
-            <p className="krafton-label">Competitive Order</p>
-
-            <h1 className="mt-4 text-6xl font-black uppercase leading-[0.9] tracking-[-0.07em] text-white md:text-8xl">
-              PlayRank
-              <br />
+            <p className="pr-kicker">Competitive order · BGMI India</p>
+            <h1 className="mt-5 text-[clamp(4.5rem,9vw,9rem)] font-semibold uppercase leading-[.78] tracking-[-.08em] text-white">
               Rankings
+              <br />
+              <span className="text-[var(--pr-red)]">that move.</span>
             </h1>
-
-            <p className="mt-5 max-w-3xl text-white/50">
-              Team rankings are aligned with official and verified PlayRank
-              records. Player rankings are generated from available player,
-              match and performance data.
+          </div>
+          <div className="lg:pb-2">
+            <p className="max-w-xl text-base leading-7 text-white/52">
+              A transparent view of team and player order, built from verified
+              records, available match data and the latest ranking snapshot.
             </p>
-
-            <div className="mt-5 flex flex-wrap gap-2">
-              <DataSourceBadge
-                source="krafton_india_esports"
-                label="Official Krafton Team Ranking"
-                verified
-              />
-              <DataSourceBadge label="PlayRank Player Ranking" />
-              <DataSourceBadge label="Ranking Snapshot" />
-              <DataSourceBadge label="Confidence Aware" />
-            </div>
-
             <div className="mt-7 flex flex-wrap gap-3">
               <Link
                 href="/rankings/teams"
-                className="btn-primary px-5 py-3 text-sm"
+                className="pr-button pr-button-primary text-[11px]"
               >
-                Team Rankings
+                Team rankings
               </Link>
-
               <Link
                 href="/rankings/players"
-                className="btn-secondary px-5 py-3 text-sm"
+                className="pr-button pr-button-secondary text-[11px]"
               >
-                Player Rankings
+                Player rankings
               </Link>
-
-              <Link href="/data" className="btn-secondary px-5 py-3 text-sm">
-                Data Trust Layer
-              </Link>
-            </div>
-          </div>
-
-          <div className="grid gap-3 md:grid-cols-2 lg:text-left">
-            <div className="rounded-2xl border border-white/10 bg-white/[0.035] p-4">
-              <p className="data-label">Team Snapshot</p>
-              <p className="mt-2 text-xl font-black text-white">
-                {formatDate(latestTeamUpdate)}
-              </p>
-            </div>
-
-            <div className="rounded-2xl border border-white/10 bg-white/[0.035] p-4">
-              <p className="data-label">Player Snapshot</p>
-              <p className="mt-2 text-xl font-black text-white">
-                {formatDate(latestPlayerUpdate)}
-              </p>
-            </div>
-
-            <div className="rounded-2xl border border-white/10 bg-white/[0.035] p-4">
-              <p className="data-label">Ranked Entities</p>
-              <p className="mt-2 text-xl font-black text-white">
-                {totalRankedEntities.toLocaleString("en-IN")}
-              </p>
-            </div>
-
-            <div className="rounded-2xl border border-white/10 bg-white/[0.035] p-4">
-              <p className="data-label">Database Coverage</p>
-              <p className="mt-2 text-xl font-black text-white">
-                {n(teamCountResult.count) + n(playerCountResult.count)}
-              </p>
             </div>
           </div>
         </div>
       </section>
 
-      <RankingExplanationPanel variant="overview" lastUpdatedValue={latestGlobalSnapshot} />
-
-      <section className="rounded-[2rem] border border-red-400/20 bg-red-400/[0.06] p-6">
-        <div className="flex flex-wrap gap-2">
-          <DataSourceBadge label="Independent Platform" />
-          <DataSourceBadge label="Source Attribution" />
-          <DataSourceBadge label="No Predictions" />
-        </div>
-
-        <h2 className="mt-4 text-2xl font-black uppercase tracking-[-0.04em] text-white">
-          Rankings are intelligence signals, not official predictions
-        </h2>
-
-        <p className="mt-3 max-w-5xl text-sm leading-7 text-white/55">
-          PlayRank is an independent esports intelligence platform. It is not
-          affiliated with, endorsed by, or operated by Krafton, PUBG, BGMI, or
-          tournament organizers. Official source data is credited where
-          available. PlayRank rankings, edge scores and confidence labels are
-          independently calculated from available source, roster, match and
-          ranking data.
-        </p>
-      </section>
-
-      <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-        {trustCards.map((item) => (
-          <TrustCardView key={item.label} item={item} />
-        ))}
-      </section>
-
-      <section className="space-y-5">
-        <div className="flex items-end justify-between gap-4">
-          <div>
-            <p className="text-xs font-black uppercase tracking-[0.28em] text-white/35">
-              Official Team Ranking
-            </p>
-
-            <h2 className="mt-2 text-2xl font-black tracking-tight text-white">
-              Top 3 Teams
-            </h2>
-
-            <div className="mt-3">
-              <DataSourceBadge label="Official + PlayRank Verified Layer" />
+      <section className="border-b border-white/15">
+        <div className="pr-container grid grid-cols-2 md:grid-cols-4">
+          {[
+            [formatDate(snapshot), "Latest snapshot"],
+            [rankedTeams.length.toLocaleString("en-IN"), "Ranked teams"],
+            [rankedPlayers.length.toLocaleString("en-IN"), "Ranked players"],
+            [
+              (
+                (teamCountResult.count || 0) + (playerCountResult.count || 0)
+              ).toLocaleString("en-IN"),
+              "Database entities",
+            ],
+          ].map(([value, label]) => (
+            <div
+              key={label}
+              className="border-r border-white/15 px-5 py-7 first:border-l md:px-7"
+            >
+              <p className="text-lg font-semibold tracking-[-.03em] text-white md:text-2xl">
+                {value}
+              </p>
+              <p className="mt-2 text-[10px] font-bold uppercase tracking-[.18em] text-white/35">
+                {label}
+              </p>
             </div>
-          </div>
+          ))}
+        </div>
+      </section>
 
-          <Link
-            href="/teams"
-            className="rounded-full border border-white/10 bg-white/[0.03] px-4 py-2 text-sm text-white/60 transition hover:border-white/25 hover:text-white"
+      <section className="pr-container py-20 md:py-24">
+        <Reveal>
+          <div className="flex items-end justify-between gap-6 border-b border-white/15 pb-8">
+            <div>
+              <p className="pr-kicker">The podium</p>
+              <h2 className="mt-4 text-4xl font-semibold tracking-[-.055em] text-white md:text-6xl">
+                India&apos;s top three.
+              </h2>
+            </div>
+            <Link
+              href="/rankings/teams"
+              className="hidden items-center gap-3 text-xs font-black uppercase tracking-[.16em] text-white/45 hover:text-white sm:inline-flex"
+            >
+              Full table <ArrowRight size={15} />
+            </Link>
+          </div>
+        </Reveal>
+
+        <div className="grid md:grid-cols-3">
+          {rankedTeams.slice(0, 3).map(({ ranking, team }, index) => (
+            <Reveal
+              key={team.id}
+              delay={index * 0.08}
+              className="border-b border-white/15 py-8 md:border-b-0 md:border-r md:px-7 md:first:pl-0 md:last:border-r-0 md:last:pr-0"
+            >
+              <Link href={`/teams/${team.slug}`} className="group block">
+                <div className="flex items-start justify-between">
+                  <EntityMark name={team.name} logoUrl={team.logo_url} />
+                  <span className="text-6xl font-semibold tracking-[-.08em] text-[var(--pr-gold)]">
+                    {String(ranking.rank).padStart(2, "0")}
+                  </span>
+                </div>
+                <h3 className="mt-16 text-2xl font-semibold tracking-[-.04em] text-white">
+                  {team.name}
+                </h3>
+                <div className="mt-5 flex items-end justify-between border-t border-white/15 pt-4">
+                  <div>
+                    <p className="text-[10px] font-bold uppercase tracking-[.16em] text-white/30">
+                      Ranking score
+                    </p>
+                    <p className="mt-1 text-lg font-semibold">
+                      {Math.round(ranking.score)}
+                    </p>
+                  </div>
+                  <Movement value={ranking.change} />
+                </div>
+                <p className="mt-8 inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-[.18em] text-white/35 transition group-hover:text-[var(--pr-red)]">
+                  Team profile <ArrowRight size={13} />
+                </p>
+              </Link>
+            </Reveal>
+          ))}
+        </div>
+      </section>
+
+      <section className="border-y border-white/15 bg-[var(--pr-surface)]">
+        <div className="pr-container grid lg:grid-cols-2">
+          <Leaderboard
+            title="Team leaderboard"
+            subtitle="Official and verified team layer"
+            href="/rankings/teams"
           >
-            View all teams
-          </Link>
-        </div>
-
-        <div className="grid gap-4 md:grid-cols-3">
-          {topThreeTeams.map(({ ranking, team }) => {
-            const styles = getTopCardStyles(ranking.rank);
-
-            return (
+            {rankedTeams.slice(0, 10).map(({ ranking, team }) => (
               <Link
-                key={ranking.entity_id}
+                key={team.id}
                 href={`/teams/${team.slug}`}
-                className={`group relative overflow-hidden rounded-[1.8rem] border p-6 transition duration-300 hover:-translate-y-1 ${styles.card}`}
+                className="pr-ranking-row group grid grid-cols-[48px_1fr_auto_auto] items-center gap-3 border-t border-white/10 py-4"
               >
-                <div
-                  className={`pointer-events-none absolute -right-10 -top-10 h-36 w-36 rounded-full blur-3xl ${styles.glow}`}
-                />
-
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.10),transparent_42%)] opacity-0 transition group-hover:opacity-100" />
-
-                <div className="relative z-10">
-                  <div className="flex items-start justify-between">
-                    <TeamLogo name={team.name} logoUrl={team.logo_url} size="lg" />
-
-                    <span
-                      className={`rounded-full border px-4 py-1.5 text-sm font-black ${getRankPillStyles(
-                        ranking.rank
-                      )}`}
-                    >
-                      #{ranking.rank}
-                    </span>
-                  </div>
-
-                  <h3 className="mt-6 text-2xl font-black tracking-tight text-white">
-                    {team.name}
-                  </h3>
-
-                  <p className="mt-1 text-xs uppercase tracking-[0.22em] text-white/35">
-                    {team.short_name || "TEAM"}
-                  </p>
-
-                  <div className="mt-4">
-                    <DataSourceBadge
-                      source={team.source}
-                      verified={team.verified}
-                      label={
-                        team.source === "krafton_india_esports"
-                          ? "Official Krafton Team"
-                          : team.verified
-                            ? "Verified Team"
-                            : "Team Record"
-                      }
-                    />
-                  </div>
-
-                  <div className="mt-6 grid grid-cols-2 gap-4 border-t border-white/10 pt-5">
-                    <div>
-                      <p className="text-xs text-white/35">Points</p>
-
-                      <p className={`mt-1 text-2xl font-black ${styles.accent}`}>
-                        {ranking.score}
-                      </p>
-                    </div>
-
-                    <div className="text-right">
-                      <p className="text-xs text-white/35">WWCD</p>
-
-                      <p className="mt-1 text-2xl font-black text-white">
-                        {team.wins ?? 0}
-                      </p>
-                    </div>
+                <RankNumber rank={ranking.rank} />
+                <div className="flex min-w-0 items-center gap-3">
+                  <EntityMark name={team.name} logoUrl={team.logo_url} />
+                  <div className="min-w-0">
+                    <p className="truncate font-semibold text-white">
+                      {team.name}
+                    </p>
+                    <p className="mt-1 text-[10px] uppercase tracking-[.14em] text-white/30">
+                      {team.short_name || "Team"}
+                    </p>
                   </div>
                 </div>
+                <Movement value={ranking.change} />
+                <p className="w-16 text-right font-semibold">
+                  {Math.round(ranking.score)}
+                </p>
               </Link>
-            );
-          })}
+            ))}
+          </Leaderboard>
+
+          <Leaderboard
+            title="Player leaderboard"
+            subtitle="PlayRank performance order"
+            href="/rankings/players"
+            right
+          >
+            {rankedPlayers.slice(0, 10).map(({ ranking, player }) => (
+              <Link
+                key={player.id}
+                href={`/players/${player.slug}`}
+                className="pr-ranking-row group grid grid-cols-[48px_1fr_auto_auto] items-center gap-3 border-t border-white/10 py-4"
+              >
+                <RankNumber rank={ranking.rank} />
+                <div className="flex min-w-0 items-center gap-3">
+                  <EntityMark name={player.ign} />
+                  <div className="min-w-0">
+                    <p className="truncate font-semibold text-white">
+                      {player.ign}
+                    </p>
+                    <p className="mt-1 text-[10px] uppercase tracking-[.14em] text-white/30">
+                      {player.role || "Player"}
+                    </p>
+                  </div>
+                </div>
+                <Movement value={ranking.change} />
+                <p className="w-16 text-right font-semibold">
+                  {Math.round(ranking.score)}
+                </p>
+              </Link>
+            ))}
+          </Leaderboard>
         </div>
       </section>
 
-      <section className="overflow-hidden rounded-[2rem] border border-white/10 bg-[#090b10] shadow-2xl">
-        <div className="flex flex-col gap-4 border-b border-white/10 p-6 md:flex-row md:items-end md:justify-between">
+      <section className="pr-container py-16 md:py-20">
+        <div className="grid gap-8 border-b border-white/15 pb-12 lg:grid-cols-[.75fr_1.25fr]">
           <div>
-            <div className="flex flex-wrap gap-2">
-              <DataSourceBadge label="Official + PlayRank Verified Layer" />
-              <DataSourceBadge label="Ranking Snapshot" />
-              <DataFreshnessBadge value={latestTeamUpdate} label="Team Freshness" />
-            </div>
-
-            <h2 className="mt-4 text-2xl font-black tracking-tight text-white">
-              Team Rankings
+            <p className="pr-kicker">Trust layer</p>
+            <h2 className="mt-4 text-4xl font-semibold tracking-[-.05em] text-white">
+              Know what the rank means.
             </h2>
-
-            <p className="mt-2 text-sm text-white/45">
-              Top 20 official and PlayRank-mapped teams. Team rows show source,
-              verification, ranking movement and latest available ranking
-              timestamp.
-            </p>
           </div>
-
-          <Link
-            href="/data"
-            className="rounded-full border border-white/10 bg-white/[0.03] px-5 py-2 text-sm text-white/60 transition hover:border-white/25 hover:text-white"
-          >
-            View data methodology
-          </Link>
-        </div>
-
-        <div className="max-h-[760px] overflow-auto">
-          <table className="w-full min-w-[1040px] border-collapse text-left">
-            <thead className="sticky top-0 z-20 backdrop-blur-xl">
-              <tr className="border-b border-white/10 bg-[#090b10]/90 text-xs uppercase tracking-[0.22em] text-white/35">
-                <th className="px-6 py-4">Rank</th>
-                <th className="px-6 py-4">Team</th>
-                <th className="px-6 py-4">Status</th>
-                <th className="px-6 py-4 text-right">Points</th>
-                <th className="px-6 py-4 text-right">Change</th>
-                <th className="px-6 py-4 text-right">WWCD</th>
-                <th className="px-6 py-4 text-right">Matches</th>
-                <th className="px-6 py-4 text-right">Kills</th>
-                <th className="px-6 py-4">Source</th>
-              </tr>
-            </thead>
-
-            <tbody>
-              {rankedTeams.length > 0 ? (
-                rankedTeams.map(({ ranking, team }) => (
-                  <tr
-                    key={ranking.entity_id}
-                    className={`border-b border-white/[0.06] transition ${getTableRowStyles(
-                      ranking.rank
-                    )}`}
-                  >
-                    <td className="px-6 py-5">
-                      <span
-                        className={`rounded-full border px-3 py-1 text-sm font-black ${getRankPillStyles(
-                          ranking.rank
-                        )}`}
-                      >
-                        #{ranking.rank}
-                      </span>
-                    </td>
-
-                    <td className="px-6 py-5">
-                      <div className="flex items-center gap-4">
-                        <TeamLogo name={team.name} logoUrl={team.logo_url} size="sm" />
-
-                        <div>
-                          <Link
-                            href={`/teams/${team.slug}`}
-                            className="font-bold text-white hover:underline"
-                          >
-                            {team.name}
-                          </Link>
-
-                          <p className="mt-1 text-xs uppercase tracking-[0.18em] text-white/35">
-                            {team.short_name || "TEAM"}
-                          </p>
-                        </div>
-                      </div>
-                    </td>
-
-                    <td className="px-6 py-5">
-                      {team.active !== false ? (
-                        <span className="rounded-full border border-emerald-400/20 bg-emerald-400/10 px-3 py-1 text-xs font-semibold text-emerald-300">
-                          Active
-                        </span>
-                      ) : (
-                        <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-semibold text-white/35">
-                          Inactive
-                        </span>
-                      )}
-                    </td>
-
-                    <td className="px-6 py-5 text-right font-black text-white">
-                      {ranking.score}
-                    </td>
-
-                    <td
-                      className={`px-6 py-5 text-right font-black ${changeTone(
-                        ranking.change
-                      )}`}
-                    >
-                      {formatChange(ranking.change)}
-                    </td>
-
-                    <td className="px-6 py-5 text-right text-white/65">
-                      {team.wins ?? 0}
-                    </td>
-
-                    <td className="px-6 py-5 text-right text-white/45">
-                      {team.matches_played ?? 0}
-                    </td>
-
-                    <td className="px-6 py-5 text-right text-white/45">
-                      {team.kills ?? 0}
-                    </td>
-
-                    <td className="px-6 py-5">
-                      <DataSourceBadge
-                        source={team.source}
-                        verified={team.verified}
-                        label={
-                          team.source === "krafton_india_esports"
-                            ? "Official Krafton"
-                            : team.verified
-                              ? "Verified"
-                              : "Record"
-                        }
-                      />
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan={9} className="px-6 py-10 text-center text-white/45">
-                    No team rankings available yet.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-      </section>
-
-      <section className="overflow-hidden rounded-[2rem] border border-white/10 bg-[#090b10] shadow-2xl">
-        <div className="flex flex-col gap-4 border-b border-white/10 p-6 md:flex-row md:items-end md:justify-between">
-          <div>
-            <div className="flex flex-wrap gap-2">
-              <DataSourceBadge label="PlayRank Player Ranking" />
-              <DataSourceBadge label="Analytics Generated" />
-              <DataSourceBadge label="Directional Confidence" />
-              <DataFreshnessBadge value={latestPlayerUpdate} label="Player Freshness" />
-            </div>
-
-            <h2 className="mt-4 text-2xl font-black tracking-tight text-white">
-              Player Rankings
-            </h2>
-
-            <p className="mt-2 text-sm text-white/45">
-              Player ranking is generated from PlayRank match, stat and seed
-              data. Treat early rankings as directional until match sample size
-              grows.
-            </p>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <TrustItem
+              icon={<ShieldCheck size={18} />}
+              title="Source-aware"
+              body="Official team data is attributed where available. PlayRank-generated analysis is labelled separately."
+            />
+            <TrustItem
+              icon={<Clock3 size={18} />}
+              title="Snapshot-based"
+              body={`This view reflects the latest available snapshot: ${formatDate(snapshot)}.`}
+            />
           </div>
-
-          <Link
-            href="/players"
-            className="rounded-full border border-white/10 bg-white/[0.03] px-5 py-2 text-sm text-white/60 transition hover:border-white/25 hover:text-white"
-          >
-            View players
-          </Link>
         </div>
-
-        <div className="overflow-x-auto">
-          <table className="w-full min-w-[980px] border-collapse text-left">
-            <thead>
-              <tr className="border-b border-white/10 bg-white/[0.025] text-xs uppercase tracking-[0.22em] text-white/35">
-                <th className="px-6 py-4">Rank</th>
-                <th className="px-6 py-4">Player</th>
-                <th className="px-6 py-4">Role</th>
-                <th className="px-6 py-4 text-right">Score</th>
-                <th className="px-6 py-4 text-right">Change</th>
-                <th className="px-6 py-4 text-right">Kills</th>
-                <th className="px-6 py-4 text-right">Damage</th>
-                <th className="px-6 py-4 text-right">MVP</th>
-                <th className="px-6 py-4">Form</th>
-                <th className="px-6 py-4">Source</th>
-              </tr>
-            </thead>
-
-            <tbody>
-              {rankedPlayers.length > 0 ? (
-                rankedPlayers.map(({ ranking, player }) => (
-                  <tr
-                    key={ranking.entity_id}
-                    className={`border-b border-white/[0.06] transition ${getTableRowStyles(
-                      ranking.rank
-                    )}`}
-                  >
-                    <td className="px-6 py-5">
-                      <span
-                        className={`rounded-full border px-3 py-1 text-sm font-black ${getRankPillStyles(
-                          ranking.rank
-                        )}`}
-                      >
-                        #{ranking.rank}
-                      </span>
-                    </td>
-
-                    <td className="px-6 py-5">
-                      <div className="flex items-center gap-4">
-                        <PlayerAvatar ign={player.ign} />
-
-                        <div>
-                          <Link
-                            href={`/players/${player.slug}`}
-                            className="font-bold text-white hover:underline"
-                          >
-                            {player.ign}
-                          </Link>
-
-                          <p className="mt-1 text-xs uppercase tracking-[0.18em] text-white/35">
-                            Player
-                          </p>
-                        </div>
-                      </div>
-                    </td>
-
-                    <td className="px-6 py-5 text-white/60">
-                      {player.role || "â€”"}
-                    </td>
-
-                    <td className="px-6 py-5 text-right font-black text-white">
-                      {ranking.score}
-                    </td>
-
-                    <td
-                      className={`px-6 py-5 text-right font-black ${changeTone(
-                        ranking.change
-                      )}`}
-                    >
-                      {formatChange(ranking.change)}
-                    </td>
-
-                    <td className="px-6 py-5 text-right text-white/65">
-                      {player.total_kills ?? 0}
-                    </td>
-
-                    <td className="px-6 py-5 text-right text-white/65">
-                      {player.avg_damage ?? 0}
-                    </td>
-
-                    <td className="px-6 py-5 text-right text-white/65">
-                      {player.mvp_count ?? 0}
-                    </td>
-
-                    <td className="px-6 py-5">
-                      <span className="rounded-full border border-emerald-400/20 bg-emerald-400/10 px-3 py-1 text-xs font-semibold text-emerald-300">
-                        {player.recent_form ?? "N/A"}
-                      </span>
-                    </td>
-
-                    <td className="px-6 py-5">
-                      <DataSourceBadge
-                        source={player.source}
-                        verified={player.verified}
-                        label={player.verified ? "Verified Player" : "PlayRank"}
-                      />
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan={10} className="px-6 py-10 text-center text-white/45">
-                    No player rankings available yet.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
+        <details className="group border-b border-white/15 py-6">
+          <summary className="flex cursor-pointer list-none items-center justify-between gap-4 font-semibold text-white">
+            <span>How PlayRank rankings should be interpreted</span>
+            <span className="text-[var(--pr-red)] transition group-open:rotate-45">
+              +
+            </span>
+          </summary>
+          <p className="mt-5 max-w-4xl text-sm leading-7 text-white/45">
+            Team rankings combine official and verified records where available.
+            Player rankings are generated from available player, match and
+            performance data and should be treated as directional while sample
+            sizes develop. Rankings are intelligence signals—not predictions or
+            official tournament decisions.
+          </p>
+        </details>
       </section>
     </main>
   );
 }
 
+function Leaderboard({
+  title,
+  subtitle,
+  href,
+  right = false,
+  children,
+}: {
+  title: string;
+  subtitle: string;
+  href: string;
+  right?: boolean;
+  children: React.ReactNode;
+}) {
+  return (
+    <section
+      className={`py-12 lg:py-16 ${right ? "lg:border-l lg:border-white/15 lg:pl-10" : "lg:pr-10"}`}
+    >
+      <div className="mb-7 flex items-end justify-between gap-4">
+        <div>
+          <p className="pr-kicker">{subtitle}</p>
+          <h2 className="mt-3 text-3xl font-semibold tracking-[-.045em] text-white">
+            {title}
+          </h2>
+        </div>
+        <Link href={href} className="text-white/35 transition hover:text-white">
+          <ArrowRight size={18} />
+        </Link>
+      </div>
+      <div>{children}</div>
+    </section>
+  );
+}
 
-
-
+function TrustItem({
+  icon,
+  title,
+  body,
+}: {
+  icon: React.ReactNode;
+  title: string;
+  body: string;
+}) {
+  return (
+    <article className="border border-white/15 p-5">
+      <div className="text-[var(--pr-red)]">{icon}</div>
+      <h3 className="mt-5 text-lg font-semibold text-white">{title}</h3>
+      <p className="mt-2 text-sm leading-6 text-white/45">{body}</p>
+    </article>
+  );
+}

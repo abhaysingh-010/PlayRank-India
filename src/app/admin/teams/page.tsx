@@ -2,52 +2,54 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { supabase } from "@/lib/supabase";
 
-function slugify(value: string) 
-{
+function slugify(value: string) {
   return value
-  .toLowerCase()
-  .trim()
-  .replace(/[^a-z0-9]+/g, "-")
-  .replace(/^-+|-+$/g, "");
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
 }
 
-export default function AdminTeamsPage() 
-{
+const inputClass =
+  "w-full border border-white/10 bg-[#050609] px-4 py-3.5 text-sm text-white outline-none transition placeholder:text-white/20 focus:border-[#ffd21a]/60 focus:bg-[#090a0d]";
+
+export default function AdminTeamsPage() {
   const [name, setName] = useState("");
   const [shortName, setShortName] = useState("");
   const [country, setCountry] = useState("India");
   const [logoUrl, setLogoUrl] = useState("");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
-  const addTeam = async () => 
-  {
+
+  const slug = slugify(name);
+
+  const addTeam = async () => {
     setMessage("");
-    if (!name.trim()) 
-    {
+    if (!name.trim()) {
       setMessage("Team name is required.");
       return;
     }
+
     setLoading(true);
-    const slug = slugify(name);
-    const { error } = await supabase.from("teams").insert
-    (
-      {
+    const response = await fetch("/api/admin/teams", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
         name: name.trim(),
-        short_name: shortName.trim() || null,
-        slug,
+        shortName: shortName.trim(),
         country: country.trim() || "India",
-        logo_url: logoUrl.trim() || null,
-        active: true,
-        verified: false,
-        source: "admin_manual",
-      }
-    );
+        logoUrl: logoUrl.trim(),
+      }),
+    });
+    const result = (await response.json()) as {
+      ok?: boolean;
+      error?: string;
+    };
     setLoading(false);
-    if (error) 
-    {
-      setMessage(error.message);
+
+    if (!response.ok) {
+      setMessage(result.error || "Unable to create team.");
       return;
     }
 
@@ -59,55 +61,147 @@ export default function AdminTeamsPage()
   };
 
   return (
-    <main className="min-h-screen bg-black px-7 py-24 text-white md:px-14">
-      <section className="krafton-grid relative overflow-hidden rounded-[2rem] border border-white/10 bg-[#07080c] p-8 md:p-12">
-        <div className="blueprint-lines" />
-        <div className="relative z-10">
-          <p className="krafton-label">Admin Console</p>
-          <h1 className="krafton-display mt-6 text-[14vw] md:text-[8vw] xl:text-[7rem]">
-            TEAM
+    <main className="bg-[#030406] text-white">
+      <header className="border-b border-white/10 bg-[#050609]">
+        <div className="mx-auto grid max-w-[1500px] gap-8 px-5 py-10 md:px-8 lg:grid-cols-[1fr_auto] lg:items-end">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.24em] text-[#f4473b]">
+              Entity management / teams
+            </p>
+            <h1 className="mt-4 text-5xl font-black uppercase leading-[0.86] tracking-[-0.065em] md:text-7xl">
+              Team records.
+            </h1>
+            <p className="mt-5 max-w-2xl text-sm leading-6 text-white/45">
+              Create the canonical team identity used by rankings, rosters,
+              match results and PUBG mapping workflows.
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <Link href="/teams" className="pr-button pr-button-primary">
+              Public teams
+            </Link>
+            <Link
+              href="/admin/data-health/missing-logos"
+              className="pr-button pr-button-secondary"
+            >
+              Logo issues
+            </Link>
+          </div>
+        </div>
+      </header>
+
+      <section className="mx-auto grid max-w-[1500px] gap-6 px-5 py-10 md:px-8 xl:grid-cols-[0.72fr_1.28fr]">
+        <aside className="border border-white/10 bg-[#080a0f] p-6">
+          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[#ffd21a]">
+            Record contract
+          </p>
+          <h2 className="mt-4 text-3xl font-black uppercase tracking-[-0.05em]">
+            Create once.
             <br />
-            CONTROL
-          </h1>
-          <p className="mt-6 max-w-3xl text-base font-black uppercase leading-6 tracking-[-0.03em] text-white/80 md:text-xl">
-            Internal shortcut for reviewing team data, creating team records,
-            managing slugs, logos and competitive profile coverage.
-          </p>
-          <div className="mt-10 flex flex-wrap gap-3">
-            <Link href="/teams" className="btn-primary px-6 py-3 text-sm">Open Public Teams</Link>
-            <Link href="/admin/data-health"className="btn-secondary px-6 py-3 text-sm">Data Health</Link>
-            <Link href="/admin" className="btn-secondary px-6 py-3 text-sm">Admin Home</Link>
+            Connect everywhere.
+          </h2>
+          <div className="mt-8 space-y-5 border-t border-white/10 pt-6 text-sm leading-6 text-white/45">
+            <p>
+              <span className="font-bold text-white">01.</span> Name generates
+              the public slug automatically.
+            </p>
+            <p>
+              <span className="font-bold text-white">02.</span> New records
+              start active and unverified.
+            </p>
+            <p>
+              <span className="font-bold text-white">03.</span> Roster and
+              source mappings can be attached afterward.
+            </p>
           </div>
-        </div>
-      </section>
-      <section className="mt-8 grid gap-6 xl:grid-cols-[0.9fr_1.1fr]">
-        <div className="krafton-card p-7">
-          <p className="krafton-label">Create Team</p>
-          <h2 className="mt-4 text-4xl font-black uppercase tracking-[-0.05em] text-white">Add Team</h2>
-          <p className="mt-4 leading-7 text-white/50">
-            Add a PlayRank team shell for rankings, rosters, match results,
-            profile pages and future PUBG/BGMI mapping workflows.
-          </p>
-        </div>
-        <div className="krafton-card p-7">
-          <div className="space-y-4">
-            <input value={name}onChange={(e) => setName(e.target.value)}placeholder="Team Name"className="w-full rounded-xl border border-white/10 bg-black px-4 py-4 text-white outline-none placeholder:text-white/35"/>
-            <input value={shortName}onChange={(e) => setShortName(e.target.value)}placeholder="Short Name, e.g. SOUL / GODL / XS"className="w-full rounded-xl border border-white/10 bg-black px-4 py-4 text-white outline-none placeholder:text-white/35"/>
-            <input value={country}onChange={(e) => setCountry(e.target.value)}placeholder="Country"className="w-full rounded-xl border border-white/10 bg-black px-4 py-4 text-white outline-none placeholder:text-white/35"/>
-            <input value={logoUrl}onChange={(e) => setLogoUrl(e.target.value)}placeholder="Logo URL optional"className="w-full rounded-xl border border-white/10 bg-black px-4 py-4 text-white outline-none placeholder:text-white/35"/>
-            <button onClick={addTeam}disabled={loading}className="w-full rounded-xl border border-emerald-400/25 bg-emerald-400/10 px-5 py-4 text-sm font-black uppercase tracking-[0.16em] text-emerald-300 hover:bg-emerald-400/20 disabled:cursor-not-allowed disabled:opacity-50">
-              {loading ? "Adding..." : "Add Team"}
+        </aside>
+        <section className="border border-white/10 bg-[#080a0f]">
+          <div className="flex items-center justify-between border-b border-white/10 px-5 py-4 md:px-6">
+            <div>
+              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/30">
+                New entity
+              </p>
+              <h2 className="mt-1 text-xl font-black uppercase">Add team</h2>
+            </div>
+            <span className="border border-white/10 px-3 py-1.5 text-[10px] font-black uppercase tracking-[0.16em] text-white/35">
+              Manual source
+            </span>
+          </div>
+
+          <div className="grid gap-5 p-5 md:grid-cols-2 md:p-6">
+            <label className="space-y-2">
+              <span className="text-[10px] font-black uppercase tracking-[0.16em] text-white/45">
+                Team name *
+              </span>
+              <input
+                value={name}
+                onChange={(event) => setName(event.target.value)}
+                placeholder="Team Soul"
+                className={inputClass}
+              />
+            </label>
+            <label className="space-y-2">
+              <span className="text-[10px] font-black uppercase tracking-[0.16em] text-white/45">
+                Short name
+              </span>
+              <input
+                value={shortName}
+                onChange={(event) => setShortName(event.target.value)}
+                placeholder="SOUL"
+                className={inputClass}
+              />
+            </label>
+            <label className="space-y-2">
+              <span className="text-[10px] font-black uppercase tracking-[0.16em] text-white/45">
+                Country
+              </span>
+              <input
+                value={country}
+                onChange={(event) => setCountry(event.target.value)}
+                placeholder="India"
+                className={inputClass}
+              />
+            </label>
+            <label className="space-y-2">
+              <span className="text-[10px] font-black uppercase tracking-[0.16em] text-white/45">
+                Logo URL
+              </span>
+              <input
+                value={logoUrl}
+                onChange={(event) => setLogoUrl(event.target.value)}
+                placeholder="https://…"
+                className={inputClass}
+              />
+            </label>
+          </div>
+
+          <div className="grid gap-4 border-t border-white/10 p-5 md:grid-cols-[1fr_auto] md:items-center md:p-6">
+            <div>
+              <p className="text-[10px] font-black uppercase tracking-[0.16em] text-white/30">
+                Generated route
+              </p>
+              <p className="mt-2 break-all font-mono text-sm text-white/60">
+                /teams/{slug || "team-slug"}
+              </p>
+            </div>
+            <button
+              onClick={addTeam}
+              disabled={loading}
+              className="bg-[#f4473b] px-7 py-4 text-xs font-black uppercase tracking-[0.18em] text-black transition hover:bg-[#ff5a4f] disabled:cursor-not-allowed disabled:opacity-45"
+            >
+              {loading ? "Creating…" : "Create team"}
             </button>
-            {message ? 
-              (
-                <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4 text-sm text-white/70">
-                  {message}
-                </div>
-              ) 
-              : null
-            }
           </div>
-        </div>
+
+          {message ? (
+            <p
+              role="status"
+              className="border-t border-white/10 px-5 py-4 text-sm text-[#ffd21a] md:px-6"
+            >
+              {message}
+            </p>
+          ) : null}
+        </section>
       </section>
     </main>
   );

@@ -109,7 +109,7 @@ export default async function PubgBlockedPromotionsPage() {
   const { data, error } = await supabaseAdmin
     .from("pubg_match_promotion_readiness")
     .select(
-      "external_match_id, shard, map_name, game_mode, created_at_api, total_participants, mapped_players, mapped_players_with_team, mapped_teams, mapped_player_percentage, promotion_status, promotion_allowed, roster_safe_players, roster_safe_teams, unmapped_players, unsafe_roster_players, ai_participants, human_participants"
+      "external_match_id, shard, map_name, game_mode, created_at_api, total_participants, mapped_players, mapped_players_with_team, mapped_teams, mapped_player_percentage, promotion_status, promotion_allowed, roster_safe_players, roster_safe_teams, unmapped_players, unsafe_roster_players, ai_participants, human_participants",
     )
     .or("promotion_allowed.is.false,promotion_allowed.is.null")
     .order("created_at_api", { ascending: false })
@@ -117,22 +117,24 @@ export default async function PubgBlockedPromotionsPage() {
 
   const rows = (data || []) as PromotionReadinessRow[];
 
-  const aiBlockedCount = rows.filter((row) => n(row.ai_participants) > 0).length;
+  const aiBlockedCount = rows.filter(
+    (row) => n(row.ai_participants) > 0,
+  ).length;
   const unmappedPlayerCount = rows.reduce(
     (sum, row) => sum + n(row.unmapped_players),
-    0
+    0,
   );
   const unsafeRosterCount = rows.reduce(
     (sum, row) => sum + n(row.unsafe_roster_players),
-    0
+    0,
   );
   const totalParticipants = rows.reduce(
     (sum, row) => sum + n(row.total_participants),
-    0
+    0,
   );
   const mappedPlayers = rows.reduce(
     (sum, row) => sum + n(row.mapped_players),
-    0
+    0,
   );
 
   const mappingPercentage =
@@ -143,7 +145,7 @@ export default async function PubgBlockedPromotionsPage() {
   if (error) {
     return (
       <main className="page-shell py-10 text-white">
-        <section className="rounded-[2rem] border border-red-500/20 bg-red-500/5 p-8">
+        <section className="border border-red-500/20 bg-red-500/5 p-8">
           <p className="text-xs font-black uppercase tracking-[0.22em] text-red-300">
             Admin Data Health
           </p>
@@ -159,7 +161,7 @@ export default async function PubgBlockedPromotionsPage() {
 
   return (
     <main className="page-shell space-y-6 py-8 text-white">
-      <section className="rounded-[2rem] border border-white/10 bg-[#07080c] p-7 md:p-9">
+      <section className="border border-white/10 bg-[#07080c] p-7 md:p-9">
         <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
           <div>
             <div className="flex flex-wrap gap-2">
@@ -227,22 +229,37 @@ export default async function PubgBlockedPromotionsPage() {
               <p className="text-xs uppercase tracking-[0.2em] text-white/35">
                 Mapping Coverage
               </p>
-              <p className="mt-2 text-3xl font-black">
-                {mappingPercentage}%
-              </p>
+              <p className="mt-2 text-3xl font-black">{mappingPercentage}%</p>
             </div>
           </div>
         </div>
 
         <div className="mt-7 flex flex-wrap gap-3">
-          <Link href="/admin/data-health" className="btn-secondary px-5 py-3 text-sm">Back to Data Health</Link>
-          <Link href="/admin/pubg/mappings" className="btn-primary px-5 py-3 text-sm">Fix Player Mappings</Link>
-          <Link href="/admin/pubg/imports" className="btn-secondary px-5 py-3 text-sm">PUBG Imports</Link>
-          <Link href="/admin/pubg" className="btn-secondary px-5 py-3 text-sm">PUBG Admin</Link>
+          <Link
+            href="/admin/data-health"
+            className="pr-button pr-button-secondary"
+          >
+            Back to Data Health
+          </Link>
+          <Link
+            href="/admin/pubg/mappings"
+            className="pr-button pr-button-primary"
+          >
+            Fix Player Mappings
+          </Link>
+          <Link
+            href="/admin/pubg/imports"
+            className="pr-button pr-button-secondary"
+          >
+            PUBG Imports
+          </Link>
+          <Link href="/admin/pubg" className="pr-button pr-button-secondary">
+            PUBG Admin
+          </Link>
         </div>
       </section>
 
-      <section className="rounded-[2rem] border border-red-400/20 bg-red-400/[0.06] p-6">
+      <section className="border border-red-400/20 bg-red-400/[0.06] p-6">
         <div className="flex flex-wrap gap-2">
           <DataSourceBadge label="Promotion Disabled" />
           <DataSourceBadge label="Safety First" />
@@ -261,7 +278,7 @@ export default async function PubgBlockedPromotionsPage() {
         </p>
       </section>
 
-      <section className="overflow-hidden rounded-[2rem] border border-white/10 bg-[#090b10] shadow-2xl">
+      <section className="overflow-hidden border border-white/10 bg-[#090b10] shadow-2xl">
         <div className="border-b border-white/10 p-6">
           <h2 className="text-2xl font-black">Blocked Matches</h2>
           <p className="mt-2 text-sm text-white/45">
@@ -310,7 +327,7 @@ export default async function PubgBlockedPromotionsPage() {
                           {row.map_name || "Unknown Map"}
                         </p>
                         <p className="mt-1 text-xs uppercase tracking-[0.16em] text-white/35">
-                          {row.game_mode || "mode"} Â· {row.shard || "shard"}
+                          {row.game_mode || "mode"} · {row.shard || "shard"}
                         </p>
                       </td>
 
@@ -350,16 +367,16 @@ export default async function PubgBlockedPromotionsPage() {
                         <div className="flex flex-col items-end gap-2">
                           <Link
                             href={`/admin/pubg/imports/${encodeURIComponent(
-                              row.external_match_id
+                              row.external_match_id,
                             )}`}
                             className="rounded-full border border-red-400/30 bg-red-400/10 px-4 py-2 text-sm text-red-300 transition hover:border-red-300 hover:text-red-200"
                           >
                             Review import
                           </Link>
 
-                                                    <Link
+                          <Link
                             href={`/admin/pubg/mappings?match=${encodeURIComponent(
-                              row.external_match_id
+                              row.external_match_id,
                             )}`}
                             className="rounded-full border border-white/10 bg-white/[0.04] px-4 py-2 text-sm text-white/60 transition hover:border-[#ffd21a]/30 hover:text-[#ffd21a]"
                           >
@@ -367,7 +384,9 @@ export default async function PubgBlockedPromotionsPage() {
                           </Link>
 
                           <Link
-                            href={getPromotionReadinessHref(row.promotion_status)}
+                            href={getPromotionReadinessHref(
+                              row.promotion_status,
+                            )}
                             className="rounded-full border border-[#ffd21a]/20 bg-[#ffd21a]/10 px-4 py-2 text-sm font-bold text-[#ffd21a] transition hover:bg-[#ffd21a]/15"
                           >
                             Readiness filter
@@ -396,5 +415,3 @@ export default async function PubgBlockedPromotionsPage() {
     </main>
   );
 }
-
-

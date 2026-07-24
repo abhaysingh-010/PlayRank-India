@@ -54,7 +54,7 @@ type BlockCopy = {
 };
 
 const shell =
-  "rounded-[2rem] border border-white/10 bg-[#080a0f] shadow-[0_24px_80px_rgba(0,0,0,0.28)]";
+  "border border-white/10 bg-[#080a0f] shadow-[0_24px_80px_rgba(0,0,0,0.28)]";
 
 const panel =
   "rounded-2xl border border-white/10 bg-white/[0.035] shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]";
@@ -201,7 +201,7 @@ function getBlockCopy(row: ReadinessRow): BlockCopy {
       description:
         "This match passed the readiness gate. Keep manual review enabled before writing into PlayRank core tables.",
       actionLabel: "Open Confirmation Workflow",
-          actionHref: `/admin/pubg/imports/${encodeURIComponent(row.external_match_id)}`,
+      actionHref: `/admin/pubg/imports/${encodeURIComponent(row.external_match_id)}`,
       tone: "healthy",
     };
   }
@@ -312,7 +312,7 @@ function ReadinessCard({ row }: { row: ReadinessRow }) {
           <div className="flex flex-wrap items-center gap-2">
             <span
               className={`rounded-full border px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.12em] ${toneStyle(
-                tone
+                tone,
               )}`}
             >
               {row.promotion_allowed ? "Ready" : blockCopy.label}
@@ -418,13 +418,34 @@ function ReadinessCard({ row }: { row: ReadinessRow }) {
         />
       </div>
 
-      <div className={`mt-5 rounded-2xl border p-4 ${toneStyle(blockCopy.tone)}`}>
-        <p className="text-xs font-black uppercase tracking-[0.16em]">{blockCopy.title}</p>
-        <p className="mt-2 text-sm leading-6 text-white/65">{blockCopy.description}</p>
+      <div
+        className={`mt-5 rounded-2xl border p-4 ${toneStyle(blockCopy.tone)}`}
+      >
+        <p className="text-xs font-black uppercase tracking-[0.16em]">
+          {blockCopy.title}
+        </p>
+        <p className="mt-2 text-sm leading-6 text-white/65">
+          {blockCopy.description}
+        </p>
         <div className="mt-4 flex flex-wrap gap-3">
-          <Link href={blockCopy.actionHref} className="text-sm font-black transition hover:text-white">{blockCopy.actionLabel} -&gt;</Link>
-          <Link href={`/admin/pubg/imports/${encodeURIComponent(row.external_match_id)}`} className="btn-secondary px-4 py-2 text-xs">View Import Detail</Link>
-          <Link href="/admin/rosters/health" className="text-sm font-black transition hover:text-white">Roster Health -&gt;</Link>
+          <Link
+            href={blockCopy.actionHref}
+            className="text-sm font-black transition hover:text-white"
+          >
+            {blockCopy.actionLabel} -&gt;
+          </Link>
+          <Link
+            href={`/admin/pubg/imports/${encodeURIComponent(row.external_match_id)}`}
+            className="btn-secondary px-4 py-2 text-xs"
+          >
+            View Import Detail
+          </Link>
+          <Link
+            href="/admin/rosters/health"
+            className="text-sm font-black transition hover:text-white"
+          >
+            Roster Health -&gt;
+          </Link>
         </div>
       </div>
     </article>
@@ -462,7 +483,7 @@ function JobRow({ job }: { job: ApiImportJob }) {
 
         <span
           className={`mt-2 inline-flex rounded-full border px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.12em] ${toneStyle(
-            tone
+            tone,
           )}`}
         >
           {job.status || "unknown"}
@@ -511,7 +532,7 @@ export default async function PubgImportsPage() {
     supabaseAdmin
       .from("pubg_match_promotion_readiness")
       .select(
-        "external_match_id, shard, map_name, game_mode, created_at_api, total_participants, mapped_players, mapped_players_with_team, mapped_teams, mapped_player_percentage, promotion_status, promotion_allowed, roster_safe_players, roster_safe_teams, unmapped_players, unsafe_roster_players, ai_participants, human_participants"
+        "external_match_id, shard, map_name, game_mode, created_at_api, total_participants, mapped_players, mapped_players_with_team, mapped_teams, mapped_player_percentage, promotion_status, promotion_allowed, roster_safe_players, roster_safe_teams, unmapped_players, unsafe_roster_players, ai_participants, human_participants",
       )
       .order("created_at_api", { ascending: false })
       .limit(50),
@@ -519,7 +540,7 @@ export default async function PubgImportsPage() {
     supabaseAdmin
       .from("api_import_jobs")
       .select(
-        "id, provider, job_type, status, raw_import_count, normalized_match_count, error_message, started_at, completed_at"
+        "id, provider, job_type, status, raw_import_count, normalized_match_count, error_message, started_at, completed_at",
       )
       .eq("provider", "pubg_developer_api")
       .order("started_at", { ascending: false })
@@ -530,30 +551,30 @@ export default async function PubgImportsPage() {
   const latestJobs = (latestJobsResult.data || []) as ApiImportJob[];
 
   const readyCount = readinessRows.filter(
-    (row) => row.promotion_allowed === true
+    (row) => row.promotion_allowed === true,
   ).length;
 
   const blockedCount = readinessRows.filter(
-    (row) => row.promotion_allowed !== true
+    (row) => row.promotion_allowed !== true,
   ).length;
 
   const rejectedPublicMatchCount = readinessRows.filter(
-    (row) => row.promotion_status === "not_ready_contains_ai_participants"
+    (row) => row.promotion_status === "not_ready_contains_ai_participants",
   ).length;
 
   const totalParticipants = readinessRows.reduce(
     (sum, row) => sum + n(row.total_participants),
-    0
+    0,
   );
 
   const mappedPlayers = readinessRows.reduce(
     (sum, row) => sum + n(row.mapped_players),
-    0
+    0,
   );
 
   const aiParticipants = readinessRows.reduce(
     (sum, row) => sum + n(row.ai_participants),
-    0
+    0,
   );
 
   const tableErrorEntries: Array<[string, string | null | undefined]> = [
@@ -567,13 +588,13 @@ export default async function PubgImportsPage() {
   ];
 
   const tableErrors = tableErrorEntries.filter(
-    (entry): entry is [string, string] => Boolean(entry[1])
+    (entry): entry is [string, string] => Boolean(entry[1]),
   );
 
   return (
-    <main className="min-h-screen bg-[#030406] text-white">
+    <main className="bg-[#030406] text-white">
       <section className="border-b border-white/10 bg-[#050609]">
-        <div className="mx-auto max-w-7xl px-5 py-12 md:py-16">
+        <div className="mx-auto max-w-[1500px] px-5 py-10 md:px-8 md:py-14">
           <div className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:items-end">
             <div>
               <div className="flex flex-wrap gap-2">
@@ -583,7 +604,10 @@ export default async function PubgImportsPage() {
                 <DataSourceBadge label="AI Rejection" size="md" />
               </div>
 
-              <h1 className="mt-7 text-5xl font-black uppercase leading-[0.9] tracking-[-0.07em] text-white md:text-7xl">
+              <p className="mt-7 text-xs font-black uppercase tracking-[0.24em] text-[#f4473b]">
+                Readiness queue / promotion gate
+              </p>
+              <h1 className="mt-4 text-5xl font-black uppercase leading-[0.9] tracking-[-0.07em] text-white md:text-7xl">
                 PUBG Import
                 <br />
                 Review
@@ -595,13 +619,16 @@ export default async function PubgImportsPage() {
                 import jobs before any core promotion.
               </p>
 
-                            <div className="mt-5 rounded-2xl border border-yellow-400/20 bg-yellow-400/10 p-4">
+              <div className="mt-5 rounded-2xl border border-yellow-400/20 bg-yellow-400/10 p-4">
                 <p className="text-xs font-black uppercase tracking-[0.18em] text-yellow-300">
                   Core promotion writes are guarded
                 </p>
 
                 <p className="mt-2 text-sm leading-6 text-white/65">
-                  Dry-run checks are allowed for readiness review, but the admin API route only calls the SQL promotion RPC after readiness, confirmation, and feature flag checks pass. Use the promotion audit page to review historical promotion attempts.
+                  Dry-run checks are allowed for readiness review, but the admin
+                  API route only calls the SQL promotion RPC after readiness,
+                  confirmation, and feature flag checks pass. Use the promotion
+                  audit page to review historical promotion attempts.
                 </p>
               </div>
 
@@ -612,50 +639,54 @@ export default async function PubgImportsPage() {
 
                 <div className="mt-3 grid gap-3 text-sm leading-6 text-white/60 md:grid-cols-2">
                   <p>
-                    1. Run dry-run readiness check from the match detail page before any promotion intent.
+                    1. Run dry-run readiness check from the match detail page
+                    before any promotion intent.
                   </p>
                   <p>
-                    2. Review Promotion Audit and readiness blockers before using the confirmation workflow.
+                    2. Review Promotion Audit and readiness blockers before
+                    using the confirmation workflow.
                   </p>
                   <p>
-                    3. Confirmed promotion requires confirm_promotion plus the exact text PROMOTE_TO_PLAYRANK_CORE.
+                    3. Confirmed promotion requires confirm_promotion plus the
+                    exact text PROMOTE_TO_PLAYRANK_CORE.
                   </p>
                   <p>
-                    4. Server flag PLAYRANK_ENABLE_PUBG_CORE_PROMOTION must remain disabled until Phase 4A approval.
+                    4. Server flag PLAYRANK_ENABLE_PUBG_CORE_PROMOTION must
+                    remain disabled until Phase 4A approval.
                   </p>
                 </div>
               </div>
               <div className="mt-8 flex flex-wrap gap-3">
                 <Link
                   href="/admin/pubg/import"
-                  className="rounded-full border border-[#ffd21a]/30 bg-[#ffd21a]/10 px-5 py-2.5 text-sm font-black text-[#ffd21a] transition hover:bg-[#ffd21a]/15"
+                  className="border border-[#ffd21a]/30 bg-[#ffd21a]/10 px-5 py-2.5 text-xs font-black uppercase tracking-[0.14em] text-[#ffd21a] transition hover:bg-[#ffd21a]/15"
                 >
                   Import Match
                 </Link>
 
                 <Link
                   href="/admin/pubg"
-                  className="rounded-full border border-white/10 bg-white/[0.04] px-5 py-2.5 text-sm font-black text-white/65 transition hover:border-white/25 hover:text-white"
+                  className="border border-white/10 bg-white/[0.04] px-5 py-2.5 text-xs font-black uppercase tracking-[0.14em] text-white/65 transition hover:border-white/25 hover:text-white"
                 >
                   PUBG Hub
                 </Link>
 
                 <Link
                   href="/admin/pubg/mappings"
-                  className="rounded-full border border-white/10 bg-white/[0.04] px-5 py-2.5 text-sm font-black text-white/65 transition hover:border-white/25 hover:text-white"
+                  className="border border-white/10 bg-white/[0.04] px-5 py-2.5 text-xs font-black uppercase tracking-[0.14em] text-white/65 transition hover:border-white/25 hover:text-white"
                 >
                   Player Mappings
                 </Link>
 
                 <Link
                   href="/admin/data-health"
-                  className="rounded-full border border-white/10 bg-white/[0.04] px-5 py-2.5 text-sm font-black text-white/65 transition hover:border-white/25 hover:text-white"
+                  className="border border-white/10 bg-white/[0.04] px-5 py-2.5 text-xs font-black uppercase tracking-[0.14em] text-white/65 transition hover:border-white/25 hover:text-white"
                 >
                   Data Health
                 </Link>
                 <Link
                   href="/admin/pubg/promotions"
-                  className="rounded-full border border-white/10 bg-white/[0.04] px-5 py-2.5 text-sm font-black text-white/65 transition hover:border-white/25 hover:text-white"
+                  className="border border-white/10 bg-white/[0.04] px-5 py-2.5 text-xs font-black uppercase tracking-[0.14em] text-white/65 transition hover:border-white/25 hover:text-white"
                 >
                   Promotion Audit
                 </Link>
@@ -684,7 +715,7 @@ export default async function PubgImportsPage() {
         </div>
       </section>
 
-      <section className="mx-auto grid max-w-7xl gap-5 px-5 py-10 lg:grid-cols-[0.9fr_1.1fr]">
+      <section className="mx-auto grid max-w-[1500px] gap-5 px-5 py-10 md:px-8 lg:grid-cols-[0.9fr_1.1fr]">
         <section className={shell + " p-5 md:p-6"}>
           <SectionHeader
             eyebrow="Coverage"
@@ -770,14 +801,15 @@ export default async function PubgImportsPage() {
 
               <p className="mt-3 text-sm leading-6 text-white/50">
                 Imported rows stay in staging until promotion_allowed is true in
-                the readiness view. Guarded promotion: real PlayRank core writes are disabled until the SQL safety audit is approved.
+                the readiness view. Guarded promotion: real PlayRank core writes
+                are disabled until the SQL safety audit is approved.
               </p>
             </div>
           </div>
         </section>
       </section>
 
-      <section className="mx-auto max-w-7xl px-5 pb-10">
+      <section className="mx-auto max-w-[1500px] px-5 pb-10 md:px-8">
         <section className={shell + " p-5 md:p-6"}>
           <SectionHeader
             eyebrow="Imported Matches"
@@ -786,7 +818,9 @@ export default async function PubgImportsPage() {
 
           {readinessRows.length === 0 ? (
             <div className="rounded-2xl border border-white/10 bg-white/[0.025] p-5">
-              <p className="font-black text-white">No imported matches found.</p>
+              <p className="font-black text-white">
+                No imported matches found.
+              </p>
 
               <p className="mt-2 text-sm leading-6 text-white/45">
                 Import a PUBG match first, then return here to review readiness.
@@ -803,7 +837,7 @@ export default async function PubgImportsPage() {
       </section>
 
       <section className="border-y border-white/10 bg-[#050609]">
-        <div className="mx-auto max-w-7xl px-5 py-10">
+        <div className="mx-auto max-w-[1500px] px-5 py-10 md:px-8">
           <SectionHeader eyebrow="Recent Activity" title="Import Jobs" />
 
           {latestJobs.length === 0 ? (
@@ -820,7 +854,7 @@ export default async function PubgImportsPage() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-5 py-10">
+      <section className="mx-auto max-w-[1500px] px-5 py-10 md:px-8">
         <SectionHeader eyebrow="Errors" title="Import Review Access Report" />
 
         {tableErrors.length > 0 ? (

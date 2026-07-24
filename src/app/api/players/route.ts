@@ -66,7 +66,7 @@ export async function GET(request: NextRequest) {
         ok: false,
         error: "Failed to load player rankings",
       },
-      500
+      500,
     );
   }
 
@@ -80,7 +80,7 @@ export async function GET(request: NextRequest) {
   const { data: playersRaw, error: playersError } = await supabase
     .from("players")
     .select(
-      "id, ign, slug, country, role, team_id, kd_ratio, avg_damage, win_rate, matches_played, total_kills, mvp_count, recent_form, source, verified, active"
+      "id, ign, slug, country, role, team_id, kd_ratio, avg_damage, win_rate, matches_played, total_kills, mvp_count, recent_form, source, verified, active",
     )
     .in("id", ids)
     .eq("active", true);
@@ -91,7 +91,7 @@ export async function GET(request: NextRequest) {
         ok: false,
         error: "Failed to load player records",
       },
-      500
+      500,
     );
   }
 

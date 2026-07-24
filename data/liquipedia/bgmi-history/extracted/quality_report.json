@@ -1,0 +1,2678 @@
+{
+  "generated_at": "2026-07-17T09:32:23.069Z",
+  "pages_scanned": 204,
+  "pages_with_match_templates": 21,
+  "match_templates": 78,
+  "maps_found": 484,
+  "allowed_years": [
+    2021,
+    2022,
+    2023,
+    2024,
+    2025,
+    2026
+  ],
+  "complete_maps": 333,
+  "import_ready_maps": 283,
+  "incomplete_maps": 151,
+  "undated_maps": 198,
+  "extracted_rows": 5391,
+  "import_ready_rows": 4528,
+  "rejected_rows": 863,
+  "pages": [
+    {
+      "title": "The Launch Party",
+      "page_id": 75140,
+      "revision_id": 706551,
+      "years": [
+        2021
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "APL Invitational/Season 2/Round 1",
+      "page_id": 75234,
+      "revision_id": 706556,
+      "years": [
+        2021
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "Battlegrounds Mobile India Series/2021",
+      "page_id": 75330,
+      "revision_id": 706559,
+      "years": [
+        2021,
+        2022
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "EGI Revamp Battle",
+      "page_id": 75727,
+      "revision_id": 709779,
+      "years": [
+        2021
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "Skyesports/Championship/3.0",
+      "page_id": 76037,
+      "revision_id": 706601,
+      "years": [
+        2021
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "Freedom Face-Off/2021",
+      "page_id": 76041,
+      "revision_id": 706602,
+      "years": [
+        2021
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "BGMI EWar Mahayudh/Season 2",
+      "page_id": 76043,
+      "revision_id": 706603,
+      "years": [
+        2021
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "THUG Invitational",
+      "page_id": 76050,
+      "revision_id": 706605,
+      "years": [
+        2021
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "OR Championship/Legends Rise/2021",
+      "page_id": 76120,
+      "revision_id": 706607,
+      "years": [
+        2021
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "The Esports Club/BGMI Invitational/Season 1",
+      "page_id": 76148,
+      "revision_id": 706613,
+      "years": [
+        2021
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "APL Invitational/Season 2/Round 2",
+      "page_id": 76231,
+      "revision_id": 706616,
+      "years": [
+        2021
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "Quantum Cup",
+      "page_id": 76268,
+      "revision_id": 706618,
+      "years": [
+        2021
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "Rooter Pro Scrims/Initial Phase",
+      "page_id": 76331,
+      "revision_id": 706622,
+      "years": [
+        2021
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "Rooter Pro Scrims/Conqueror Phase",
+      "page_id": 76333,
+      "revision_id": 709752,
+      "years": [
+        2021
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "IQOO All Stars Cup",
+      "page_id": 76356,
+      "revision_id": 706626,
+      "years": [
+        2021
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "The Esports Club/BGMI Invitational/Season 2",
+      "page_id": 76693,
+      "revision_id": 706631,
+      "years": [
+        2021
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "Esportswala Elite Invitational Battle/Season 2",
+      "page_id": 76840,
+      "revision_id": 706637,
+      "years": [
+        2021
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "Chemin Esports Ultimate Showdown",
+      "page_id": 77040,
+      "revision_id": 706643,
+      "years": [
+        2021
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "Game.tv Weekly Wars/Season 1",
+      "page_id": 77112,
+      "revision_id": 706644,
+      "years": [
+        2021
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "Lockdown Warriors Cup/Phase 1",
+      "page_id": 77129,
+      "revision_id": 709832,
+      "years": [
+        2021
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "Villager Esports Pro Invitational/2021/Group Stage",
+      "page_id": 77195,
+      "revision_id": 706650,
+      "years": [
+        2021
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "Villager Esports Pro Invitational/2021/Grand Finals",
+      "page_id": 77255,
+      "revision_id": 706651,
+      "years": [
+        2021
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "Insane Summer Split",
+      "page_id": 77334,
+      "revision_id": 706653,
+      "years": [
+        2021
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "THUG Invitational/Season 3",
+      "page_id": 77342,
+      "revision_id": 706655,
+      "years": [
+        2021
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "OG Starter Cup",
+      "page_id": 77408,
+      "revision_id": 706656,
+      "years": [
+        2021
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "Wings BattleFest",
+      "page_id": 77411,
+      "revision_id": 706657,
+      "years": [
+        2021
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "AKEF BGMI Gaming Saga",
+      "page_id": 77479,
+      "revision_id": 706659,
+      "years": [
+        2021
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "Bhains Ki Tait TDM Battle",
+      "page_id": 77491,
+      "revision_id": 706660,
+      "years": [
+        2021
+      ],
+      "match_templates": 44,
+      "maps": 51,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "LOCO War of Glory/League Stage",
+      "page_id": 77559,
+      "revision_id": 706662,
+      "years": [
+        2021
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "LOCO War of Glory/Grand Finals",
+      "page_id": 77660,
+      "revision_id": 706670,
+      "years": [
+        2021
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "Ranbhoomi/Season 1",
+      "page_id": 77851,
+      "revision_id": 706675,
+      "years": [
+        2021
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "Clutch Invitational",
+      "page_id": 78103,
+      "revision_id": 706685,
+      "years": [
+        2021
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "Cosmic Byte God Mode",
+      "page_id": 78218,
+      "revision_id": 706688,
+      "years": [
+        2021
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "India Today's Dangal",
+      "page_id": 78251,
+      "revision_id": 706691,
+      "years": [
+        2021
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "LOCO Diwali Battle/League Stage",
+      "page_id": 78476,
+      "revision_id": 706697,
+      "years": [
+        2021
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "LOCO Diwali Battle/Grand Finals",
+      "page_id": 78479,
+      "revision_id": 706698,
+      "years": [
+        2021
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "The Fall Season Face-Off",
+      "page_id": 78641,
+      "revision_id": 708401,
+      "years": [
+        2021
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "OneShot Showdown/Season 2",
+      "page_id": 78724,
+      "revision_id": 706709,
+      "years": [
+        2021
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "Battle of Rivals/Season 1",
+      "page_id": 78873,
+      "revision_id": 706717,
+      "years": [
+        2021
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "Red Bull M.E.O./Season 4/India",
+      "page_id": 78997,
+      "revision_id": 706719,
+      "years": [
+        2021
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "Battlegrounds Mobile India Series/2021/The Grind",
+      "page_id": 79026,
+      "revision_id": 708219,
+      "years": [
+        2021
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "WD Black Cup/Season 2",
+      "page_id": 79060,
+      "revision_id": 706721,
+      "years": [
+        2021
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "Skyesports Mobile Open",
+      "page_id": 79255,
+      "revision_id": 706727,
+      "years": [
+        2021
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "Skyesports Grand Slam/2022",
+      "page_id": 79875,
+      "revision_id": 708299,
+      "years": [
+        2022
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "THUG Invitational/Season 4",
+      "page_id": 80193,
+      "revision_id": 706778,
+      "years": [
+        2022
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "Pro Warrior Cup/Season 1",
+      "page_id": 80585,
+      "revision_id": 706800,
+      "years": [
+        2022
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "OR Championship/Legends Rise/2022",
+      "page_id": 80731,
+      "revision_id": 706802,
+      "years": [
+        2022
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "Villager Esports/Winter Masters/2022",
+      "page_id": 80752,
+      "revision_id": 708093,
+      "years": [
+        2022
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "Ruthless Invitational Showdown India",
+      "page_id": 80905,
+      "revision_id": 706811,
+      "years": [
+        2022
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "Survivors Throne/Season 2",
+      "page_id": 81018,
+      "revision_id": 710952,
+      "years": [
+        2022
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "Skyesports/Pro League",
+      "page_id": 81537,
+      "revision_id": 708121,
+      "years": [
+        2022
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "Battlegrounds Mobile India Open Challenge/2022",
+      "page_id": 81550,
+      "revision_id": 706836,
+      "years": [
+        2022
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "Battlegrounds Mobile India Pro Series/Season 1",
+      "page_id": 81581,
+      "revision_id": 708685,
+      "years": [
+        2022
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "Upthrust Esports India Rising/2022",
+      "page_id": 81606,
+      "revision_id": 706839,
+      "years": [
+        2022
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "7Sea Invitational",
+      "page_id": 81732,
+      "revision_id": 706857,
+      "years": [
+        2022
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "The Esports Club/BGMI Invitational/Season 3",
+      "page_id": 81788,
+      "revision_id": 706859,
+      "years": [
+        2022
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "Battlegrounds Mobile India Open Challenge/2022/The Grind",
+      "page_id": 81806,
+      "revision_id": 706861,
+      "years": [
+        2022
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "Pro Warrior Cup/Season 2/Conquest Round",
+      "page_id": 81867,
+      "revision_id": 706879,
+      "years": [
+        2022
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "Pro Warrior Cup/Season 2/Ultimate Round",
+      "page_id": 81871,
+      "revision_id": 706880,
+      "years": [
+        2022
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "Nodwin x Loco All Stars Invitational",
+      "page_id": 82077,
+      "revision_id": 709233,
+      "years": [
+        2022
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "THUG Invitational/Season 5",
+      "page_id": 82358,
+      "revision_id": 706930,
+      "years": [
+        2022
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "The Esports Club/BGMI Invitational/Season 4",
+      "page_id": 82765,
+      "revision_id": 706956,
+      "years": [
+        2022
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "BGMI Masters Series",
+      "page_id": 82815,
+      "revision_id": 706971,
+      "years": [
+        2022
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "Skyesports/Streamers Showdown",
+      "page_id": 83040,
+      "revision_id": 707005,
+      "years": [
+        2022
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "The Esports Club/Streamer Quest/Season/2",
+      "page_id": 83045,
+      "revision_id": 707007,
+      "years": [
+        2022
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "Battlegrounds Mobile India Showdown/2022",
+      "page_id": 83142,
+      "revision_id": 707023,
+      "years": [
+        2022
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "Snapdragon Conquest Mobile Open",
+      "page_id": 83154,
+      "revision_id": 708654,
+      "years": [
+        2022
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "Skyesports League/2022",
+      "page_id": 83192,
+      "revision_id": 708655,
+      "years": [
+        2022
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "Rooter Invitational Series",
+      "page_id": 84197,
+      "revision_id": 711591,
+      "years": [
+        2022
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "BGMI Rising/2023",
+      "page_id": 86805,
+      "revision_id": 707330,
+      "years": [
+        2023
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "Skyesports/Champions Series",
+      "page_id": 86847,
+      "revision_id": 707334,
+      "years": [
+        2023
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "Villager Esports/DOMIN8R",
+      "page_id": 86851,
+      "revision_id": 707338,
+      "years": [
+        2023
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "BGMI Pro Scrims/2023",
+      "page_id": 86892,
+      "revision_id": 707348,
+      "years": [
+        2023
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "Upthrust Esports/Survivors Saga/Season 2",
+      "page_id": 86926,
+      "revision_id": 707350,
+      "years": [
+        2023
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "Novum Esports/Overpower Series/Season 1",
+      "page_id": 86960,
+      "revision_id": 707352,
+      "years": [
+        2023
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "Esports XO/Pro Cup",
+      "page_id": 86979,
+      "revision_id": 707354,
+      "years": [
+        2023
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "Nodwin/BGMI/Champions Cup",
+      "page_id": 86981,
+      "revision_id": 707356,
+      "years": [
+        2023
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "Fight Night/Pro Scrims",
+      "page_id": 86985,
+      "revision_id": 707357,
+      "years": [
+        2023
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "Upthrust Esports/Challengers Showdown",
+      "page_id": 86994,
+      "revision_id": 709234,
+      "years": [
+        2023
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "Lidoma/Battleground Invitational",
+      "page_id": 87051,
+      "revision_id": 707365,
+      "years": [
+        2023
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "IQOO Pro Series/2023",
+      "page_id": 87068,
+      "revision_id": 707368,
+      "years": [
+        2023
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "Villager Esports Pro Invitational/2023",
+      "page_id": 87148,
+      "revision_id": 707377,
+      "years": [
+        2023
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "Ranbhoomi/Season 2",
+      "page_id": 87158,
+      "revision_id": 707378,
+      "years": [
+        2023
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "Fight Night/Season 5",
+      "page_id": 87182,
+      "revision_id": 708465,
+      "years": [
+        2023
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "Vanquishers Cup/Season 1",
+      "page_id": 87190,
+      "revision_id": 671002,
+      "years": [
+        2023
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "India Today/League Invitationals",
+      "page_id": 87192,
+      "revision_id": 707382,
+      "years": [
+        2023
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "Skyesports/Skirmish Series/Season 2",
+      "page_id": 87200,
+      "revision_id": 708467,
+      "years": [
+        2023
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "Battle For Revolution/Season 1",
+      "page_id": 87201,
+      "revision_id": 707385,
+      "years": [
+        2023
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "Revenant Invitational Showdown",
+      "page_id": 87205,
+      "revision_id": 707387,
+      "years": [
+        2023
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "Battlegrounds Mobile India Series/2023",
+      "page_id": 87253,
+      "revision_id": 707392,
+      "years": [
+        2023
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "Battlegrounds Mobile India Series/2023/The Grind",
+      "page_id": 87256,
+      "revision_id": 660041,
+      "years": [
+        2023
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "BGMI Masters Series/Season 2",
+      "page_id": 87263,
+      "revision_id": 707393,
+      "years": [
+        2023
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "Upthrust Esports/Survivors Throne/Season 4",
+      "page_id": 87416,
+      "revision_id": 707414,
+      "years": [
+        2023
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "Upthrust Esports/Pro Showdown/Season 2",
+      "page_id": 87813,
+      "revision_id": 707426,
+      "years": [
+        2023
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "OS Invitational/Season 1",
+      "page_id": 87814,
+      "revision_id": 707427,
+      "years": [
+        2023
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "Battle For Revolution/Season 2",
+      "page_id": 88001,
+      "revision_id": 707447,
+      "years": [
+        2023
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "BGMI Challengers Series",
+      "page_id": 88127,
+      "revision_id": 707455,
+      "years": [
+        2025
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "Grand Masters Invitational",
+      "page_id": 88159,
+      "revision_id": 660168,
+      "years": [
+        2023
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "Skyesports/Championship/5.0",
+      "page_id": 88162,
+      "revision_id": 707461,
+      "years": [
+        2023
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "India Korea Invitational/2023",
+      "page_id": 88200,
+      "revision_id": 707467,
+      "years": [
+        2023
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "Upthrust Esports/Diwali Battle/2023",
+      "page_id": 88222,
+      "revision_id": 707470,
+      "years": [
+        2023
+      ],
+      "match_templates": 1,
+      "maps": 14,
+      "rows": 224,
+      "complete_maps": 14,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "Red Bull M.E.O./Season 6/India",
+      "page_id": 88396,
+      "revision_id": 707486,
+      "years": [
+        2023
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "Battlegrounds Mobile India Pro Series/2023",
+      "page_id": 88420,
+      "revision_id": 707492,
+      "years": [
+        2023
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "The World Of Battle/Winter Invitational",
+      "page_id": 88577,
+      "revision_id": 707517,
+      "years": [
+        2023
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "ESL/Snapdragon Pro Series/2024/BGMI",
+      "page_id": 88609,
+      "revision_id": 707523,
+      "years": [
+        2024
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "APL/Winter Showdown/Season 2",
+      "page_id": 88779,
+      "revision_id": 707544,
+      "years": [
+        2023
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "OnePlus/Dominate Arena/2023/December",
+      "page_id": 88837,
+      "revision_id": 707550,
+      "years": [
+        2023
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "OnePlus/Dominate Arena/2024/January",
+      "page_id": 88842,
+      "revision_id": 710303,
+      "years": [
+        2024
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "Upthrust Esports/Survivors Saga/Season 3",
+      "page_id": 88853,
+      "revision_id": 710302,
+      "years": [
+        2023
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "ESL/Snapdragon Pro Series/2024/BGMI/Conquest Open Finals",
+      "page_id": 88976,
+      "revision_id": 707560,
+      "years": [
+        2024
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "Upthrust Esports/The Multiverse Series/2024",
+      "page_id": 88982,
+      "revision_id": 707563,
+      "years": [
+        2024
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "Bingo Nachos/GAMEON CUP",
+      "page_id": 89095,
+      "revision_id": 707577,
+      "years": [
+        2024
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "Upthrust Esports/The Multiverse Series/2024/The Final Showdown",
+      "page_id": 89128,
+      "revision_id": 707584,
+      "years": [
+        2024
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "IQOO All Stars Cup/Season 4",
+      "page_id": 89141,
+      "revision_id": 707588,
+      "years": [
+        2024
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "Upthrust Esports/The Patriot Cup",
+      "page_id": 89161,
+      "revision_id": 707590,
+      "years": [
+        2024
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "IQOO Pro Series/2024",
+      "page_id": 89199,
+      "revision_id": 707596,
+      "years": [
+        2024
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "RA Esports/Rising Star Showdown/Season 3",
+      "page_id": 89213,
+      "revision_id": 707599,
+      "years": [
+        2024
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "Skyesports/Champions Series/2024",
+      "page_id": 89272,
+      "revision_id": 707607,
+      "years": [
+        2024
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "IQOO India League/2024",
+      "page_id": 89330,
+      "revision_id": 709308,
+      "years": [
+        2024
+      ],
+      "match_templates": 1,
+      "maps": 14,
+      "rows": 16,
+      "complete_maps": 1,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "OnePlus/Dominate Arena/2024/February",
+      "page_id": 89473,
+      "revision_id": 707629,
+      "years": [
+        2024
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "Skyesports Mobile Open/2024",
+      "page_id": 89633,
+      "revision_id": 710285,
+      "years": [
+        2024
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "Upthrust Esports India Rising/2024",
+      "page_id": 89682,
+      "revision_id": 707642,
+      "years": [
+        2024
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "Lidoma/Masters Showdown",
+      "page_id": 89765,
+      "revision_id": 707648,
+      "years": [
+        2024
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "OneGame/Pro Championship/Season 1",
+      "page_id": 89855,
+      "revision_id": 707651,
+      "years": [
+        2024
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "OnePlus/Dominate Arena/2024/March",
+      "page_id": 89856,
+      "revision_id": 707652,
+      "years": [
+        2024
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "Battlegrounds Mobile India Series/2024",
+      "page_id": 89890,
+      "revision_id": 707656,
+      "years": [
+        2024
+      ],
+      "match_templates": 1,
+      "maps": 18,
+      "rows": 288,
+      "complete_maps": 17,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "Battlegrounds Mobile India Series/2024/The Grind",
+      "page_id": 89892,
+      "revision_id": 660043,
+      "years": [
+        2024
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "Holi Face-Off",
+      "page_id": 89894,
+      "revision_id": 707657,
+      "years": [
+        2024
+      ],
+      "match_templates": 7,
+      "maps": 9,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "RA Esports/Champions Gala/Season 1",
+      "page_id": 90155,
+      "revision_id": 710304,
+      "years": [
+        2024
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "OS Esports/Clash Of Warriors/Season 2",
+      "page_id": 90329,
+      "revision_id": 707684,
+      "years": [
+        2024
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "Upthrust Esports/Challengers Showdown/Season 2",
+      "page_id": 90489,
+      "revision_id": 707689,
+      "years": [
+        2024
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "OnePlus/Dominate Arena/2024/April",
+      "page_id": 90531,
+      "revision_id": 712452,
+      "years": [
+        2024
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "RA Esports/Battle For Swaraj/Season 1",
+      "page_id": 90623,
+      "revision_id": 708393,
+      "years": [
+        2024
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "Fearless Championship Series/Season 1",
+      "page_id": 90885,
+      "revision_id": 708463,
+      "years": [
+        2024
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "Battle For Revolution/Season 3",
+      "page_id": 90999,
+      "revision_id": 707734,
+      "years": [
+        2024
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "BGMI Masters Series/Season 3",
+      "page_id": 91008,
+      "revision_id": 712353,
+      "years": [
+        2024
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "Philips OneBlade Cup",
+      "page_id": 91011,
+      "revision_id": 707738,
+      "years": [
+        2024
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "Battlegrounds Mobile India Pro Series/2024",
+      "page_id": 91047,
+      "revision_id": 711581,
+      "years": [
+        2024
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "Ultimate Regional Rivalry/Season 2",
+      "page_id": 91083,
+      "revision_id": 708346,
+      "years": [
+        2024
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "TVS Wicked Battles",
+      "page_id": 91088,
+      "revision_id": 711204,
+      "years": [
+        2024
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "Rooter Invitational Series/2024",
+      "page_id": 91101,
+      "revision_id": 708485,
+      "years": [
+        2024
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "Freedom Face-Off/2024",
+      "page_id": 91501,
+      "revision_id": 707787,
+      "years": [
+        2024
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "Gauntlet/Season 1",
+      "page_id": 91530,
+      "revision_id": 707790,
+      "years": [
+        2024
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "Gauntlet/Season 2",
+      "page_id": 91794,
+      "revision_id": 711320,
+      "years": [
+        2024
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "Titans Rising",
+      "page_id": 91860,
+      "revision_id": 711322,
+      "years": [
+        2024
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "THUG Invitational/2024",
+      "page_id": 91893,
+      "revision_id": 707826,
+      "years": [
+        2024
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "Red Bull M.E.O./2024/India",
+      "page_id": 91986,
+      "revision_id": 712956,
+      "years": [
+        2024
+      ],
+      "match_templates": 1,
+      "maps": 18,
+      "rows": 288,
+      "complete_maps": 18,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "Deepavali BattleMania/2024",
+      "page_id": 92103,
+      "revision_id": 708422,
+      "years": [
+        2024
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "1M DYNASTY",
+      "page_id": 92128,
+      "revision_id": 712964,
+      "years": [
+        2024
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "Skyesports/Championship/2024",
+      "page_id": 92139,
+      "revision_id": 711350,
+      "years": [
+        2024
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "ESL/Snapdragon Pro Series/Season 6/BGMI",
+      "page_id": 92171,
+      "revision_id": 712449,
+      "years": [
+        2024
+      ],
+      "match_templates": 1,
+      "maps": 18,
+      "rows": 288,
+      "complete_maps": 18,
+      "import_ready_maps": 18
+    },
+    {
+      "title": "Samatva/Elite Series/2024",
+      "page_id": 92240,
+      "revision_id": 710316,
+      "years": [
+        2024
+      ],
+      "match_templates": 2,
+      "maps": 30,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "Battlegrounds Mobile India Series/2025",
+      "page_id": 92322,
+      "revision_id": 711331,
+      "years": [
+        2025
+      ],
+      "match_templates": 1,
+      "maps": 18,
+      "rows": 288,
+      "complete_maps": 18,
+      "import_ready_maps": 18
+    },
+    {
+      "title": "Battlegrounds Mobile India Pro Series/2025",
+      "page_id": 92325,
+      "revision_id": 712967,
+      "years": [
+        2025
+      ],
+      "match_templates": 1,
+      "maps": 18,
+      "rows": 288,
+      "complete_maps": 18,
+      "import_ready_maps": 18
+    },
+    {
+      "title": "Battlegrounds Mobile India Series/2025/The Grind",
+      "page_id": 92411,
+      "revision_id": 690065,
+      "years": [
+        2025
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "Upthrust Esports/The Multiverse Series/2025",
+      "page_id": 92429,
+      "revision_id": 712450,
+      "years": [
+        2025
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "SL4Y Esports/Glacial Glow",
+      "page_id": 92545,
+      "revision_id": 710317,
+      "years": [
+        2025
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "1M/Slayy Zone",
+      "page_id": 92582,
+      "revision_id": 710318,
+      "years": [
+        2025
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "OneGame/Pro Championship/Season 2",
+      "page_id": 92634,
+      "revision_id": 711347,
+      "years": [
+        2025
+      ],
+      "match_templates": 1,
+      "maps": 24,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "Caribbean Clash",
+      "page_id": 93046,
+      "revision_id": 711348,
+      "years": [
+        2025
+      ],
+      "match_templates": 1,
+      "maps": 24,
+      "rows": 383,
+      "complete_maps": 22,
+      "import_ready_maps": 22
+    },
+    {
+      "title": "Creators Unite/Rondo Rampage",
+      "page_id": 93165,
+      "revision_id": 707965,
+      "years": [
+        2025
+      ],
+      "match_templates": 2,
+      "maps": 2,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "Mother Dairy/Chillz Cup",
+      "page_id": 93217,
+      "revision_id": 708427,
+      "years": [
+        2025
+      ],
+      "match_templates": 1,
+      "maps": 18,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "IQOO Battlegrounds Series",
+      "page_id": 93772,
+      "revision_id": 712965,
+      "years": [
+        2025
+      ],
+      "match_templates": 1,
+      "maps": 18,
+      "rows": 288,
+      "complete_maps": 18,
+      "import_ready_maps": 18
+    },
+    {
+      "title": "G-League/2025",
+      "page_id": 93774,
+      "revision_id": 708394,
+      "years": [
+        2025
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "Clash of Champions/Season 2",
+      "page_id": 93788,
+      "revision_id": 712448,
+      "years": [
+        2025
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "Survival Surge/Chapter 1",
+      "page_id": 93941,
+      "revision_id": 712966,
+      "years": [
+        2025
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "TVS Wicked Battles/2025",
+      "page_id": 93984,
+      "revision_id": 708117,
+      "years": [
+        2025
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "BGMI Masters Series/Season 4",
+      "page_id": 93988,
+      "revision_id": 712961,
+      "years": [
+        2025
+      ],
+      "match_templates": 3,
+      "maps": 24,
+      "rows": 384,
+      "complete_maps": 23,
+      "import_ready_maps": 23
+    },
+    {
+      "title": "OG vs NG/Legacies Clash",
+      "page_id": 94057,
+      "revision_id": 712960,
+      "years": [
+        2025
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "Battlegrounds Mobile India Showdown/2025",
+      "page_id": 94163,
+      "revision_id": 712446,
+      "years": [
+        2025
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "Battlegrounds Mobile India International Cup/2025",
+      "page_id": 94240,
+      "revision_id": 708141,
+      "years": [
+        2025
+      ],
+      "match_templates": 1,
+      "maps": 18,
+      "rows": 288,
+      "complete_maps": 18,
+      "import_ready_maps": 18
+    },
+    {
+      "title": "Chennai Esports Global Championship/2025",
+      "page_id": 94508,
+      "revision_id": 712963,
+      "years": [
+        2025
+      ],
+      "match_templates": 1,
+      "maps": 16,
+      "rows": 256,
+      "complete_maps": 16,
+      "import_ready_maps": 16
+    },
+    {
+      "title": "1M DYNASTY/Season 2",
+      "page_id": 94574,
+      "revision_id": 708162,
+      "years": [
+        2025
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "Battlegrounds Mobile India Series/2026",
+      "page_id": 94600,
+      "revision_id": 713223,
+      "years": [
+        2025,
+        2026
+      ],
+      "match_templates": 3,
+      "maps": 54,
+      "rows": 864,
+      "complete_maps": 54,
+      "import_ready_maps": 54
+    },
+    {
+      "title": "Battlegrounds Mobile India Pro Series/2026",
+      "page_id": 94601,
+      "revision_id": 710520,
+      "years": [
+        2026
+      ],
+      "match_templates": 3,
+      "maps": 54,
+      "rows": 864,
+      "complete_maps": 54,
+      "import_ready_maps": 54
+    },
+    {
+      "title": "Battlegrounds Mobile India Showdown/2026",
+      "page_id": 94602,
+      "revision_id": 711936,
+      "years": [
+        2026
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "Battlegrounds Mobile India International Cup/2026",
+      "page_id": 94603,
+      "revision_id": 703261,
+      "years": [
+        2026
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "RekRoom Reload Arena/2025",
+      "page_id": 94683,
+      "revision_id": 713222,
+      "years": [
+        2025
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "OneGame/Pro Championship/Season 3",
+      "page_id": 94713,
+      "revision_id": 708175,
+      "years": [
+        2025
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "Upthrust Esports/Pro Showdown/2026",
+      "page_id": 94714,
+      "revision_id": 712444,
+      "years": [
+        2026
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "Rising Championship/Season 1",
+      "page_id": 94715,
+      "revision_id": 713015,
+      "years": [
+        2025
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "Winter Premier League/2025",
+      "page_id": 94717,
+      "revision_id": 712445,
+      "years": [
+        2025
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "Battlegrounds Mobile India Series/2026/The Grind",
+      "page_id": 94754,
+      "revision_id": 694567,
+      "years": [
+        2026
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "Skyesports/Skirmish Series/2025",
+      "page_id": 94758,
+      "revision_id": 708180,
+      "years": [
+        2025
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "UNIV Premiership/Season One",
+      "page_id": 94808,
+      "revision_id": 708181,
+      "years": [
+        2026
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "Blizzard Battlegrounds/2026",
+      "page_id": 94814,
+      "revision_id": 708183,
+      "years": [
+        2026
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "Weltify Pro Clash/2025",
+      "page_id": 95033,
+      "revision_id": 708192,
+      "years": [
+        2025
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "Weltify Pro Clash/Season 2",
+      "page_id": 95046,
+      "revision_id": 708194,
+      "years": [
+        2026
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "Upthrust Esports India Rising/2026",
+      "page_id": 95325,
+      "revision_id": 710315,
+      "years": [
+        2026
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "Orion Conquest Series/2026",
+      "page_id": 95437,
+      "revision_id": 713011,
+      "years": [
+        2026
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "OneGame/Championship Summer Series/2026",
+      "page_id": 95451,
+      "revision_id": 713012,
+      "years": [
+        2026
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "Rising Championship/Season 2",
+      "page_id": 95459,
+      "revision_id": 708198,
+      "years": [
+        2026
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "College Campus Tour/2026",
+      "page_id": 95522,
+      "revision_id": 702602,
+      "years": [
+        2026
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "Battlegrounds Mobile India Pro Series/2026/Qualifiers",
+      "page_id": 95683,
+      "revision_id": 710376,
+      "years": [
+        2026
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "Espotz Pro League/2026",
+      "page_id": 95921,
+      "revision_id": 710378,
+      "years": [
+        2026
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "Battlegrounds Mobile India Pro Series/2026/Survival Stage",
+      "page_id": 95965,
+      "revision_id": 712969,
+      "years": [
+        2026
+      ],
+      "match_templates": 1,
+      "maps": 24,
+      "rows": 384,
+      "complete_maps": 24,
+      "import_ready_maps": 24
+    },
+    {
+      "title": "BGMI Naye Khiladi",
+      "page_id": 96044,
+      "revision_id": 711202,
+      "years": [
+        2026
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "Rising Star Invitational/2026",
+      "page_id": 96161,
+      "revision_id": 711680,
+      "years": [
+        2026
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "RekRoom Revamp Master Series/2026",
+      "page_id": 96188,
+      "revision_id": 713130,
+      "years": [
+        2026
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "Domination Arena/Season 1",
+      "page_id": 96222,
+      "revision_id": 713131,
+      "years": [
+        2026
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "OneGame/Championship Fall Season/2026",
+      "page_id": 96261,
+      "revision_id": 711930,
+      "years": [
+        2026
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "BGMI Masters Series/Season 5",
+      "page_id": 96288,
+      "revision_id": 712383,
+      "years": [
+        2026
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "Trident Ignite/2026/Road to Masters",
+      "page_id": 96329,
+      "revision_id": 712886,
+      "years": [
+        2026
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    },
+    {
+      "title": "Trident Ignite/2026/Challengers vs Masters",
+      "page_id": 96330,
+      "revision_id": 712888,
+      "years": [
+        2026
+      ],
+      "match_templates": 0,
+      "maps": 0,
+      "rows": 0,
+      "complete_maps": 0,
+      "import_ready_maps": 0
+    }
+  ]
+}

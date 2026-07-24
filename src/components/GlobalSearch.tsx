@@ -1,102 +1,332 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import Link from "next/link";
+import { Search, X } from "lucide-react";
+import { createPortal } from "react-dom";
+import { useCallback, useEffect, useRef, useState } from "react";
 
-type Result = {id: string;name?: string;ign?: string;slug: string;type: "player" | "team" | "tournament";};
+type Result = {
+  id: string;
+  name?: string;
+  ign?: string;
+  slug: string;
+  type: "player" | "team" | "tournament";
+};
 
-export default function GlobalSearch()
-{
+type GlobalSearchProps = {
+  forceOpen?: boolean;
+  onRequestClose?: () => void;
+};
 
-  const [open, setOpen] = useState(false);
+const suggestedLinks = [
+  { label: "Rankings", href: "/rankings" },
+  { label: "Teams", href: "/teams" },
+  { label: "Players", href: "/players" },
+  { label: "Matches", href: "/matches" },
+  { label: "Tournaments", href: "/tournaments" },
+  { label: "Compare", href: "/compare" },
+];
+
+function resultHref(item: Result) {
+  if (item.type === "team") return `/teams/${item.slug}`;
+  if (item.type === "player") return `/players/${item.slug}`;
+  return `/tournaments/${item.slug}`;
+}
+
+export default function GlobalSearch({
+  forceOpen = false,
+  onRequestClose,
+}: GlobalSearchProps) {
+  const [internalOpen, setInternalOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<Result[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const inputRef = useRef<HTMLInputElement>(null);
 
-  // Ctrl + K
-  useEffect(() => 
-  {
-    function onKeyDown(e: KeyboardEvent) 
-    {if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k") 
-      {
-        e.preventDefault();
-        setOpen(true);
+  const open = forceOpen || internalOpen;
+
+  const openSearch = useCallback(() => {
+    setInternalOpen(true);
+  }, []);
+
+  const closeSearch = useCallback(() => {
+    setInternalOpen(false);
+    setQuery("");
+    setResults([]);
+    setLoading(false);
+    setError("");
+    onRequestClose?.();
+  }, [onRequestClose]);
+
+  function handleQueryChange(value: string) {
+    setQuery(value);
+
+    if (!value.trim()) {
+      setResults([]);
+      setLoading(false);
+      setError("");
+    }
+  }
+
+  useEffect(() => {
+    function onKeyDown(event: KeyboardEvent) {
+      if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "k") {
+        event.preventDefault();
+        openSearch();
+      }
+
+      if (event.key === "Escape" && open) {
+        closeSearch();
       }
     }
-    window.addEventListener("keydown", onKeyDown);return () => window.removeEventListener("keydown", onKeyDown);
-  }, 
-  []);
 
-  // search API
-  useEffect(() => 
-  {
-    async function search()
-    {
-      if (!query.trim()) 
-      {
+    window.addEventListener("keydown", onKeyDown);
+
+    return () => {
+      window.removeEventListener("keydown", onKeyDown);
+    };
+  }, [closeSearch, open, openSearch]);
+
+  useEffect(() => {
+    if (!open) return;
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    window.requestAnimationFrame(() => {
+      inputRef.current?.focus();
+    });
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [open]);
+
+  useEffect(() => {
+    const trimmedQuery = query.trim();
+
+    if (!trimmedQuery) return;
+
+    const controller = new AbortController();
+
+    async function search() {
+      setLoading(true);
+      setError("");
+
+      try {
+        const response = await fetch(
+          `/api/search?q=${encodeURIComponent(trimmedQuery)}`,
+          {
+            signal: controller.signal,
+          },
+        );
+
+        if (!response.ok) {
+          throw new Error("Search request failed.");
+        }
+
+        const data = (await response.json()) as Result[];
+        setResults(Array.isArray(data) ? data : []);
+      } catch (searchError) {
+        if (
+          searchError instanceof DOMException &&
+          searchError.name === "AbortError"
+        ) {
+          return;
+        }
+
         setResults([]);
-        return;
+        setError("Search is temporarily unavailable.");
+      } finally {
+        if (!controller.signal.aborted) {
+          setLoading(false);
+        }
       }
-      const res = await fetch(`/api/search?q=${query}`);
-      const data = await res.json();setResults(data || []);
     }
 
-    const t = setTimeout(search, 250);
-    return () => clearTimeout(t);
+    const timeout = window.setTimeout(search, 250);
+
+    return () => {
+      window.clearTimeout(timeout);
+      controller.abort();
+    };
   }, [query]);
 
   return (
     <>
-      {/* Trigger */}
-      <div onClick={() => setOpen(true)} className="w-full cursor-pointer">
-        <div className="w-full rounded-xl border border-white/20 bg-zinc-900 px-4 py-2 text-zinc-400">
-          Search players, teams, tournaments...
-        </div>
-      </div>
+      {!forceOpen ? (
+        <button
+          type="button"
+          onClick={openSearch}
+          className="flex h-10 w-full min-w-0 items-center justify-between gap-4 rounded-xl border border-[var(--border-soft)] bg-white/[0.025] px-3.5 text-left transition hover:border-[var(--border-medium)] hover:bg-white/[0.04] sm:min-w-[280px]"
+          aria-label="Search PlayRank"
+        >
+          <span className="flex min-w-0 items-center gap-2.5">
+            <Search size={16} className="shrink-0 text-[var(--text-muted)]" />
 
-      {/* Modal */}
-      {open && 
-        (
-          <div className="fixed inset-0 z-[9999] bg-black/70 backdrop-blur-md flex items-start justify-center pt-28 px-6">
-            <div className="w-full max-w-3xl rounded-2xl border border-white/10 bg-zinc-950 overflow-hidden">
+            <span className="truncate text-sm text-[var(--text-muted)]">
+              Search PlayRank
+            </span>
+          </span>
 
-              {/* input */}
-              <div className="border-b border-white/10 p-4">
-                <input value={query ?? ""}onChange={(e) => setQuery(e.target.value)}/>
-              </div>
-              {/* results */}
-              <div className="max-h-[400px] overflow-y-auto">
-                {results.map
-                  (
-                    (item) => 
-                    (
-                      <Link key={`${item.type}-${item.id}`} href={ item.type === "team" ? `/teams/${item.slug}` : item.type === "player" ? `/players/${item.slug}` : `/tournaments/${item.slug}`} onClick={() => setOpen(false)} className="block p-4 hover:bg-white/5">
-                        <div className="text-white">
-                          {item.name || item.ign}
-                        </div>
-                        <div className="text-xs text-zinc-500 capitalize">
-                          {item.type}
-                        </div>
-                      </Link>
-                    )
-                  )
+          <span className="rounded-md border border-[var(--border-soft)] bg-white/[0.03] px-2 py-1 text-[10px] font-semibold text-[var(--text-subtle)]">
+            Ctrl K
+          </span>
+        </button>
+      ) : null}
+
+      {open && typeof document !== "undefined"
+        ? createPortal(
+            <div
+              className="pr-search-overlay fixed inset-0 z-[10000] flex items-start justify-center bg-black/35 px-3 pt-3 backdrop-blur-[64px] backdrop-saturate-0 sm:px-5 sm:pt-[10vh]"
+              onMouseDown={(event) => {
+                if (event.target === event.currentTarget) {
+                  closeSearch();
                 }
-                {query && results.length === 0 && 
-                  (
-                    <div className="p-4 text-zinc-500">
-                      No results found
+              }}
+            >
+              <div
+                aria-hidden="true"
+                className="pointer-events-none absolute inset-0 overflow-hidden"
+              >
+                <div className="absolute inset-0 opacity-25 [background-image:linear-gradient(rgba(255,255,255,.08)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.08)_1px,transparent_1px)] [background-size:96px_96px] [mask-image:radial-gradient(circle_at_center,black,transparent_78%)]" />
+                <div className="pr-search-orb pr-search-orb-red absolute -right-[12vw] -top-[24vh] h-[70vh] w-[70vh] rounded-full bg-[#f4473b]/20 blur-[140px]" />
+                <div className="pr-search-orb pr-search-orb-gold absolute -bottom-[30vh] -left-[14vw] h-[78vh] w-[78vh] rounded-full bg-[#ffd21a]/10 blur-[160px]" />
+                <p className="pr-search-backdrop-title absolute left-[4vw] top-[24vh] select-none text-[clamp(6rem,17vw,18rem)] font-black uppercase leading-[.72] tracking-[-.09em] text-white/[.035]">
+                  Find the
+                  <br />
+                  signal.
+                </p>
+                <p className="absolute bottom-8 right-8 hidden font-mono text-[9px] uppercase tracking-[.28em] text-white/15 sm:block">
+                  Players / Teams / Events / Intelligence
+                </p>
+              </div>
+              <section
+                role="dialog"
+                aria-modal="true"
+                aria-label="Search PlayRank"
+                className="pr-search-panel relative z-10 w-full max-w-[900px] overflow-hidden border border-white/20 bg-[#080808]/95 shadow-[0_35px_140px_rgba(0,0,0,.78),inset_0_1px_0_rgba(255,255,255,.08)] backdrop-blur-[40px] backdrop-saturate-150 before:pointer-events-none before:absolute before:inset-0 before:bg-[linear-gradient(135deg,rgba(255,255,255,.055),transparent_35%,rgba(244,71,59,.025))]"
+              >
+                <div className="relative flex items-center justify-between border-b border-white/10 bg-white/[0.025] px-5 py-3">
+                  <p className="text-[9px] font-black uppercase tracking-[.22em] text-white/30">
+                    Search PlayRank
+                  </p>
+                  <button
+                    type="button"
+                    onClick={closeSearch}
+                    className="inline-flex h-8 w-8 shrink-0 items-center justify-center text-white/35 transition hover:bg-white/[0.05] hover:text-white"
+                    aria-label="Close search"
+                  >
+                    <X size={16} />
+                  </button>
+                </div>
+
+                <div className="relative flex items-center gap-4 border-b border-white/15 bg-black/10 px-5">
+                  <Search
+                    size={20}
+                    className="pr-search-icon shrink-0 text-[#f4473b]"
+                  />
+
+                  <input
+                    ref={inputRef}
+                    value={query}
+                    onChange={(event) => handleQueryChange(event.target.value)}
+                    placeholder="Player, team or tournament…"
+                    className="h-[72px] min-w-0 flex-1 !border-0 !bg-transparent px-0 text-lg font-medium text-white !shadow-none !outline-none placeholder:text-white/20 focus:!border-0 focus:!bg-transparent focus:!shadow-none"
+                    aria-label="Search query"
+                  />
+                </div>
+
+                <div className="relative max-h-[min(430px,65vh)] overflow-y-auto">
+                  {!query.trim() ? (
+                    <div className="p-5">
+                      <p className="mb-3 text-[9px] font-black uppercase tracking-[.2em] text-white/25">
+                        Quick access
+                      </p>
+
+                      <div className="grid border-l border-t border-white/10 sm:grid-cols-2">
+                        {suggestedLinks.map((item, index) => (
+                          <Link
+                            key={item.href}
+                            href={item.href}
+                            onClick={closeSearch}
+                            className="pr-search-shortcut group flex items-center justify-between border-b border-r border-white/10 px-4 py-3.5 text-sm font-semibold text-white/55 transition hover:bg-white/[0.04] hover:text-white"
+                          >
+                            <span>{item.label}</span>
+                            <span className="font-mono text-[9px] text-white/15 transition group-hover:text-[#f4473b]">
+                              0{index + 1}
+                            </span>
+                          </Link>
+                        ))}
+                      </div>
                     </div>
-                  )
-                }
-              </div>
+                  ) : null}
 
-              {/* close */}
-              <button onClick={() => setOpen(false)}className="w-full border-t border-white/10 py-3 text-zinc-400 hover:text-white">
-                Close
-              </button>
-            </div>
-          </div>
-        )
-      }
+                  {loading ? (
+                    <div className="px-5 py-12 text-center text-sm text-white/35">
+                      Searching…
+                    </div>
+                  ) : null}
+
+                  {error ? (
+                    <div className="m-5 border border-red-400/25 bg-red-400/10 px-4 py-4 text-sm text-red-300">
+                      {error}
+                    </div>
+                  ) : null}
+
+                  {!loading && !error && results.length > 0 ? (
+                    <div>
+                      {results.map((item) => (
+                        <Link
+                          key={`${item.type}-${item.id}`}
+                          href={resultHref(item)}
+                          onClick={closeSearch}
+                          className="pr-search-result group flex items-center justify-between gap-4 border-b border-white/10 px-5 py-4 transition hover:bg-white/[0.04]"
+                        >
+                          <div className="min-w-0">
+                            <p className="truncate text-sm font-semibold text-white">
+                              {item.name || item.ign || "Unnamed"}
+                            </p>
+
+                            <p className="mt-1 text-[9px] font-bold uppercase tracking-[.15em] text-white/25">
+                              {item.type}
+                            </p>
+                          </div>
+
+                          <span className="text-sm text-white/20 transition group-hover:translate-x-1 group-hover:text-[#f4473b]">
+                            →
+                          </span>
+                        </Link>
+                      ))}
+                    </div>
+                  ) : null}
+
+                  {!loading &&
+                  !error &&
+                  query.trim() &&
+                  results.length === 0 ? (
+                    <div className="px-5 py-12 text-center">
+                      <p className="text-sm font-medium text-white/60">
+                        No results found
+                      </p>
+
+                      <p className="mt-2 text-xs text-white/25">
+                        Try a different player, team, or tournament name.
+                      </p>
+                    </div>
+                  ) : null}
+                </div>
+
+                <div className="relative flex items-center justify-between border-t border-white/10 bg-black/10 px-5 py-3 text-[9px] uppercase tracking-[.14em] text-white/20">
+                  <span>Esc to close</span>
+                  <span>Live records</span>
+                </div>
+              </section>
+            </div>,
+            document.body,
+          )
+        : null}
     </>
   );
 }

@@ -34,7 +34,7 @@ type TeamRow = {
 type MatchParticipantRow = Record<string, unknown>;
 
 const shell =
-  "rounded-[2rem] border border-white/10 bg-[#080a0f] shadow-[0_24px_80px_rgba(0,0,0,0.28)]";
+  "border border-white/10 bg-[#080a0f] shadow-[0_24px_80px_rgba(0,0,0,0.28)]";
 
 const panel =
   "rounded-2xl border border-white/10 bg-white/[0.035] shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]";
@@ -106,7 +106,7 @@ function getParticipantMappingKeys(participant: MatchParticipantRow) {
 
 function mappingMatchesParticipant(
   mapping: MappingRow,
-  participantKeySet: Set<string>
+  participantKeySet: Set<string>,
 ) {
   return (
     participantKeySet.has(textKey(mapping.pubg_player_account_id)) ||
@@ -117,7 +117,7 @@ function mappingMatchesParticipant(
 function buildMappingFilterHref(
   status: string,
   searchQuery: string,
-  matchQuery: string
+  matchQuery: string,
 ) {
   const params = new URLSearchParams({ status });
 
@@ -191,7 +191,7 @@ function SectionHeader({
           href={actionHref}
           className="w-fit text-sm font-black text-white/40 transition hover:text-[#ffd21a]"
         >
-          {actionLabel} â†’
+          {actionLabel} →
         </Link>
       ) : null}
     </div>
@@ -267,7 +267,7 @@ function MappingCard({
           <div className="flex flex-wrap items-center gap-2">
             <span
               className={`rounded-full border px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.12em] ${toneStyle(
-                tone
+                tone,
               )}`}
             >
               {getMappingLabel(mapping)}
@@ -285,7 +285,7 @@ function MappingCard({
           </p>
 
           <p className="mt-2 text-xs text-white/35">
-            Confidence {n(mapping.confidence_score).toFixed(2)} Â· Updated{" "}
+            Confidence {n(mapping.confidence_score).toFixed(2)} · Updated{" "}
             {formatDate(mapping.updated_at)}
           </p>
         </div>
@@ -384,28 +384,28 @@ export default async function PubgMappingsPage({
 
   const [mappingsResult, playersResult, teamsResult, matchParticipantsResult] =
     await Promise.all([
-    supabaseAdmin
-      .from("pubg_player_mappings")
-      .select(
-        "id, pubg_player_account_id, pubg_player_name, player_id, mapping_status, confidence_score, verified, updated_at"
-      )
-      .order("verified", { ascending: true })
-      .order("confidence_score", { ascending: false })
-      .order("pubg_player_name", { ascending: true })
-      .limit(1000),
+      supabaseAdmin
+        .from("pubg_player_mappings")
+        .select(
+          "id, pubg_player_account_id, pubg_player_name, player_id, mapping_status, confidence_score, verified, updated_at",
+        )
+        .order("verified", { ascending: true })
+        .order("confidence_score", { ascending: false })
+        .order("pubg_player_name", { ascending: true })
+        .limit(1000),
 
-    supabaseAdmin
-      .from("players")
-      .select("id, ign, slug, team_id")
-      .order("ign", { ascending: true }),
+      supabaseAdmin
+        .from("players")
+        .select("id, ign, slug, team_id")
+        .order("ign", { ascending: true }),
 
-    supabaseAdmin
-      .from("teams")
-      .select("id, name, slug")
-      .order("name", { ascending: true }),
+      supabaseAdmin
+        .from("teams")
+        .select("id, name, slug")
+        .order("name", { ascending: true }),
 
-    matchParticipantsQuery,
-  ]);
+      matchParticipantsQuery,
+    ]);
 
   const mappings = (mappingsResult.data || []) as MappingRow[];
   const players = (playersResult.data || []) as PlayerRow[];
@@ -416,7 +416,7 @@ export default async function PubgMappingsPage({
   const playerById = new Map(players.map((player) => [player.id, player]));
   const teamById = new Map(teams.map((team) => [team.id, team]));
   const matchParticipantKeySet = new Set(
-    matchParticipants.flatMap(getParticipantMappingKeys)
+    matchParticipants.flatMap(getParticipantMappingKeys),
   );
 
   const statusFilteredMappings = mappings.filter((mapping) => {
@@ -431,7 +431,7 @@ export default async function PubgMappingsPage({
   const matchFilteredMappings =
     matchQuery.length > 0
       ? statusFilteredMappings.filter((mapping) =>
-          mappingMatchesParticipant(mapping, matchParticipantKeySet)
+          mappingMatchesParticipant(mapping, matchParticipantKeySet),
         )
       : statusFilteredMappings;
 
@@ -459,7 +459,7 @@ export default async function PubgMappingsPage({
 
   const totalMappings = mappings.length;
   const verifiedMappings = mappings.filter(
-    (row) => row.verified === true
+    (row) => row.verified === true,
   ).length;
   const mappedMappings = mappings.filter((row) => row.player_id).length;
   const unmappedMappings = mappings.filter((row) => !row.player_id).length;
@@ -479,9 +479,9 @@ export default async function PubgMappingsPage({
   ];
 
   return (
-    <main className="min-h-screen bg-[#030406] text-white">
+    <main className="bg-[#030406] text-white">
       <section className="border-b border-white/10 bg-[#050609]">
-        <div className="mx-auto max-w-7xl px-5 py-12 md:py-16">
+        <div className="mx-auto max-w-[1500px] px-5 py-10 md:px-8 md:py-14">
           <div className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:items-end">
             <div>
               <div className="flex flex-wrap gap-2">
@@ -490,7 +490,10 @@ export default async function PubgMappingsPage({
                 <DataSourceBadge label="Promotion Gate" size="md" />
               </div>
 
-              <h1 className="mt-7 text-5xl font-black uppercase leading-[0.9] tracking-[-0.07em] text-white md:text-7xl">
+              <p className="mt-7 text-xs font-black uppercase tracking-[0.24em] text-[#f4473b]">
+                Identity resolution / promotion prerequisite
+              </p>
+              <h1 className="mt-4 text-5xl font-black uppercase leading-[0.9] tracking-[-0.07em] text-white md:text-7xl">
                 PUBG Player
                 <br />
                 Mapping
@@ -505,30 +508,23 @@ export default async function PubgMappingsPage({
               <div className="mt-8 flex flex-wrap gap-3">
                 <Link
                   href="/admin/pubg/imports"
-                  className="rounded-full border border-[#ffd21a]/30 bg-[#ffd21a]/10 px-5 py-2.5 text-sm font-black text-[#ffd21a] transition hover:bg-[#ffd21a]/15"
+                  className="border border-[#ffd21a]/30 bg-[#ffd21a]/10 px-5 py-2.5 text-xs font-black uppercase tracking-[0.14em] text-[#ffd21a] transition hover:bg-[#ffd21a]/15"
                 >
                   Import Review
                 </Link>
 
                 <Link
                   href="/admin/pubg"
-                  className="rounded-full border border-white/10 bg-white/[0.04] px-5 py-2.5 text-sm font-black text-white/65 transition hover:border-white/25 hover:text-white"
+                  className="border border-white/10 bg-white/[0.04] px-5 py-2.5 text-xs font-black uppercase tracking-[0.14em] text-white/65 transition hover:border-white/25 hover:text-white"
                 >
                   PUBG Hub
                 </Link>
 
                 <Link
                   href="/admin/data-health"
-                  className="rounded-full border border-white/10 bg-white/[0.04] px-5 py-2.5 text-sm font-black text-white/65 transition hover:border-white/25 hover:text-white"
+                  className="border border-white/10 bg-white/[0.04] px-5 py-2.5 text-xs font-black uppercase tracking-[0.14em] text-white/65 transition hover:border-white/25 hover:text-white"
                 >
                   Data Health
-                </Link>
-
-                <Link
-                  href="/admin"
-                  className="rounded-full border border-white/10 bg-white/[0.04] px-5 py-2.5 text-sm font-black text-white/65 transition hover:border-white/25 hover:text-white"
-                >
-                  Admin Home
                 </Link>
               </div>
             </div>
@@ -556,7 +552,7 @@ export default async function PubgMappingsPage({
       </section>
 
       {tableErrors.length > 0 ? (
-        <section className="mx-auto max-w-7xl px-5 py-8">
+        <section className="mx-auto max-w-[1500px] px-5 py-8 md:px-8">
           <div className="rounded-2xl border border-red-400/25 bg-red-400/10 p-5">
             <p className="font-black uppercase text-red-300">
               Failed to load mapping data
@@ -573,17 +569,11 @@ export default async function PubgMappingsPage({
         </section>
       ) : null}
 
-      <section className="mx-auto grid max-w-7xl gap-5 px-5 py-10 lg:grid-cols-[0.85fr_1.15fr]">
+      <section className="mx-auto grid max-w-[1500px] gap-5 px-5 py-10 md:px-8 lg:grid-cols-[0.85fr_1.15fr]">
         <section className={shell + " p-5 md:p-6"}>
-          <SectionHeader
-            eyebrow="Mapping Filters"
-            title="Search & Review"
-          />
+          <SectionHeader eyebrow="Mapping Filters" title="Search & Review" />
 
-          <form
-            action="/admin/pubg/mappings"
-            className="grid gap-3"
-          >
+          <form action="/admin/pubg/mappings" className="grid gap-3">
             <input type="hidden" name="status" value={selectedStatus} />
             {matchQuery ? (
               <input type="hidden" name="match" value={matchQuery} />
@@ -593,12 +583,12 @@ export default async function PubgMappingsPage({
               name="q"
               defaultValue={searchQuery}
               placeholder="Search PUBG name, account ID, or PlayRank IGN..."
-              className="w-full rounded-xl border border-white/10 bg-black px-4 py-3 text-sm text-white outline-none placeholder:text-white/35"
+              className="w-full border border-white/10 bg-black px-4 py-3 text-sm text-white outline-none placeholder:text-white/35 focus:border-[#ffd21a]/60"
             />
 
             <button
               type="submit"
-              className="rounded-xl border border-[#ffd21a]/30 bg-[#ffd21a]/10 px-4 py-3 text-xs font-black uppercase tracking-[0.14em] text-[#ffd21a] transition hover:bg-[#ffd21a]/15"
+              className="border border-[#ffd21a]/30 bg-[#ffd21a]/10 px-4 py-3 text-xs font-black uppercase tracking-[0.14em] text-[#ffd21a] transition hover:bg-[#ffd21a]/15"
             >
               Search
             </button>
@@ -609,14 +599,14 @@ export default async function PubgMappingsPage({
               const href = buildMappingFilterHref(
                 filter.value,
                 searchQuery,
-                matchQuery
+                matchQuery,
               );
 
               return (
                 <Link
                   key={filter.value}
                   href={href}
-                  className={`rounded-full border px-4 py-2 text-xs font-black uppercase tracking-[0.14em] ${
+                  className={`border px-4 py-2 text-xs font-black uppercase tracking-[0.14em] ${
                     selectedStatus === filter.value
                       ? "border-[#ffd21a]/40 bg-[#ffd21a]/10 text-[#ffd21a]"
                       : "border-white/10 bg-white/[0.03] text-white/50 hover:text-white"
@@ -685,7 +675,3 @@ export default async function PubgMappingsPage({
     </main>
   );
 }
-
-
-
-

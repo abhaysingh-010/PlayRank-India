@@ -151,15 +151,15 @@ export default async function RosterIssuesPage() {
     .limit(1000);
 
   const healthRows = ((healthRaw || []) as RosterHealthRow[]).filter(
-    isRosterIssue
+    isRosterIssue,
   );
 
   const playerIds = Array.from(
     new Set(
       healthRows
         .map((row) => row.player_id)
-        .filter((value): value is string => Boolean(value))
-    )
+        .filter((value): value is string => Boolean(value)),
+    ),
   );
 
   const { data: playersRaw, error: playersError } =
@@ -167,7 +167,7 @@ export default async function RosterIssuesPage() {
       ? await supabaseAdmin
           .from("players")
           .select(
-            "id, ign, slug, team_id, role, source, verified, active, created_at"
+            "id, ign, slug, team_id, role, source, verified, active, created_at",
           )
           .in("id", playerIds)
       : { data: [], error: null };
@@ -179,8 +179,8 @@ export default async function RosterIssuesPage() {
     new Set(
       players
         .map((player) => player.team_id)
-        .filter((value): value is string => Boolean(value))
-    )
+        .filter((value): value is string => Boolean(value)),
+    ),
   );
 
   const { data: teamsRaw, error: teamsError } =
@@ -197,7 +197,9 @@ export default async function RosterIssuesPage() {
   const error = healthError || playersError || teamsError;
 
   const issues: RosterIssue[] = healthRows.map((health) => {
-    const player = health.player_id ? playerById.get(health.player_id) || null : null;
+    const player = health.player_id
+      ? playerById.get(health.player_id) || null
+      : null;
     const team = player?.team_id ? teamById.get(player.team_id) || null : null;
 
     return {
@@ -210,15 +212,15 @@ export default async function RosterIssuesPage() {
   });
 
   const criticalCount = issues.filter(
-    (issue) => issue.priority.label === "Critical"
+    (issue) => issue.priority.label === "Critical",
   ).length;
 
   const highCount = issues.filter(
-    (issue) => issue.priority.label === "High"
+    (issue) => issue.priority.label === "High",
   ).length;
 
   const promotionUnsafeCount = issues.filter(
-    (issue) => issue.health.promotion_safe !== true
+    (issue) => issue.health.promotion_safe !== true,
   ).length;
 
   const missingPlayerCount = issues.filter((issue) => !issue.player).length;
@@ -226,7 +228,7 @@ export default async function RosterIssuesPage() {
   if (error) {
     return (
       <main className="page-shell py-10 text-white">
-        <section className="rounded-[2rem] border border-red-500/20 bg-red-500/5 p-8">
+        <section className="border border-red-500/20 bg-red-500/5 p-8">
           <p className="text-xs font-black uppercase tracking-[0.22em] text-red-300">
             Admin Data Health
           </p>
@@ -242,7 +244,7 @@ export default async function RosterIssuesPage() {
 
   return (
     <main className="page-shell space-y-6 py-8 text-white">
-      <section className="rounded-[2rem] border border-white/10 bg-[#07080c] p-7 md:p-9">
+      <section className="border border-white/10 bg-[#07080c] p-7 md:p-9">
         <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
           <div>
             <div className="flex flex-wrap gap-2">
@@ -311,32 +313,29 @@ export default async function RosterIssuesPage() {
         <div className="mt-7 flex flex-wrap gap-3">
           <Link
             href="/admin/data-health"
-            className="btn-secondary px-5 py-3 text-sm"
+            className="pr-button pr-button-secondary"
           >
             Back to Data Health
           </Link>
           <Link
             href="/admin/rosters/health"
-            className="btn-primary px-5 py-3 text-sm"
+            className="pr-button pr-button-primary"
           >
             Roster Health
           </Link>
-          <Link
-            href="/admin/rosters"
-            className="btn-secondary px-5 py-3 text-sm"
-          >
+          <Link href="/admin/rosters" className="pr-button pr-button-secondary">
             Rosters
           </Link>
           <Link
             href="/admin/pubg/mappings"
-            className="btn-secondary px-5 py-3 text-sm"
+            className="pr-button pr-button-secondary"
           >
             PUBG Mappings
           </Link>
         </div>
       </section>
 
-      <section className="rounded-[2rem] border border-yellow-400/20 bg-yellow-400/[0.06] p-6">
+      <section className="border border-yellow-400/20 bg-yellow-400/[0.06] p-6">
         <div className="flex flex-wrap gap-2">
           <DataSourceBadge label="Promotion Guard" />
           <DataSourceBadge label="Manual Review Required" />
@@ -354,7 +353,7 @@ export default async function RosterIssuesPage() {
         </p>
       </section>
 
-      <section className="overflow-hidden rounded-[2rem] border border-white/10 bg-[#090b10] shadow-2xl">
+      <section className="overflow-hidden border border-white/10 bg-[#090b10] shadow-2xl">
         <div className="border-b border-white/10 p-6">
           <h2 className="text-2xl font-black">Affected Roster Records</h2>
           <p className="mt-2 text-sm text-white/45">
@@ -452,7 +451,7 @@ export default async function RosterIssuesPage() {
                       {formatDate(issue.player?.created_at || null)}
                     </td>
 
-                                        <td className="px-6 py-5 text-right">
+                    <td className="px-6 py-5 text-right">
                       <div className="flex justify-end gap-2">
                         <Link
                           href={getPlayerReviewHref(issue.player)}
@@ -500,4 +499,3 @@ export default async function RosterIssuesPage() {
     </main>
   );
 }
-

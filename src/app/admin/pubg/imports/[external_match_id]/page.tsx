@@ -12,14 +12,15 @@ type PageProps = {
 type AnyRecord = Record<string, unknown>;
 
 function valueToText(value: unknown) {
-  if (value === null || value === undefined) return "â€”";
+  if (value === null || value === undefined) return "—";
   if (typeof value === "string") return value;
-  if (typeof value === "number" || typeof value === "boolean") return String(value);
+  if (typeof value === "number" || typeof value === "boolean")
+    return String(value);
   return JSON.stringify(value);
 }
 
 function getField(row: AnyRecord | null | undefined, keys: string[]) {
-  if (!row) return "â€”";
+  if (!row) return "—";
 
   for (const key of keys) {
     const value = row[key];
@@ -28,7 +29,7 @@ function getField(row: AnyRecord | null | undefined, keys: string[]) {
     }
   }
 
-  return "â€”";
+  return "—";
 }
 
 function getMatchMappingsHref(externalMatchId: string) {
@@ -42,20 +43,12 @@ function getPromotionReadinessHref(readiness: AnyRecord | null) {
       : "blocked";
 
   return `/api/admin/pubg/promotion-readiness?status=${encodeURIComponent(
-    status
+    status,
   )}`;
 }
-function StatusBadge({
-  status,
-}: {
-  status: "ready" | "blocked" | "unknown";
-}) {
+function StatusBadge({ status }: { status: "ready" | "blocked" | "unknown" }) {
   const label =
-    status === "ready"
-      ? "Ready"
-      : status === "blocked"
-        ? "Blocked"
-        : "Unknown";
+    status === "ready" ? "Ready" : status === "blocked" ? "Blocked" : "Unknown";
 
   const className =
     status === "ready"
@@ -65,7 +58,9 @@ function StatusBadge({
         : "border-zinc-700 bg-zinc-900 text-zinc-300";
 
   return (
-    <span className={`inline-flex rounded-full border px-3 py-1 text-xs font-semibold ${className}`}>
+    <span
+      className={`inline-flex border px-3 py-1 text-xs font-semibold ${className}`}
+    >
       {label}
     </span>
   );
@@ -81,10 +76,12 @@ function InfoCard({
   helper?: string;
 }) {
   return (
-    <div className="rounded-2xl border border-zinc-800 bg-zinc-950 p-5">
-      <p className="text-xs uppercase tracking-[0.2em] text-zinc-500">{title}</p>
+    <div className="border border-white/10 bg-[#080a0f] p-5">
+      <p className="text-xs uppercase tracking-[0.2em] text-white/30">
+        {title}
+      </p>
       <p className="mt-3 text-2xl font-bold text-white">{value}</p>
-      {helper ? <p className="mt-2 text-sm text-zinc-500">{helper}</p> : null}
+      {helper ? <p className="mt-2 text-sm text-white/35">{helper}</p> : null}
     </div>
   );
 }
@@ -92,22 +89,22 @@ function InfoCard({
 function KeyValueTable({ data }: { data: AnyRecord | null }) {
   if (!data) {
     return (
-      <div className="rounded-2xl border border-zinc-800 bg-zinc-950 p-6 text-sm text-zinc-400">
+      <div className="border border-white/10 bg-[#080a0f] p-6 text-sm text-white/40">
         No record found.
       </div>
     );
   }
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-zinc-800">
+    <div className="overflow-hidden border border-white/10">
       <table className="w-full text-left text-sm">
         <tbody>
           {Object.entries(data).map(([key, value]) => (
-            <tr key={key} className="border-b border-zinc-900 last:border-b-0">
-              <th className="w-64 bg-zinc-950 px-4 py-3 font-medium text-zinc-400">
+            <tr key={key} className="border-b border-white/10 last:border-b-0">
+              <th className="w-64 bg-[#080a0f] px-4 py-3 font-medium text-white/40">
                 {key}
               </th>
-              <td className="bg-black px-4 py-3 text-zinc-200">
+              <td className="bg-[#030406] px-4 py-3 text-white/70">
                 {valueToText(value)}
               </td>
             </tr>
@@ -164,7 +161,7 @@ export default async function PubgImportDetailPage({ params }: PageProps) {
       dry_run: true,
     },
     null,
-    2
+    2,
   );
 
   const confirmedPromotionRequestBody = JSON.stringify(
@@ -175,19 +172,23 @@ export default async function PubgImportDetailPage({ params }: PageProps) {
       confirmation_text: PROMOTION_CONFIRMATION_TEXT,
     },
     null,
-    2
+    2,
   );
 
   const errors = [
     matchResult.error ? `Match: ${matchResult.error.message}` : null,
-    participantsResult.error ? `Participants: ${participantsResult.error.message}` : null,
-    readinessResult.error ? `Readiness: ${readinessResult.error.message}` : null,
+    participantsResult.error
+      ? `Participants: ${participantsResult.error.message}`
+      : null,
+    readinessResult.error
+      ? `Readiness: ${readinessResult.error.message}`
+      : null,
   ].filter(Boolean);
 
   return (
-    <main className="min-h-screen bg-black px-6 py-8 text-white">
-      <div className="mx-auto max-w-7xl">
-        <div className="mb-4 rounded-2xl border border-yellow-500/20 bg-yellow-500/10 p-4">
+    <main className="bg-[#030406] text-white">
+      <div className="mx-auto max-w-[1500px] px-5 py-10 md:px-8">
+        <div className="mb-4 border border-yellow-500/20 bg-yellow-500/10 p-4">
           <p className="text-xs font-black uppercase tracking-[0.18em] text-yellow-300">
             Promotion safety mode
           </p>
@@ -195,57 +196,73 @@ export default async function PubgImportDetailPage({ params }: PageProps) {
             {PROMOTION_WRITE_STATUS}
           </p>
           <div className="mt-3 flex flex-wrap gap-3">
-            <Link href="/admin/pubg/promotions" className="text-sm font-bold text-yellow-300 hover:text-yellow-200">
+            <Link
+              href="/admin/pubg/promotions"
+              className="text-sm font-bold text-yellow-300 hover:text-yellow-200"
+            >
               Promotion Audit -&gt;
             </Link>
-            <Link href="/admin/pubg/imports" className="text-sm font-bold text-zinc-300 hover:text-white">
+            <Link
+              href="/admin/pubg/imports"
+              className="text-sm font-bold text-zinc-300 hover:text-white"
+            >
               Import Review -&gt;
             </Link>
           </div>
         </div>
 
-        <div className="mb-4 rounded-2xl border border-yellow-500/20 bg-yellow-500/10 p-4">
+        <div className="mb-4 border border-yellow-500/20 bg-yellow-500/10 p-4">
           <p className="text-xs font-black uppercase tracking-[0.18em] text-yellow-300">
             Dry-run vs confirmed promotion workflow
           </p>
 
           <div className="mt-4 grid gap-4 lg:grid-cols-2">
-            <div className="rounded-2xl border border-emerald-500/20 bg-emerald-500/10 p-4">
+            <div className="border border-emerald-500/20 bg-emerald-500/10 p-4">
               <p className="text-sm font-black text-emerald-300">
                 Step 1: Run dry-run readiness check
               </p>
               <p className="mt-2 text-sm leading-6 text-zinc-300">
-                Dry-run validates readiness and returns would_promote without writing to PlayRank core tables.
+                Dry-run validates readiness and returns would_promote without
+                writing to PlayRank core tables.
               </p>
-              <pre className="mt-3 overflow-auto rounded-xl border border-black/30 bg-black/30 p-3 text-xs leading-5 text-zinc-300">
+              <pre className="mt-3 overflow-auto border border-black/30 bg-black/30 p-3 text-xs leading-5 text-zinc-300">
                 {dryRunRequestBody}
               </pre>
             </div>
 
-            <div className="rounded-2xl border border-red-500/20 bg-red-500/10 p-4">
+            <div className="border border-red-500/20 bg-red-500/10 p-4">
               <p className="text-sm font-black text-red-300">
                 Step 2: Confirm promotion intent
               </p>
               <p className="mt-2 text-sm leading-6 text-zinc-300">
-                Confirmed promotion requires confirm_promotion, the exact confirmation_text, and the server flag PLAYRANK_ENABLE_PUBG_CORE_PROMOTION. Real writes execute only after the guarded server flag is enabled.
+                Confirmed promotion requires confirm_promotion, the exact
+                confirmation_text, and the server flag
+                PLAYRANK_ENABLE_PUBG_CORE_PROMOTION. Real writes execute only
+                after the guarded server flag is enabled.
               </p>
-              <pre className="mt-3 overflow-auto rounded-xl border border-black/30 bg-black/30 p-3 text-xs leading-5 text-zinc-300">
+              <pre className="mt-3 overflow-auto border border-black/30 bg-black/30 p-3 text-xs leading-5 text-zinc-300">
                 {confirmedPromotionRequestBody}
               </pre>
             </div>
           </div>
 
           <p className="mt-4 text-sm leading-6 text-zinc-300">
-            Required confirmation text: <span className="font-black text-yellow-300">PROMOTE_TO_PLAYRANK_CORE</span>
+            Required confirmation text:{" "}
+            <span className="font-black text-yellow-300">
+              PROMOTE_TO_PLAYRANK_CORE
+            </span>
           </p>
 
-          <div className="mt-4 rounded-2xl border border-white/10 bg-black/20 p-4">
+          <div className="mt-4 border border-white/10 bg-black/20 p-4">
             <p className="text-xs font-black uppercase tracking-[0.18em] text-yellow-300">
               Audit and failure follow-up
             </p>
 
             <p className="mt-2 text-sm leading-6 text-zinc-300">
-              After any confirmed attempt, review Promotion Audit for failed, blocked, started, and promoted states. Failed or started rows must remain in staging until error_message, completed_at, and core_match_id are reviewed.
+              After any confirmed attempt, review Promotion Audit for failed,
+              blocked, started, and promoted states. Failed or started rows must
+              remain in staging until error_message, completed_at, and
+              core_match_id are reviewed.
             </p>
           </div>
         </div>
@@ -256,7 +273,7 @@ export default async function PubgImportDetailPage({ params }: PageProps) {
               href="/admin/pubg/imports"
               className="text-sm font-medium text-red-400 hover:text-red-300"
             >
-              â† Back to PUBG imports
+              ← Back to PUBG imports
             </Link>
 
             <h1 className="mt-4 text-3xl font-black tracking-tight md:text-5xl">
@@ -278,37 +295,37 @@ export default async function PubgImportDetailPage({ params }: PageProps) {
           </div>
         </div>
 
-        <div className="mb-6 rounded-2xl border border-yellow-500/30 bg-yellow-500/10 p-5 text-sm text-yellow-200">
+        <div className="mb-6 border border-yellow-500/30 bg-yellow-500/10 p-5 text-sm text-yellow-200">
           PUBG core promotion is intentionally disabled until SQL safety is
-          audited. This page is read-only and should not write to core
-          PlayRank tables.
+          audited. This page is read-only and should not write to core PlayRank
+          tables.
         </div>
 
-        <div className="mb-6 flex flex-wrap gap-3 rounded-2xl border border-white/10 bg-zinc-950 p-5">
+        <div className="mb-6 flex flex-wrap gap-3 border border-white/10 bg-[#080a0f] p-5">
           <Link
             href={getMatchMappingsHref(externalMatchId)}
-            className="rounded-full border border-[#ffd21a]/30 bg-[#ffd21a]/10 px-5 py-2.5 text-sm font-black text-[#ffd21a] transition hover:bg-[#ffd21a]/15"
+            className="border border-[#ffd21a]/30 bg-[#ffd21a]/10 px-5 py-2.5 text-xs font-black uppercase tracking-[0.14em] text-[#ffd21a] transition hover:bg-[#ffd21a]/15"
           >
             Fix Match Mappings
           </Link>
 
           <Link
             href={getPromotionReadinessHref(readiness)}
-            className="rounded-full border border-white/10 bg-white/[0.04] px-5 py-2.5 text-sm font-black text-white/65 transition hover:border-white/25 hover:text-white"
+            className="border border-white/10 bg-white/[0.04] px-5 py-2.5 text-xs font-black uppercase tracking-[0.14em] text-white/65 transition hover:border-white/25 hover:text-white"
           >
             Readiness Status
           </Link>
 
           <Link
             href="/admin/data-health/pubg-blocked-promotions"
-            className="rounded-full border border-white/10 bg-white/[0.04] px-5 py-2.5 text-sm font-black text-white/65 transition hover:border-white/25 hover:text-white"
+            className="border border-white/10 bg-white/[0.04] px-5 py-2.5 text-xs font-black uppercase tracking-[0.14em] text-white/65 transition hover:border-white/25 hover:text-white"
           >
             Blocked Promotions
           </Link>
         </div>
 
         {errors.length > 0 ? (
-          <div className="mb-6 rounded-2xl border border-red-500/30 bg-red-500/10 p-5 text-sm text-red-200">
+          <div className="mb-6 border border-red-500/30 bg-red-500/10 p-5 text-sm text-red-200">
             <p className="font-semibold">Some data could not be loaded:</p>
             <ul className="mt-2 list-disc space-y-1 pl-5">
               {errors.map((error) => (
@@ -360,13 +377,13 @@ export default async function PubgImportDetailPage({ params }: PageProps) {
           <h2 className="mb-4 text-xl font-bold">Participants</h2>
 
           {participants.length === 0 ? (
-            <div className="rounded-2xl border border-zinc-800 bg-zinc-950 p-6 text-sm text-zinc-400">
+            <div className="border border-white/10 bg-[#080a0f] p-6 text-sm text-white/40">
               No participants found for this external match id.
             </div>
           ) : (
-            <div className="overflow-hidden rounded-2xl border border-zinc-800">
+            <div className="overflow-x-auto border border-white/10">
               <table className="w-full min-w-[900px] text-left text-sm">
-                <thead className="bg-zinc-950 text-xs uppercase tracking-[0.16em] text-zinc-500">
+                <thead className="bg-[#080a0f] text-xs uppercase tracking-[0.16em] text-white/30">
                   <tr>
                     <th className="px-4 py-3">Player</th>
                     <th className="px-4 py-3">Team / Roster</th>
@@ -381,7 +398,7 @@ export default async function PubgImportDetailPage({ params }: PageProps) {
                   {participants.map((participant, index) => (
                     <tr
                       key={`${getField(participant, ["id", "participant_id", "account_id"])}-${index}`}
-                      className="border-t border-zinc-900 bg-black"
+                      className="border-t border-white/10 bg-[#030406]"
                     >
                       <td className="px-4 py-3 font-medium text-white">
                         {getField(participant, [
@@ -404,13 +421,25 @@ export default async function PubgImportDetailPage({ params }: PageProps) {
                         {getField(participant, ["kills", "kill_count"])}
                       </td>
                       <td className="px-4 py-3 text-zinc-300">
-                        {getField(participant, ["damage", "damage_dealt", "damageDealt"])}
+                        {getField(participant, [
+                          "damage",
+                          "damage_dealt",
+                          "damageDealt",
+                        ])}
                       </td>
                       <td className="px-4 py-3 text-zinc-300">
-                        {getField(participant, ["placement", "rank", "win_place"])}
+                        {getField(participant, [
+                          "placement",
+                          "rank",
+                          "win_place",
+                        ])}
                       </td>
                       <td className="px-4 py-3 font-mono text-xs text-zinc-500">
-                        {getField(participant, ["id", "participant_id", "account_id"])}
+                        {getField(participant, [
+                          "id",
+                          "participant_id",
+                          "account_id",
+                        ])}
                       </td>
                     </tr>
                   ))}

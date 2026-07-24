@@ -1,9 +1,8 @@
-﻿import Link from "next/link";
+import Link from "next/link";
+import { ArrowRight } from "lucide-react";
 import { supabase } from "@/lib/supabase";
-import DataSourceBadge from "@/components/DataSourceBadge";
-import PublicTrustNotice from "@/components/PublicTrustNotice";
 
-type TournamentRow = {
+type Tournament = {
   id: string;
   name: string;
   slug: string;
@@ -12,417 +11,303 @@ type TournamentRow = {
   location: string | null;
   prize_pool: number | null;
   participating_teams: number | null;
-  logo_url?: string | null;
-  source: string | null;
-  source_url: string | null;
+  start_date: string | null;
+  end_date: string | null;
   verified: boolean | null;
-  start_date?: string | null;
-  end_date?: string | null;
-  created_at: string | null;
+  source_url: string | null;
+  map_count: number;
+  standing_count: number;
+  has_coverage: boolean;
 };
 
-type CountRow = {
-  tournament_id: string | null;
-};
+type SortDirection = "asc" | "desc";
+type DirectoryMode = "covered" | "archive";
 
-const card =
-  "rounded-[2rem] border border-white/10 bg-[#090b10] shadow-[0_24px_80px_rgba(0,0,0,0.35)]";
+const SIZE = 10;
 
-const softCard =
-  "rounded-2xl border border-white/10 bg-white/[0.035] shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]";
-
-function n(value: unknown, fallback = 0) {
-  const numberValue = Number(value);
-  return Number.isFinite(numberValue) ? numberValue : fallback;
+function num(value: unknown) {
+  const result = Number(value);
+  return Number.isFinite(result) ? result : 0;
 }
 
-function formatPrizePool(value: unknown) {
-  const amount = n(value);
+function pageNumber(value?: string) {
+  const page = Number.parseInt(value || "1", 10);
+  return Number.isFinite(page) && page > 0 ? page : 1;
+}
 
+function sortDirection(value?: string): SortDirection {
+  return value === "asc" ? "asc" : "desc";
+}
+
+function directoryMode(value?: string): DirectoryMode {
+  return value === "archive" ? "archive" : "covered";
+}
+
+function date(value?: string | null) {
+  return value
+    ? new Date(`${value}T00:00:00`).toLocaleDateString("en-IN", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+      })
+    : "TBD";
+}
+
+function money(value: unknown) {
+  const amount = num(value);
   if (!amount) return "TBD";
-  if (amount >= 10000000) return `â‚¹${(amount / 10000000).toFixed(1)}Cr`;
-  if (amount >= 100000) return `â‚¹${(amount / 100000).toFixed(1)}L`;
-
-  return `â‚¹${amount.toLocaleString("en-IN")}`;
+  if (amount >= 10000000) return `₹${(amount / 10000000).toFixed(1)}Cr`;
+  if (amount >= 100000) return `₹${(amount / 100000).toFixed(1)}L`;
+  return `₹${amount.toLocaleString("en-IN")}`;
 }
 
-function formatDate(value: string | null | undefined) {
-  if (!value) return "TBD";
-
-  return new Date(value).toLocaleDateString("en-IN", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-  });
+function pageHref(page: number, sort: SortDirection, mode: DirectoryMode) {
+  return `/tournaments?page=${page}&sort=${sort}&view=${mode}`;
 }
 
-function getInitials(name: string) {
-  return name
-    .split(" ")
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((word) => word[0])
-    .join("")
-    .toUpperCase();
-}
-
-function getStatusLabel(status: string | null) {
-  return status || "Upcoming";
-}
-
-function getStatusClass(status: string | null) {
-  const safeStatus = (status || "").toLowerCase();
-
-  if (safeStatus.includes("live") || safeStatus.includes("ongoing")) {
-    return "border-emerald-400/25 bg-emerald-400/10 text-emerald-300";
-  }
-
-  if (safeStatus.includes("complete") || safeStatus.includes("ended")) {
-    return "border-white/10 bg-white/[0.04] text-white/45";
-  }
-
-  if (safeStatus.includes("cancel")) {
-    return "border-red-400/25 bg-red-400/10 text-red-300";
-  }
-
-  return "border-[#ffd21a]/25 bg-[#ffd21a]/10 text-[#ffd21a]";
-}
-
-function getSourceLabel(source: string | null, verified: boolean | null) {
-  if (source === "krafton_india_esports") return "Official Krafton";
-  if (source === "admin_manual") return "Admin Verified";
-  if (verified) return "Verified Event";
-  return "Tournament Record";
-}
-
-function countByTournament(rows: CountRow[]) {
-  const map = new Map<string, number>();
-
-  for (const row of rows) {
-    if (!row.tournament_id) continue;
-    map.set(row.tournament_id, (map.get(row.tournament_id) || 0) + 1);
-  }
-
-  return map;
-}
-
-function Metric({
-  label,
-  value,
-  muted = false,
+export default async function TournamentsPage({
+  searchParams,
 }: {
-  label: string;
-  value: string | number;
-  muted?: boolean;
+  searchParams?: Promise<{ page?: string; sort?: string; view?: string }>;
 }) {
-  return (
-    <div className={softCard + " p-4"}>
-      <p className="text-xs uppercase tracking-[0.2em] text-white/35">
-        {label}
-      </p>
+  const params = searchParams ? await searchParams : {};
+  const page = pageNumber(params.page);
+  const sort = sortDirection(params.sort);
+  const mode = directoryMode(params.view);
+  const offset = (page - 1) * SIZE;
 
-      <p
-        className={`mt-2 text-2xl font-black ${
-          muted ? "text-white/65" : "text-white"
-        }`}
-      >
-        {value}
-      </p>
-    </div>
-  );
-}
+  const eventsResult = await supabase
+    .from("tournament_public_coverage")
+    .select(
+      "id,name,slug,organizer,status,location,prize_pool,participating_teams,start_date,end_date,verified,source_url,map_count,standing_count,has_coverage",
+      { count: "exact" },
+    )
+    .eq("has_coverage", mode === "covered")
+    .order("start_date", { ascending: sort === "asc", nullsFirst: false })
+    .order("name", { ascending: true })
+    .range(offset, offset + SIZE - 1);
 
-function TournamentLogo({
-  name,
-  logoUrl,
-}: {
-  name: string;
-  logoUrl?: string | null;
-}) {
-  return (
-    <div className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-white/10 bg-white/[0.04]">
-      {logoUrl ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          src={logoUrl}
-          alt={`${name} logo`}
-          className="h-full w-full object-contain p-2"
-        />
-      ) : (
-        <span className="text-sm font-black text-white/75">
-          {getInitials(name)}
-        </span>
-      )}
-    </div>
-  );
-}
-
-function MiniStat({
-  label,
-  value,
-}: {
-  label: string;
-  value: string | number;
-}) {
-  return (
-    <div>
-      <p className="text-[10px] font-black uppercase tracking-[0.18em] text-white/30">
-        {label}
-      </p>
-
-      <p className="mt-1 text-sm font-black text-white/75">{value}</p>
-    </div>
-  );
-}
-
-function TournamentCard({
-  tournament,
-  matchCount,
-  standingCount,
-}: {
-  tournament: TournamentRow;
-  matchCount: number;
-  standingCount: number;
-}) {
-  const statusLabel = getStatusLabel(tournament.status);
-  const sourceLabel = getSourceLabel(tournament.source, tournament.verified);
-
-  return (
-    <article className="group relative overflow-hidden rounded-3xl border border-white/10 bg-[#090b10] p-5 transition hover:-translate-y-0.5 hover:border-[#ffd21a]/30 hover:bg-white/[0.035]">
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.07),transparent_32%),radial-gradient(circle_at_bottom_right,rgba(250,204,21,0.07),transparent_28%)] opacity-0 transition group-hover:opacity-100" />
-
-      <div className="relative z-10">
-        <div className="flex items-start justify-between gap-4">
-          <div className="flex min-w-0 items-center gap-3">
-            <TournamentLogo
-              name={tournament.name}
-              logoUrl={tournament.logo_url}
-            />
-
-            <div className="min-w-0">
-              <Link
-                href={`/tournaments/${tournament.slug}`}
-                className="line-clamp-1 text-lg font-black tracking-[-0.03em] text-white hover:underline"
-              >
-                {tournament.name}
-              </Link>
-
-              <p className="mt-1 truncate text-xs font-semibold text-white/40">
-                {tournament.organizer || "Organizer TBD"}
-              </p>
-            </div>
-          </div>
-
-          <span
-            className={`shrink-0 rounded-full border px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.12em] ${getStatusClass(
-              tournament.status
-            )}`}
-          >
-            {statusLabel}
-          </span>
-        </div>
-
-        <div className="mt-4 flex flex-wrap gap-2">
-          <DataSourceBadge
-            source={tournament.source}
-            verified={tournament.verified}
-            label={sourceLabel}
-          />
-        </div>
-
-        <div className="mt-5 grid grid-cols-4 gap-4 border-y border-white/10 py-4">
-          <MiniStat label="Prize" value={formatPrizePool(tournament.prize_pool)} />
-          <MiniStat label="Teams" value={tournament.participating_teams || "â€”"} />
-          <MiniStat label="Matches" value={matchCount} />
-          <MiniStat label="Rows" value={standingCount} />
-        </div>
-
-        <div className="mt-4 flex items-center justify-between gap-4">
-          <div className="min-w-0">
-            <p className="truncate text-xs font-bold text-white/40">
-              {tournament.location || "India"}
-            </p>
-
-            <p className="mt-1 text-[10px] uppercase tracking-[0.16em] text-white/25">
-              Added {formatDate(tournament.created_at)}
-            </p>
-          </div>
-
-          <Link
-            href={`/tournaments/${tournament.slug}`}
-            className="shrink-0 rounded-full border border-white/10 bg-white/[0.04] px-4 py-2 text-xs font-black text-white/50 transition hover:border-[#ffd21a]/30 hover:text-[#ffd21a]"
-          >
-            View
-          </Link>
-        </div>
-      </div>
-    </article>
-  );
-}
-
-export default async function TournamentsPage() {
-  const [tournamentsResult, matchesResult, standingsResult] = await Promise.all([
-    supabase
-      .from("tournaments")
-      .select("*")
-      .order("created_at", { ascending: false }),
-
-    supabase.from("matches").select("tournament_id"),
-
-    supabase.from("tournament_standings").select("tournament_id"),
-  ]);
-
-  const tournaments = (tournamentsResult.data || []) as TournamentRow[];
-  const matches = (matchesResult.data || []) as CountRow[];
-  const standings = (standingsResult.data || []) as CountRow[];
-
-  const matchesByTournament = countByTournament(matches);
-  const standingsByTournament = countByTournament(standings);
-
-  const liveTournaments = tournaments.filter((tournament) => {
-    const status = (tournament.status || "").toLowerCase();
-    return status.includes("live") || status.includes("ongoing");
-  }).length;
-
-  const completedTournaments = tournaments.filter((tournament) => {
-    const status = (tournament.status || "").toLowerCase();
-    return status.includes("complete") || status.includes("ended");
-  }).length;
-
-  const verifiedTournaments = tournaments.filter(
-    (tournament) => tournament.verified === true
-  ).length;
-
-  const totalPrizePool = tournaments.reduce(
-    (sum, tournament) => sum + n(tournament.prize_pool),
-    0
-  );
-
-  if (tournamentsResult.error) {
+  if (eventsResult.error) {
     return (
-      <main className="page-shell py-10">
-        <section className={card + " p-8"}>
-          <h1 className="text-2xl font-black text-white">Tournaments</h1>
-
-          <p className="mt-3 text-red-300">
-            Failed to load tournaments. Check Supabase query, table permissions,
-            or selected columns.
-          </p>
-        </section>
+      <main className="pr-container py-20">
+        <h1 className="text-5xl font-semibold text-white">
+          Tournaments could not be loaded.
+        </h1>
       </main>
     );
   }
 
+  const events = (eventsResult.data || []) as Tournament[];
+  const total = eventsResult.count || 0;
+  const pages = Math.max(1, Math.ceil(total / SIZE));
+
   return (
-    <main className="page-shell space-y-6 py-8 text-white">
-      <section className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-[#07080c] p-7 shadow-2xl md:p-9">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.10),transparent_34%),radial-gradient(circle_at_bottom_right,rgba(250,204,21,0.10),transparent_30%)]" />
-        <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/30 to-transparent" />
-
-        <div className="relative z-10 flex flex-col gap-7 lg:flex-row lg:items-end lg:justify-between">
+    <main className="bg-[var(--pr-bg)] text-white">
+      <section className="border-b border-white/15">
+        <div className="pr-container grid gap-12 py-16 md:py-24 lg:grid-cols-[1.2fr_.8fr] lg:items-end">
           <div>
-            <p className="text-xs font-black uppercase tracking-[0.28em] text-[#ffd21a]">
-              PlayRank Tournament Center
-            </p>
-
-            <h1 className="mt-2 max-w-4xl text-5xl font-black uppercase leading-[0.9] tracking-[-0.06em] text-white md:text-7xl">
-              Event
+            <p className="pr-kicker">Events · organisers · competition</p>
+            <h1 className="mt-5 text-[clamp(4.5rem,9vw,9rem)] font-semibold uppercase leading-[.78] tracking-[-.08em]">
+              Tournament
               <br />
-              Intelligence
+              <span className="text-[var(--pr-red)]">register.</span>
             </h1>
-
-            <p className="mt-4 max-w-3xl leading-7 text-white/45">
-              Track tournament records, prize pools, active event status,
-              participating teams, match volume and standings coverage.
-            </p>
-
-            <div className="mt-5 flex flex-wrap gap-2">
-              <DataSourceBadge label="Tournament Records" />
-              <DataSourceBadge label="Standings Aware" />
-              <DataSourceBadge label="Modern Event Cards" />
-            </div>
           </div>
-
-          <div className="flex flex-wrap gap-3">
-            <Link
-              href="/standings"
-              className="rounded-full border border-[#ffd21a]/30 bg-[#ffd21a]/10 px-5 py-2.5 text-sm font-black text-[#ffd21a] transition hover:bg-[#ffd21a]/15"
-            >
-              Standings
-            </Link>
-
-            <Link
-              href="/matches"
-              className="rounded-full border border-white/10 bg-white/[0.04] px-5 py-2.5 text-sm font-semibold text-white/55 transition hover:border-white/25 hover:text-white"
-            >
-              Matches
-            </Link>
-
-            <Link
-              href="/data"
-              className="rounded-full border border-white/10 bg-white/[0.04] px-5 py-2.5 text-sm font-semibold text-white/55 transition hover:border-white/25 hover:text-white"
-            >
-              Data Trust
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      <PublicTrustNotice variant="tournaments" />
-
-      <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
-        <Metric label="Events" value={tournaments.length} />
-        <Metric label="Live" value={liveTournaments} />
-        <Metric label="Completed" value={completedTournaments} />
-        <Metric label="Verified" value={verifiedTournaments} />
-        <Metric label="Prize Pool" value={formatPrizePool(totalPrizePool)} muted />
-      </section>
-
-      <section className={card + " p-5 md:p-6"}>
-        <div className="mb-5 flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
           <div>
-            <div className="flex flex-wrap gap-2">
-              <DataSourceBadge label="Event Cards" />
-              <DataSourceBadge label="Compact View" />
+            <p className="max-w-xl text-base leading-7 text-white/50">
+              {mode === "covered"
+                ? "Explore tournaments with published matches or final standings."
+                : "Browse historical event records whose detailed scorecards are not yet available."}
+            </p>
+            <div className="mt-7 flex gap-3">
+              <Link
+                href="/standings"
+                className="pr-button pr-button-primary text-[10px]"
+              >
+                Standings
+              </Link>
+              <Link
+                href="/matches"
+                className="pr-button pr-button-secondary text-[10px]"
+              >
+                Matches
+              </Link>
             </div>
-
-            <p className="mt-4 text-xs font-black uppercase tracking-[0.28em] text-white/35">
-              Tournaments
-            </p>
-
-            <h2 className="mt-2 text-2xl font-black text-white">
-              Tournament Records
-            </h2>
-
-            <p className="mt-2 max-w-2xl text-sm leading-6 text-white/45">
-              Minimal cards with event status, prize pool, match coverage and
-              standings coverage.
-            </p>
           </div>
+        </div>
+      </section>
 
-          <p className="text-sm text-white/35">
-            {tournaments.length} tournaments
-          </p>
+      <section className="border-b border-white/15">
+        <div className="pr-container grid grid-cols-3">
+          {[
+            [total, "Events"],
+            [
+              events.filter((event) =>
+                (event.status || "").toLowerCase().includes("live"),
+              ).length,
+              "Live on page",
+            ],
+            [SIZE, "Events per page"],
+          ].map(([value, label]) => (
+            <div
+              key={label}
+              className="border-r border-white/15 px-5 py-7 first:border-l"
+            >
+              <p className="text-2xl font-semibold">{value}</p>
+              <p className="mt-2 text-[9px] uppercase tracking-[.15em] text-white/25">
+                {label}
+              </p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="pr-container py-16 md:py-22">
+        <div className="flex flex-col gap-6 border-b border-white/15 pb-7 md:flex-row md:items-end md:justify-between">
+          <div>
+            <p className="pr-kicker">Event index · page {page}</p>
+            <h2 className="mt-4 text-4xl font-semibold tracking-[-.05em] md:text-6xl">
+              Competition calendar.
+            </h2>
+          </div>
+          <div className="flex flex-wrap items-center gap-3">
+            <div
+              className="flex border border-white/15 p-1"
+              aria-label="Tournament coverage filter"
+            >
+              <Link
+                href={pageHref(1, sort, "covered")}
+                aria-current={mode === "covered" ? "page" : undefined}
+                className={`px-4 py-3 text-[9px] font-semibold uppercase tracking-[.14em] transition-colors ${mode === "covered" ? "bg-white text-black" : "text-white/40 hover:text-white"}`}
+              >
+                Covered
+              </Link>
+              <Link
+                href={pageHref(1, sort, "archive")}
+                aria-current={mode === "archive" ? "page" : undefined}
+                className={`px-4 py-3 text-[9px] font-semibold uppercase tracking-[.14em] transition-colors ${mode === "archive" ? "bg-white text-black" : "text-white/40 hover:text-white"}`}
+              >
+                Archive
+              </Link>
+            </div>
+            <div
+              className="flex border border-white/15 p-1"
+              aria-label="Tournament date order"
+            >
+              <Link
+                href={pageHref(1, "desc", mode)}
+                aria-current={sort === "desc" ? "page" : undefined}
+                className={`px-4 py-3 text-[9px] font-semibold uppercase tracking-[.14em] transition-colors ${sort === "desc" ? "bg-[var(--pr-red)] text-black" : "text-white/40 hover:text-white"}`}
+              >
+                Newest
+              </Link>
+              <Link
+                href={pageHref(1, "asc", mode)}
+                aria-current={sort === "asc" ? "page" : undefined}
+                className={`px-4 py-3 text-[9px] font-semibold uppercase tracking-[.14em] transition-colors ${sort === "asc" ? "bg-[var(--pr-red)] text-black" : "text-white/40 hover:text-white"}`}
+              >
+                Oldest
+              </Link>
+            </div>
+          </div>
         </div>
 
-        {tournaments.length > 0 ? (
-          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-            {tournaments.map((tournament) => (
-              <TournamentCard
-                key={tournament.id}
-                tournament={tournament}
-                matchCount={matchesByTournament.get(tournament.id) || 0}
-                standingCount={standingsByTournament.get(tournament.id) || 0}
-              />
-            ))}
-          </div>
-        ) : (
-          <p className="rounded-2xl border border-white/10 bg-white/[0.03] p-5 text-sm text-white/45">
-            No tournaments available yet.
+        <div>
+          {events.length ? (
+            events.map((event) => {
+              const maps = event.map_count || 0;
+              const rankedTeams = event.standing_count || 0;
+              return (
+                <Link
+                  key={event.id}
+                  href={
+                    mode === "covered"
+                      ? `/tournaments/${event.slug}`
+                      : event.source_url || "/tournaments"
+                  }
+                  target={
+                    mode === "archive" && event.source_url
+                      ? "_blank"
+                      : undefined
+                  }
+                  rel={mode === "archive" ? "noreferrer" : undefined}
+                  className="pr-ranking-row group grid gap-5 border-b border-white/10 py-6 md:grid-cols-[160px_1.4fr_repeat(3,.6fr)_24px] md:items-center"
+                >
+                  <div>
+                    <p className="font-semibold">{date(event.start_date)}</p>
+                    <p className="mt-1 text-[9px] uppercase tracking-[.14em] text-white/25">
+                      to {date(event.end_date)}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-lg font-semibold">{event.name}</p>
+                    <p className="mt-1 text-[9px] uppercase tracking-[.14em] text-white/25">
+                      {event.organizer || "Organiser TBD"} ·{" "}
+                      {event.location || "India"}
+                    </p>
+                  </div>
+                  <Stat value={event.status || "Upcoming"} label="Status" />
+                  <Stat value={money(event.prize_pool)} label="Prize pool" />
+                  <Stat
+                    value={
+                      mode === "covered"
+                        ? `${maps} maps · ${rankedTeams} ranked`
+                        : "Open source record"
+                    }
+                    label={
+                      mode === "covered"
+                        ? "Event coverage"
+                        : "Historical archive"
+                    }
+                  />
+                  <ArrowRight
+                    size={15}
+                    className="hidden text-white/20 group-hover:text-[var(--pr-red)] md:block"
+                  />
+                </Link>
+              );
+            })
+          ) : (
+            <p className="py-14 text-white/35">No tournaments found.</p>
+          )}
+        </div>
+
+        <nav className="mt-8 flex items-center justify-between border-t border-white/15 pt-7">
+          <p className="text-[10px] uppercase tracking-[.16em] text-white/30">
+            Page {Math.min(page, pages)} of {pages} ·{" "}
+            {sort === "asc" ? "Oldest first" : "Newest first"}
           </p>
-        )}
+          <div className="flex gap-2">
+            {page > 1 ? (
+              <Link
+                href={pageHref(page - 1, sort, mode)}
+                className="pr-button pr-button-secondary text-[10px]"
+              >
+                Previous 10
+              </Link>
+            ) : null}
+            {page < pages ? (
+              <Link
+                href={pageHref(page + 1, sort, mode)}
+                className="pr-button pr-button-primary text-[10px]"
+              >
+                Next 10 <ArrowRight size={13} />
+              </Link>
+            ) : null}
+          </div>
+        </nav>
       </section>
     </main>
   );
 }
 
+function Stat({ value, label }: { value: string | number; label: string }) {
+  return (
+    <div>
+      <p className="truncate text-sm font-semibold">{value}</p>
+      <p className="mt-1 text-[9px] uppercase tracking-[.14em] text-white/25">
+        {label}
+      </p>
+    </div>
+  );
+}

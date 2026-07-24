@@ -80,7 +80,7 @@ function StatBlock({
   tone?: Tone;
 }) {
   return (
-    <div className={`rounded-2xl border p-4 ${toneClass(tone)}`}>
+    <div className={`border p-4 ${toneClass(tone)}`}>
       <p className="text-[10px] font-black uppercase tracking-[0.2em] opacity-70">
         {label}
       </p>
@@ -104,7 +104,7 @@ function JobStatusBadge({ status }: { status: string | null }) {
 
   return (
     <span
-      className={`rounded-full border px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.14em] ${className}`}
+      className={`border px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.14em] ${className}`}
     >
       {value}
     </span>
@@ -198,9 +198,9 @@ export default async function AdminRankingsSyncPage() {
   ].filter(Boolean);
 
   return (
-    <main className="min-h-screen bg-[#030406] text-white">
+    <main className="bg-[#030406] text-white">
       <section className="border-b border-white/10 bg-[#050609]">
-        <div className="mx-auto max-w-7xl px-5 py-12 md:py-16">
+        <div className="mx-auto max-w-[1500px] px-5 py-10 md:px-8 md:py-14">
           <div className="flex flex-wrap gap-2">
             <DataSourceBadge label="Internal Console" size="md" />
             <DataSourceBadge label="Protected" size="md" />
@@ -209,8 +209,8 @@ export default async function AdminRankingsSyncPage() {
 
           <div className="mt-7 grid gap-8 lg:grid-cols-[1.15fr_0.85fr] lg:items-end">
             <div>
-              <p className="text-xs font-black uppercase tracking-[0.3em] text-[#ffd21a]">
-                PlayRank Admin
+              <p className="text-xs font-black uppercase tracking-[0.24em] text-[#f4473b]">
+                Protected mutation / ranking engine
               </p>
               <h1 className="mt-4 text-5xl font-black uppercase leading-[0.9] tracking-[-0.07em] text-white md:text-7xl">
                 Ranking Sync
@@ -225,20 +225,14 @@ export default async function AdminRankingsSyncPage() {
 
               <div className="mt-8 flex flex-wrap gap-3">
                 <Link
-                  href="/admin"
-                  className="rounded-full border border-white/10 bg-white/[0.04] px-5 py-2.5 text-sm font-black text-white/65 transition hover:border-white/25 hover:text-white"
-                >
-                  Admin Home
-                </Link>
-                <Link
                   href="/admin/data-health"
-                  className="rounded-full border border-white/10 bg-white/[0.04] px-5 py-2.5 text-sm font-black text-white/65 transition hover:border-white/25 hover:text-white"
+                  className="border border-white/10 bg-white/[0.04] px-5 py-2.5 text-xs font-black uppercase tracking-[0.14em] text-white/65 transition hover:border-white/25 hover:text-white"
                 >
                   Data Health
                 </Link>
                 <Link
                   href="/rankings"
-                  className="rounded-full border border-[#ffd21a]/30 bg-[#ffd21a]/10 px-5 py-2.5 text-sm font-black text-[#ffd21a] transition hover:bg-[#ffd21a]/15"
+                  className="border border-[#ffd21a]/30 bg-[#ffd21a]/10 px-5 py-2.5 text-xs font-black uppercase tracking-[0.14em] text-[#ffd21a] transition hover:bg-[#ffd21a]/15"
                 >
                   Public Rankings
                 </Link>
@@ -274,9 +268,9 @@ export default async function AdminRankingsSyncPage() {
         </div>
       </section>
 
-      <section className="mx-auto grid max-w-7xl gap-5 px-5 py-10 lg:grid-cols-[0.95fr_1.05fr]">
+      <section className="mx-auto grid max-w-[1500px] gap-5 px-5 py-10 md:px-8 lg:grid-cols-[0.95fr_1.05fr]">
         <div className="space-y-5">
-          <section className="rounded-[2rem] border border-white/10 bg-[#080a0f] p-5">
+          <section className="border border-white/10 bg-[#080a0f] p-5">
             <SectionHeader
               eyebrow="Sync Status"
               title="Ranking Drift Guard"
@@ -308,7 +302,9 @@ export default async function AdminRankingsSyncPage() {
                 </p>
                 <div className="mt-2 flex flex-wrap items-center gap-2">
                   <p className="text-lg font-black text-white">
-                    {latestJob ? formatDate(latestJob.started_at) : "No jobs yet"}
+                    {latestJob
+                      ? formatDate(latestJob.started_at)
+                      : "No jobs yet"}
                   </p>
                   {latestJob && <JobStatusBadge status={latestJob.status} />}
                 </div>
@@ -340,7 +336,7 @@ export default async function AdminRankingsSyncPage() {
 
         <div className="space-y-5">
           {errors.length > 0 && (
-            <section className="rounded-[2rem] border border-red-400/20 bg-red-400/[0.06] p-5">
+            <section className="border border-red-400/20 bg-red-400/[0.06] p-5">
               <SectionHeader
                 eyebrow="Query Errors"
                 title="Ranking Sync Data Errors"
@@ -360,7 +356,7 @@ export default async function AdminRankingsSyncPage() {
             </section>
           )}
 
-          <section className="rounded-[2rem] border border-white/10 bg-[#080a0f] p-5">
+          <section className="border border-white/10 bg-[#080a0f] p-5">
             <SectionHeader
               eyebrow="Recent Jobs"
               title="Ranking Recalculation Log"
@@ -412,7 +408,7 @@ export default async function AdminRankingsSyncPage() {
             )}
           </section>
 
-          <section className="rounded-[2rem] border border-white/10 bg-[#080a0f] p-5">
+          <section className="border border-white/10 bg-[#080a0f] p-5">
             <SectionHeader
               eyebrow="Latest Rows"
               title="Latest Ranking Records"
@@ -424,7 +420,7 @@ export default async function AdminRankingsSyncPage() {
                 No ranking rows found.
               </p>
             ) : (
-              <div className="overflow-hidden rounded-2xl border border-white/10">
+              <div className="overflow-x-auto border border-white/10">
                 <table className="w-full min-w-[620px] text-left text-sm">
                   <thead className="bg-white/[0.04] text-[10px] uppercase tracking-[0.18em] text-white/35">
                     <tr>
