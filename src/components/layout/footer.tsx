@@ -103,7 +103,7 @@ export default function Footer() {
         </div>
 
         <div className="mt-6 flex flex-col gap-3 border-t border-[var(--border-soft)] pt-6 text-xs text-[var(--text-subtle)] md:flex-row md:items-center md:justify-between">
-          <p>© {new Date().getFullYear()} PlayRank. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} PlayRank Technologies Pvt. Ltd., All rights reserved.</p>
           <p>Built for India&apos;s competitive esports ecosystem.</p>
         </div>
       </div>
